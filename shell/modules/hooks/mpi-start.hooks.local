@@ -1,0 +1,15 @@
+#
+#!/bin/sh 
+#
+# Copyright (c) 2009      Instituto de Fisica de Cantabria - CSIC. 
+#
+
+# Uncomment and define local hooks if you need them. 
+
+#pre_run_hook () {
+#    return 0
+#}
+
+#post_run_hook () {
+#    return 0
+#}

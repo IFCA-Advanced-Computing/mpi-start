@@ -1,0 +1,47 @@
+#!/bin/sh
+#
+# Copyright (c) 2006-2007 High Performance Computing Center Stuttgart, 
+#                         University of Stuttgart.  All rights reserved. 
+#
+
+
+MPI_START_PREFIX=`dirname $I2G_MPI_START`
+
+# check the necesarry environment variables 
+if [ "x$I2G_MPI_TYPE" = "x" ] ; then 
+    echo "You must set I2G_MPI_TYPE to the MPI type you want".
+    exit 1;
+fi
+
+if [ "x$I2G_MPI_FLAVOUR" = "x" ] ; then
+    echo "You must set I2G_MPI_FLAVOUR to the MPI flavour you want".
+    exit 1;
+fi
+
+# check config file 
+if [ ! -e $MPI_START_PREFIX/../etc/mpi-start/$I2G_MPI_TYPE.mpi ] ; then
+    echo "Cannot find '/opt/i2g/etc/mpi-start/$I2G_MPI_TYPE.mpi'."
+    exit 1;
+fi
+
+# source the config file and spawn a shell
+source  $MPI_START_PREFIX/../etc/mpi-start/$I2G_MPI_TYPE.mpi
+unset mpi_start
+
+
+case `basename $SHELL` in
+    sh|bash)
+    echo "# Please execute the command after this message to setup the MPI environment."
+    echo export PATH=$PATH
+    echo export LD_LIBRARY_PATH=$LD_LIBRARY_PATH
+    ;;
+    csh|tcsh)
+    echo "; Please execute the command after this message to setup the MPI environment."
+    echo setenv PATH $PATH
+    echo setenv LD_LIBRARY_PATH $LD_LIBRARY_PATH
+    ;;
+    *)
+    echo "You are using a not supported shell : $SHELL"
+    echo "Please fill a ticket in the mpi-start bugtracker."
+    ;;
+esac

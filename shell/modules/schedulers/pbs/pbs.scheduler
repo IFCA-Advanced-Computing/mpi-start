@@ -1,0 +1,31 @@
+#!/bin/sh
+#
+# Copyright (c) 2006-2007 High Performance Computing Center Stuttgart,
+#                         University of Stuttgart.  All rights reserved.
+#
+
+
+#
+# This function checks if the current job is running in a PBS 
+# environment.
+#
+# Return values :
+#  0     - Support for this kind of scheduler is found.
+#  else  - NO support for this of scheduler is found. 
+#
+scheduler_available () {
+    debug_msg " checking for \$PBS_NODEFILE"
+	if test "x$PBS_NODEFILE" = "x" ; then 
+		return 13;
+	else
+		return 0
+	fi
+}
+
+#
+# This function is called to setup 
+scheduler_get_machinefile () {
+    debug_msg " return PBS_NODEFILE"
+	export MPI_START_MACHINEFILE=$PBS_NODEFILE
+    return 0
+}

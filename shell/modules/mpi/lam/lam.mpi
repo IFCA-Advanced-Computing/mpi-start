@@ -1,0 +1,58 @@
+#!/bin/sh
+#
+# Copyright (c) 2006-2007 High Performance Computing Center Stuttgart,
+#                         University of Stuttgart.  All rights reserved.
+#           (c) 2009      Instituto de Fisica de Cantabria - CSIC. 
+#
+
+
+# specifies where Open MPI is installed
+if test "x$I2G_LAM_PREFIX" = "x" ; then
+    if test "x$MPI_LAM_PATH" = "x" ; then
+        if test "x$MPI_START_MPI_PREFIX" != "x"  ; then
+            export I2G_LAM_PREFIX=$MPI_START_MPI_PREFIX
+        else 
+            export I2G_LAM_PREFIX=/opt/lam-7.1.2
+            debug_msg "use default installtion : $I2G_LAM_PREFIX"
+        fi
+    else
+        export I2G_LAM_PREFIX=$MPI_LAM_PATH
+        debug_msg "use user provided prefix : $MPI_LAM_PATH"
+    fi
+else 
+    debug_msg "use user provided prefix : $I2G_LAM_PREFIX"
+fi
+
+# activate MPI
+mpi_start_activate_mpi $I2G_LAM_PREFIX "$MPI_START_MPI_MODULE"
+
+#
+# start an mpi job
+#
+mpi_exec () {
+	debug_msg "found LAM-MPI, set machinefile and np parameters"
+	export I2G_MACHINEFILE_AND_NP="-machinefile $MPI_START_MACHINEFILE -np $I2G_MPI_NP"
+    # check for user supplied mpiexec 
+    MPIEXEC=`which mpiexec`
+    if test "x$MPI_LAM_MPIEXEC" != "x" ; then
+        MPIEXEC="$MPI_LAM_MPIEXEC $MPI_LAM_MPIEXEC_PARAMS"
+        debug_msg "using user supplied startup : '$MPIEXEC'"
+    elif test "x$MPI_LAM_MPIRUN" != "x" ; then
+        MPIEXEC="$MPI_LAM_MPIRUN $MPI_LAM_MPIRUN_PARAMS"
+        debug_msg "using user supplied startup : '$MPIEXEC'"
+    fi
+
+    # With version 7.1.2 we don't need to start the daemons in advanged.
+    MPI_SPECIFIC_PARAMS=$LAM_PARAMS
+    . $MPI_START_PREFIX/../etc/mpi-start/generic_mpiexec.sh
+    generic_mpiexec
+
+    return $?
+}
+
+
+mpi_start () {
+    . $MPI_START_PREFIX/../etc/mpi-start/generic_mpi_start.sh
+    generic_mpi_start
+    return $?
+}

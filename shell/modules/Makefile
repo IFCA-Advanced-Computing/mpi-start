@@ -1,0 +1,15 @@
+all:
+	$(MAKE) -C schedulers all
+	$(MAKE) -C mpi all
+	$(MAKE) -C hooks all
+
+clean:
+	$(MAKE) -C schedulers clean
+	$(MAKE) -C mpi clean
+	$(MAKE) -C hooks clean
+
+install:
+	$(MAKE) -C schedulers install
+	$(MAKE) -C mpi install
+	$(MAKE) -C hooks install
+

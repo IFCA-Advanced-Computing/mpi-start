@@ -1,0 +1,58 @@
+#!/bin/sh
+#
+# Copyright (c) 2006-2007 High Performance Computing Center Stuttgart,
+#                         University of Stuttgart.  All rights reserved.
+#
+
+# specifies where backend MPI is installed
+FLAVOUR_PREFIX=/opt/i2g/$I2G_MPI_FLAVOUR
+PACX_PREFIX=/opt/i2g/pacx-$I2G_MPI_FLAVOUR
+
+# add necessary PATH to the environment variables
+export PATH=$PACX_PREFIX/bin:$FLAVOUR_PREFIX/bin:$PATH
+export LD_LIBRARY_PATH=$FLAVOUR_PREFIX/lib:$LD_LIBRARY_PATH
+
+shadow_mpi_start () {
+    # remove of mpi_start function 
+    unset mpi_start
+
+    # add 2 additional processes for PACX
+    debug_msg "add 2 additional processes"
+    I2G_MPI_NP=$(($I2G_MPI_NP+2))
+
+    # create a new machinefile with the relay host
+    # add host 2 times to reserve 2 slots 
+    NEW_MACHINEFILE=`mktemp`
+    debug_msg "create new machinefile :" $NEW_MACHINEFILE
+    echo $I2G_MPI_RELAY > $NEW_MACHINEFILE
+    echo $I2G_MPI_RELAY >> $NEW_MACHINEFILE
+    cat $MPI_START_MACHINEFILE >>  $NEW_MACHINEFILE
+    MPI_START_MACHINEFILE=$NEW_MACHINEFILE
+    export I2G_MACHINEFILE_AND_NP="-machinefile $MPI_START_MACHINEFILE -np $I2G_MPI_NP"
+
+    # create PACX specific config file
+    debug_msg "create .hostfile"
+    PACX_HOSTFILE=".hostfile"
+    echo "Server $I2G_MPI_STARTUP_INFO $I2G_MPI_JOB_NUMBER" > $PACX_HOSTFILE
+
+    # source local MPI config 
+    info_msg "load support for local MPI implementation : $I2G_MPI_FLAVOUR"
+    source $MPI_START_PREFIX/../etc/mpi-start/$I2G_MPI_FLAVOUR.mpi
+
+    # start local mpi implementation
+    info_msg "call local MPI implementation"
+    mpi_start
+    result=$?
+
+    # remove temp file
+    debug_msg "cleanup temp. files"
+    rm -f $MPI_START_MACHINEFILE
+    rm -f $PACX_HOSTFILE
+
+    exit $result
+}
+
+mpi_start () {
+    debug_msg "call shadow_mpi_start"
+    shadow_mpi_start
+}

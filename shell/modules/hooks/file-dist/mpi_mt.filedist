@@ -1,0 +1,113 @@
+#!/bin/sh
+#
+# Copyright (c) 2006-2007 High Performance Computing Center Stuttgart, 
+#                         University of Stuttgart.  All rights reserved. 
+#
+
+
+check_distribution_method(){
+	#======================================================================
+	# setup the mpi-mt tool
+	#======================================================================
+	if test "x$I2G_MPI_MT" = "x"  ; then 
+		    export I2G_MPI_MT=$MPI_START_PREFIX/i2g-${I2G_MPI_TYPE}_mpi-mt
+	fi
+
+	result=255
+        if test -e $I2G_MPI_MT ; then 
+		result=0	
+	fi
+	return $result
+
+}
+
+copy(){
+
+    	# backup old values
+	OLD_I2G_MPI_APPLICATION=$I2G_MPI_APPLICATION
+	OLD_I2G_MPI_APPLICATION_ARGS=$I2G_MPI_APPLICATION_ARGS
+	OLD_I2G_MPI_NP=$I2G_MPI_NP
+	OLD_I2G_MPI_PRECOMMAND=$I2G_MPI_PRECOMMAND
+	OLD_MPI_START_MACHINEFILE=$MPI_START_MACHINEFILE   
+	I2G_MPI_MPIEXEC_PARAMS=`printenv MPI_${MPI_TYPE}_MPIEXEC_PARAMS`
+	OLD_I2G_MPI_MPIEXEC_PARAMS=$I2G_MPIEXEC_PARAMS
+	debug_msg "distribute using mpi_mt"
+	# set to tmp. values
+	I2G_MPI_RESET_ARGS="yes"
+	I2G_MPI_APPLICATION=$I2G_MPI_MT
+	I2G_MPI_APPLICATION_ARGS="cp $TARBALL $PWD/$TARBALL_BASENAME"
+	I2G_MPI_NP=$COPY_NP
+	I2G_MPI_PRECOMMAND=
+	MPI_START_MACHINEFILE=$COPY_MACHINEFILE
+	
+        # launch the mpi job
+	mpi_exec
+
+        # set to tmp. values
+	I2G_MPI_APPLICATION=$I2G_MPI_MT
+	I2G_MPI_APPLICATION_ARGS="shell tar xzf $TARBALL_BASENAME -C /"
+	I2G_MPI_NP=$COPY_NP
+	I2G_MPI_PRECOMMAND=
+	MPI_START_MACHINEFILE=$COPY_MACHINEFILE
+	
+        # launch the mpi job
+	mpi_exec
+
+	if test "x$I2G_MPI_RESET_ARGS" = "xyes"; then
+	        # reset to original values
+	        I2G_MPI_APPLICATION=$OLD_I2G_MPI_APPLICATION
+	        I2G_MPI_APPLICATION_ARGS=$OLD_I2G_MPI_APPLICATION_ARGS
+	        I2G_MPI_NP=$OLD_I2G_MPI_NP
+	        I2G_MPI_PRECOMMAND=$OLD_I2G_MPI_PRECOMMAND
+	        MPI_START_MACHINEFILE=$OLD_MPI_START_MACHINEFILE
+		I2G_MPI_MPIEXEC_PARAMS=$OLD_I2G_MPIEXEC_PARAMS
+        fi
+	return 0
+
+}
+
+clean(){
+
+    # create hostfile, with 
+    # one process per host, and localhost must be the first entry.
+    COPY_MACHINEFILE=`mktemp`
+    echo `hostname -s` > $COPY_MACHINEFILE
+    cat $MPI_START_MACHINEFILE | sort -u | grep -v `hostname` | grep -v `hostname -f` | grep -v `hostname -s` >> $COPY_MACHINEFILE
+    
+    # get node count
+    COPY_NP=`cat $COPY_MACHINEFILE  | wc -l`
+
+    # check of there are several hosts or not
+    if test "x$COPY_NP" = "x1"  ; then
+        debug_msg "only localhost -> skip distribution"
+        return
+    fi
+
+    # backup old values
+    OLD_I2G_MPI_APPLICATION=$I2G_MPI_APPLICATION
+    OLD_I2G_MPI_APPLICATION_ARGS=$I2G_MPI_APPLICATION_ARGS
+    OLD_I2G_MPI_NP=$I2G_MPI_NP
+    OLD_I2G_MPI_PRECOMMAND=$I2G_MPI_PRECOMMAND
+    OLD_MPI_START_MACHINEFILE=$MPI_START_MACHINEFILE   
+    
+    # reset to tmp. values
+    I2G_MPI_APPLICATION=$I2G_MPI_MT
+    I2G_MPI_APPLICATION_ARGS="shell rm -rf `pwd`"
+    I2G_MPI_NP=$COPY_NP
+    I2G_MPI_PRECOMMAND=
+    MPI_START_MACHINEFILE=$COPY_MACHINEFILE
+    
+    # lunch the mpi job
+    mpi_exec
+
+    # reset to original values
+    I2G_MPI_APPLICATION=$OLD_I2G_MPI_APPLICATION
+    I2G_MPI_APPLICATION_ARGS=$OLD_I2G_MPI_APPLICATION_ARGS
+    I2G_MPI_NP=$OLD_I2G_MPI_NP
+    I2G_MPI_PRECOMMAND=$OLD_I2G_MPI_PRECOMMAND
+    MPI_START_MACHINEFILE=$OLD_MPI_START_MACHINEFILE
+
+    rm $COPY_MACHINEFILE
+    return 0
+
+}

@@ -1,0 +1,81 @@
+#!/bin/sh
+#
+# Copyright (c) 2006-2007 High Performance Computing Center Stuttgart,
+#                         University of Stuttgart.  All rights reserved.
+# Copyright (c) 2006-2007 Charles Loomis
+#           (c) 2009      Instituto de Fisica de Cantabria - CSIC. 
+#
+
+
+# specifies where Open MPI is installed
+if test "x$I2G_MPICH2_PREFIX" = "x" ; then
+    if test "x$MPI_MPICH2_PATH" = "x" ; then
+        if test "x$MPI_START_MPI_PREFIX" != "x" ; then
+            export I2G_MPICH2_PREFIX=$MPI_START_MPI_PREFIX
+        else 
+            export I2G_MPICH2_PREFIX=/opt/mpich2-1.0.4p1
+            debug_msg "use default installtion : $I2G_MPICH2_PREFIX"
+        fi
+    else
+        export I2G_MPICH2_PREFIX=$MPI_MPICH2_PATH
+        debug_msg "use user provided prefix : $MPI_MPICH2_PATH"
+    fi
+else 
+    debug_msg "use user provided prefix : $I2G_MPICH2_PREFIX"
+fi
+
+# activate MPI
+mpi_start_activate_mpi $I2G_MPICH2_PREFIX "$MPI_START_MPI_MODULE"
+
+
+#
+# start an mpi job
+#
+mpi_exec () {
+
+    # Check if the user wants to his own startup script binary to be used 
+    if test "x$MPI_MPICH2_MPIEXEC" = "x" -a  "x$MPI_MPICH2_MPIRUN" = "x" ; then
+        MPIEXEC=`which mpiexec`
+    	debug_msg "user did not configure special mpiexec/mpirun, assume it is safe to set the machinefile and number of processes"
+        export I2G_MACHINEFILE_AND_NP="-machinefile $MPI_START_MACHINEFILE -np $I2G_MPI_NP"
+
+        # take care that the ".mpd.conf" file is available
+        echo "MPD_SECRETWORD=" > $HOME/.mpd.conf
+        chmod 0600 $HOME/.mpd.conf
+
+        # Start MPICH2 daemon.
+        mpdboot -n `cat $MPI_START_MACHINEFILE | sort -u | wc -l` -f $MPI_START_MACHINEFILE
+        MPI_SPECIFIC_PARAMS=$MPICH2_PARAMS
+        . $MPI_START_PREFIX/../etc/mpi-start/generic_mpiexec.sh
+        generic_mpiexec
+        err=$?
+
+        # Stop the daemon.
+        mpdallexit
+    else
+        if test "x$MPI_MPICH2_MPIEXEC" != "x"  ; then
+            MPIEXEC="$MPI_MPICH2_MPIEXEC $I2G_MPI_MPIEXEC_PARAMS"
+            debug_msg "using user supplied startup : '$MPIEXEC'"
+        elif test "x$MPI_MPICH2_MPIRUN" != "x" ; then
+            MPIEXEC="$MPI_MPICH2_MPIRUN $MPI_MPICH2_MPIRUN_PARAMS"
+            debug_msg "using user supplied startup : '$MPIEXEC'"
+        fi
+
+        # if a comm method has already been requested don't set
+        if `echo $I2G_MPI_MPIEXEC_PARAMS|grep -vq "comm="`; then
+            MPI_SPECIFIC_PARAMS="$MPICH2_PARAMS --comm=pmi"
+        fi
+		. $MPI_START_PREFIX/../etc/mpi-start/generic_mpiexec.sh
+		generic_mpiexec
+		err=$?
+	fi
+
+    return $err 
+}
+
+
+mpi_start () {
+    . $MPI_START_PREFIX/../etc/mpi-start/generic_mpi_start.sh
+    generic_mpi_start
+    return $?
+}

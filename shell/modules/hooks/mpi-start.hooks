@@ -1,0 +1,369 @@
+#!/bin/sh 
+#
+# Copyright (c) 2006-2007 High Performance Computing Center Stuttgart,
+#                         University of Stuttgart.  All rights reserved.
+#           (c) 2009      Instituto de Fisica de Cantabria - CSIC. 
+#
+
+
+
+#======================================================================
+# MPI_START_SHARED_FS
+# Global variable that specifies if we are on a 
+# shared filesystem or not. 
+# 0 - fs NOT shared
+# 1 - fs is shared 
+#======================================================================
+
+#======================================================================
+# Helper  function of the callback hooks. The user provides a callback
+# function/script that is called with each host in the job.
+#
+# $1 name of the callback function or host
+#======================================================================
+mpi_start_foreach_host() {
+    if test "x$1" = "x"  ; then
+        error_msg "mpi_start_foreach called without callback function paramater."
+        return 1
+    fi
+    
+    # call callback function
+    debug_msg "loop over machine file and call user specific callback"
+    for i in `cat $MPI_START_MACHINEFILE | sort -u`; do
+        CMD="$1 $i"
+        debug_msg " call : $CMD"
+        $CMD
+    done
+}
+
+
+#======================================================================
+# Function to query if we are on a shared filesystem 
+# or not. Will set MPI_START_SHARED_FS to 0 or 1
+#======================================================================
+mpi_start_detect_shared_fs() {
+    if test "x$MPI_START_SHARED_FS" = "x" ; then
+        debug_msg "detect shared filesystem"
+
+        CUR_DIR=$PWD
+        MOUNT_POINTS=`cat /etc/mtab | cut -d ' '  -f2`
+        MOUNT_POINTS_FS=`cat /etc/mtab | cut -d ' ' -f3`
+        LOCAL_FS_TYPE="unknown"
+
+        # dump mount points
+        debug_msg "dump mount point information:"
+        MOUNT_POINT_INDEX=1
+        for MOUNT_POINT in $MOUNT_POINTS ; do
+            MOUNT_POINT_FS=`echo  $MOUNT_POINTS_FS | cut -d ' ' -f$MOUNT_POINT_INDEX `
+            debug_msg "=> $MOUNT_POINT = $MOUNT_POINT_FS"
+            MOUNT_POINT_INDEX=$(($MOUNT_POINT_INDEX+1))
+        done
+        debug_msg "current working directory : $CUR_DIR"
+
+        while test "xCUR_DIR" != "x"  ; do
+            IS_LINK=`stat $CUR_DIR | grep File | awk '{ print $3 }' `
+            if test "x$IS_LINK" != "x" ; then
+                SYM_LINK=`stat -c "%N" $CUR_DIR`
+                debug_msg "found symbolic link : $SYM_LINK "
+                CUR_DIR=`stat $CUR_DIR | grep File | awk '{ print $4 }' | tr -d \\\047 | tr -d \\\140 `
+            fi
+
+            MOUNT_POINT_INDEX=1
+            for MOUNT_POINT in $MOUNT_POINTS ; do
+                if test "x$MOUNT_POINT" = "x$CUR_DIR" ; then
+                    LOCAL_FS_TYPE=`echo $MOUNT_POINTS_FS | cut -d ' ' -f$MOUNT_POINT_INDEX `
+                    break 2
+                fi
+                MOUNT_POINT_INDEX=$(($MOUNT_POINT_INDEX+1))
+            done
+            # if we reach this point no mount point mached
+            # lets try another round with parent dir of CUR_DIR
+            # but only if we not alread reached the root
+            if test "x$CUR_DIR" != "x/"  ; then 
+                CUR_DIR=`dirname $CUR_DIR`
+            else
+                # we are done
+                break
+            fi
+        done
+
+        case $LOCAL_FS_TYPE in
+        nfs|gfs|afs|smb|gpfs|lustre) debug_msg "found network fs : $LOCAL_FS_TYPE";
+            export MPI_START_SHARED_FS=1;
+             ;;
+        *) debug_msg "found local fs : $LOCAL_FS_TYPE";
+            export MPI_START_SHARED_FS=0;
+            ;;
+        esac
+    fi
+    return 0
+}
+
+
+
+#======================================================================
+# This hook will use mpi_mt, mpiexec or cptoshared to distribute files.
+#======================================================================
+mpi_start_pre_run_hook_copy () {
+    debug_msg "mpi_start_pre_run_hook_copy"
+
+    debug_msg "fs not shared -> distribute binary"
+    # create hostfile, with 
+    # one process per host, and localhost must be the first entry.
+    COPY_MACHINEFILE=`mktemp`
+    echo `hostname -s` > $COPY_MACHINEFILE
+    cat $MPI_START_MACHINEFILE | sort -u | grep -v `hostname` | grep -v `hostname -f` | grep -v `hostname -s` >> $COPY_MACHINEFILE
+    
+    # get node count
+    COPY_NP=`cat $COPY_MACHINEFILE | wc -l`
+
+    # check of there are several hosts or not
+    if test "x$COPY_NP" = "x1"  ; then
+        debug_msg "only localhost -> skip distribution"
+        return
+    fi
+
+    # create tarball
+    TARBALL=`mktemp`
+    status=$?
+    if [ $status -ne 0 -o "x$TARBALL" = "x" ]; then
+        error_msg "failed to create tarball for file distribution"
+        exit 1
+    fi
+    TARBALL_BASENAME=`basename $TARBALL`
+   
+    # try and get the whole job directory
+    if [ "x$EDG_WL_RB_BROKERINFO" = "x" ]; then
+        MYDIR=`pwd`
+    else
+        MYDIR=`dirname $EDG_WL_RB_BROKERINFO`
+    fi
+
+    HIDDEN_FILES="$PWD/.[a-zA-Z0-9]*"
+
+    tar czf $TARBALL --ignore-failed-read $MYDIR $X509_USER_PROXY $HIDDEN_FILES
+ 
+	#check all available file distribution plugins
+    priority=255
+    chosenDistrMethod="undef"
+
+    #check if some file distribution method has been explicitely given
+    #if it was not, try to pick the best method
+    if test "x$I2G_MPI_FILE_DIST" = "x"
+    then
+    	for i in $MPI_START_PREFIX/../etc/mpi-start/*.filedist ; do
+	        unset check_distribution_method
+	        source $i
+	        check_distribution_method
+	        returnPrior=$?
+            #should we change the file distribution method?
+	        if test $priority -gt $returnPrior ; then
+	            chosenDistrMethod=$i	
+	            priority=$returnPrior
+                I2G_MPI_FILE_DIST=`echo "$i" | sed -e 's/^[-.0-9a-zA-Z_/]*\///g' | sed -e 's/\.filedist//g'`
+	        fi
+    	done
+    else
+        chosenDistrMethod="$MPI_START_PREFIX/../etc/mpi-start/$I2G_MPI_FILE_DIST.filedist"
+    fi
+    debug_msg "I2G_MPI_FILE_DIST => $I2G_MPI_FILE_DIST"
+
+    #if no plugin was suitable, program is interrupted
+    if test "x$chosenDistrMethod" = "xundef" ; then
+        error_msg "no file distribution method was found"
+        dump_env
+        exit 1
+    fi
+
+    unset copy
+    source $chosenDistrMethod
+    copy
+
+    rm $TARBALL
+    rm $COPY_MACHINEFILE
+}
+
+
+#======================================================================
+# Run the pre hook defined in the file passed as parameter
+#======================================================================
+mpi_start_run_pre_hook() {
+    debug_msg "mpi_start_run_pre_hook"
+
+    if test "x$1" == "x" ; then
+        return 0 
+    fi
+    if test -e $1 ; then 
+        debug_msg "Try to run pre hooks at $1"
+        unset pre_run_hook
+        source $1
+        type pre_run_hook &> /dev/null
+        result=$?
+        if test $result -ne 0 ; then
+            debug_msg "pre_run_hook is not defined, ignoring"
+            return 0
+        fi
+		debug_msg "call pre_run hook"
+        if test "x$I2G_MPI_START_VERBOSE" = "x1" ; then echo "-<START PRE-RUN HOOK>---------------------------------------------------"; fi
+        pre_run_hook
+        result=$?
+        if test "x$I2G_MPI_START_VERBOSE" = "x1" ; then echo "-<STOP PRE-RUN HOOK>----------------------------------------------------"; fi
+        if test $result -ne 0 ; then 
+            error_msg "pre-run hook returned : $i"
+            error_msg "pre-run hook returned : $result"
+            dump_env
+            exit $result
+        fi
+	fi	
+}
+
+#======================================================================
+# This hook is called before the "mpirun" is started.
+#======================================================================
+mpi_start_pre_run_hook () {
+    debug_msg "mpi_start_pre_run_hook"
+
+    # call generic function
+    mpi_start_pre_run_hook_generic
+    return $?
+}
+
+mpi_start_pre_run_hook_generic () {
+    debug_msg "mpi_start_pre_run_hook_generic"
+
+    # set any compiler environment variables
+    MPI_START_COMPILER_HOOKS=$MPI_START_PREFIX/../etc/mpi-start/compiler.hooks
+    if test -e $MPI_START_COMPILER_HOOKS ; then
+        unset mpi_start_compiler_hooks
+        source $MPI_START_COMPILER_HOOKS
+        type mpi_start_compiler_hooks &> /dev/null
+        result=$?
+        if test $result -ne 0 ; then
+            debug_msg "mpi_start_compiler_hooks function not found, ignoring" 
+        fi
+        mpi_start_compiler_hooks
+        result=$?
+        if test $result -ne 0 ; then
+            error_msg "compiler hook returned : $result"
+            dump_env
+            exit $result
+        fi
+    fi
+
+    # determine local filesystem
+    mpi_start_detect_shared_fs
+
+    MPI_START_HOOKS_LOCAL=$MPI_START_PREFIX/../etc/mpi-start/mpi-start.hooks.local
+    mpi_start_run_pre_hook $MPI_START_HOOKS_LOCAL
+
+    mpi_start_run_pre_hook $I2G_MPI_PRE_RUN_HOOK
+
+    if  test "x$MPI_START_SHARED_FS" != "x1" -o "x$MPI_START_DISTRIBUTE_PROXY" = "x1" ; then 
+        mpi_start_pre_run_hook_copy
+    else
+        debug_msg "fs shared -> do not distribute binary"
+    fi
+    return $?
+}
+
+
+#======================================================================
+# Run the post hook defined in the file passed as parameter
+#======================================================================
+mpi_start_run_post_hook() {
+    debug_msg "mpi_start_run_post_hook"
+
+    if test "x$1" == "x" ; then
+        return 0 
+    fi
+    if test -e $1 ; then 
+        debug_msg "Try to run post hooks at $1"
+        unset post_run_hook
+        source $1
+        type post_run_hook &> /dev/null
+        result=$?
+        if test $result -ne 0 ; then
+            debug_msg "post_run_hook is not defined, ignoring"
+            return 0
+        fi
+        debug_msg "call post-run hook"
+        if test "x$I2G_MPI_START_VERBOSE" = "x1" ; then echo "-<START POST-RUN HOOK>---------------------------------------------------"; fi
+        post_run_hook
+        result=$?
+        if test "x$I2G_MPI_START_VERBOSE" = "x1" ; then echo "-<STOP POST-RUN HOOK>----------------------------------------------------"; fi
+        if test $result -ne 0 ; then 
+            error_msg "post-run hook returned : $i"
+            dump_env
+            exit $result
+        fi
+    fi
+}
+ 
+#======================================================================
+# This hook is called after the "mpirun" has been finished.
+#======================================================================
+mpi_start_post_run_hook_generic () {
+    debug_msg "mpi_start_post_run_hook_generic"
+
+    # determine local filesystem
+    mpi_start_detect_shared_fs
+
+    MPI_START_HOOKS_LOCAL=$MPI_START_PREFIX/../etc/mpi-start/mpi-start.hooks.local
+    mpi_start_run_post_hook $MPI_START_HOOKS_LOCAL
+
+    mpi_start_run_post_hook $I2G_MPI_POST_RUN_HOOK
+
+    if test "x$I2G_USE_MARMOT" = "x1" ; then
+	if test "x$MPI_START_SHARED_FS" != "x1" ; then
+		export LAST_MACHINE_NAME=`tail -n 1 $MPI_START_MACHINEFILE`
+		debug_msg "LAST_MACHINE_NAME => $LAST_MACHINE_NAME"
+                scp "$LAST_MACHINE_NAME":$MARMOT_LOGFILE_PATH/MarmotLog.* .
+        fi
+fi
+
+    if test "x$I2G_USE_MPITRACE" = "x1" ; then
+	for MPI_START_REMOTE_NODE in `cat $MPI_START_MACHINEFILE | sort -u`; do
+		if test $MPI_START_REMOTE_NODE = `hostname` -o $MPI_START_REMOTE_NODE = `hostname -f` -o $MPI_START_REMOTE_NODE = "localhost" ; then
+			debug_msg "skip local machine"
+		else
+			scp $MPI_START_REMOTE_NODE:$PWD/*.mpit . 2>&1 > /dev/null
+			result=$?
+			if test "x$result" != "x0" ; then 
+				error_msg "mpitrace files: failed to copy binary from remote machine"
+				return 1
+			fi
+		fi
+	done
+
+	MPITRACE_INSTALLATION=/opt/i2g/mpitrace
+	CMD="$MPITRACE_INSTALLATION/bin/mpi2prv *.mpit -o $I2G_MPI_APPLICATION.prv"
+	debug_msg "$CMD"
+	debug_msg "files here:"
+	ls .
+	$CMD
+    fi
+
+    if  test "x$MPI_START_SHARED_FS" != "x1" -o "x$MPI_START_DISTRIBUTE_PROXY" = "x1"  ; then 
+        # this may be unset if only running on localhost
+        if test "x$chosenDistrMethod" != "x"; then
+            unset clean
+            source $chosenDistrMethod
+            clean
+        fi
+    else
+       debug_msg "fs shared -> do not cleanup"
+    fi
+}
+
+
+
+#======================================================================
+# This hook is called after the "mpirun" has been finished.
+#======================================================================
+mpi_start_post_run_hook () {
+    debug_msg "mpi_start_post_run_hook"
+
+    # call generic function
+    mpi_start_post_run_hook_generic
+    return $?
+}

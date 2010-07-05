@@ -1,0 +1,66 @@
+========
+Overview
+========
+MPI-Start is a set of scripts that allow the execution of MPI programs 
+on clusters. The main advantage of MPI-Start is the possibility to 
+detect and use site-specific configuration features - like the batch 
+scheduler and the file system on the site. Also, different MPI 
+implementations on a site are supported.
+MPI-Start has a core which is always executed and uses the 
+available frameworks at different stages of the execution. MPI-Start in 
+its current version has three different frameworks:
+-scheduler framework
+-MPI framework
+-file distribution framework
+
+All of those frameworks use well-defined interfaces which allow
+different plugins to be loaded and used for each framework.
+
+The workflow of MPI-Start is as follows:
+-check for scheduler plugin
+-activate scheduler plugin
+-get machinefile
+-check for MPI plugin
+-check I2G/EGEE environment
+-parameter adjustments depending on scheduler/MPI
+-activate MPI plugin and set MPI implementation specific parameters
+-check user pre-run hooks
+-check file system
+-choose file distribution plugin if FS is non-shared
+-distribute files using the file distribution plugin
+-check for external MPI tools
+-execute MPI application with generated command
+-check user post-run hook
+-check for external MPI tools
+-clean up files using the file distribution plugin
+-return the value of the mpirun/mpiexec command
+
+====================
+Scheduler framework
+====================
+Every plugin for this framework defines a method scheduler_available() 
+which returns 0 if and only if the scheduler is available on the site. A 
+second method scheduler_get_machinefile() sets the variable 
+MPI_START_MACHINEFILE to point to the machine file. The format of this 
+file has to be generic and if necessary the plugin has to guarantee 
+that.
+The assumption is that each site has exactly one scheduler. The 
+first suitable scheduler is chosen.
+
+Supported schedulers:
+-SGE
+-PBS
+-LSF
+
+=============
+MPI framework
+=============
+Every plugin for MPI has  mpi_exec() and mpi_start() methods. 
+mpi_start() is always called and calls a generic flow of running 
+pre_run_hook/mpi_exec/post_run_hook. mpi_exec() is the 
+MPI-implementation specific method of the plugin. It sets special 
+parameters that are used to parametrize the generic_mpiexec() in the 
+common /mpi directory.
+This plugin is *not* automatically detected. The user or the broker 
+must set I2G_MPI_TYPE to the MPI plugin.
+Supported MPI

@@ -1,0 +1,339 @@
+#!/bin/bash
+#
+# Copyright (c) 2006-2007 High Performance Computing Center Stuttgart,
+#                         University of Stuttgart.  All rights reserved.
+# Copyright (c) 2009-2010 Instituto de Fisica de Cantabria, 
+#                         CSIC-UC. All rights reserved.
+#
+#
+# Return values of this script:
+# 0   - Success
+
+clean_up () {
+    echo "hello world"
+}
+
+trap clean_up EXIT
+
+#======================================================================
+# Displays a warning message
+#======================================================================
+warn_msg () {
+    if test "x$I2G_MPI_START_VERBOSE" = "x1" ; then 
+        echo "mpi-start [WARNING]:" $@
+    fi
+}
+
+#======================================================================
+# Displays a warning message
+#======================================================================
+error_msg () {
+    echo "mpi-start [ERROR  ]:" $@
+}
+
+#======================================================================
+# Display a debug message in the case that I2G_MPI_START_DEBUG
+# is 1.
+#======================================================================
+debug_msg () {
+    if test "x$I2G_MPI_START_VERBOSE" = "x1" ; then 
+        if test "x$I2G_MPI_START_DEBUG" = "x1"  ; then
+            echo "mpi-start [DEBUG  ]: "$@
+        fi
+    fi
+}
+
+#======================================================================
+# Display a debug message in the case that I2G_MPI_START_DEBUG
+# is 1.
+#======================================================================
+info_msg () {
+    if test "x$I2G_MPI_START_VERBOSE" = "x1" ; then 
+        echo "mpi-start [INFO   ]: "$@
+    fi
+}
+
+#======================================================================
+# Dump environment.
+# $1 level
+#======================================================================
+dump_env () {
+    for i in `env`; do
+        echo "mpi-start [DUMPENV]:" $i
+    done
+}  info_msg "activate support for $I2G_MPI_TYPE"
+    debug_msg "source : $MPI_PLUGIN_FILE"
+    . $MPI_PLUGIN_FILE
+    if test $? -ne 0 ; then
+        error_msg "Error loading the MPI plugin: $MPI_PLUGIN_FILE"
+        error_msg "Dump environment"
+        dump_env
+        exit 1
+    fi
+
+    # call the MPI specific startup functions
+    info_msg "call backend MPI implementation"
+    mpi_start
+    result=$?
+
+    exit $result
+
+
+#======================================================================
+# Create the hostfile: a file with a line per host with the
+# host name and the number of slots allocated there
+# Also modify the machinefile to just include one entry per host
+# if the I2G_MPI_SINGLE_PROCESS is defined
+#======================================================================
+mpi_start_create_hostfile() {
+        
+    MPI_START_HOSTS_SLOTS=`mktemp`
+    cat $MPI_START_MACHINEFILE | sort | uniq -c | sed 's/^ *\([1-9]*\) \(.*\)$/\2\t\1/' \
+        > $MPI_START_HOSTS_SLOTS
+    MPI_START_HOSTSFILE=`mktemp`
+    cat $MPI_START_HOSTS_SLOTS | cut -f1 > $MPI_START_HOSTSFILE
+
+    debug_msg "dump hosts:"
+    for i in `cat $MPI_START_HOSTSFILE` ; do
+        debug_msg "=> $i"
+    done
+
+    if test "x${I2G_MPI_SINGLE_PROCESS}" == "x1" ; then
+        # define I2G_MPI_NUM_SLOTS as the minimum number of slots in all hosts
+        # XXX Should be fixed to handle heterogeneous cases
+        I2G_MPI_NUM_SLOTS=`cat $MPI_START_HOSTS_SLOTS | cut -f2 | sort -n | head -1`
+        export OMP_NUM_THREADS=$I2G_MPI_NUM_SLOTS
+        debug_msg "$I2G_MPI_NUM_SLOTS slots per host allocated"
+        I2G_MPI_NP=`cat $MPI_START_HOSTSFILE | wc -l`
+    else
+        I2G_MPI_NP=`cat $MPI_START_MACHINEFILE | wc -l`
+    fi
+
+    # setup the np count 
+    debug_msg "starting with $I2G_MPI_NP processes."
+}
+ 
+
+#======================================================================
+# Activate a MPI by the given information. If there are module
+# informations available then the modules system will be used
+# otherwise the PATH and LD_LIBRARY_PATH is updated manually.
+#
+# $1 the MPI prefix path (mandatory)
+# $2 the MPI module string (optional)
+#======================================================================
+mpi_start_activate_mpi () {
+    if test "x$2" = "x" ; then
+        debug_msg "activate MPI via manually update"
+        export PATH=$1/bin:$PATH
+        export LD_LIBRARY_PATH=$1/lib:$LD_LIBRARY_PATH
+    else
+        debug_msg "activate MPI via modules : $2"
+        for mod in $2 ; do
+            debug_msg  "+  module load  $mod"
+            module load $mod
+        done
+    fi
+}
+
+#======================================================================
+# The main function that binds everything together
+#======================================================================
+main() {
+    #
+    # Output general information
+    #
+    if test "x$I2G_MPI_START_VERBOSE" = "x1" ; then 
+        echo "************************************************************************"
+        echo "UID     = " `whoami`
+        echo "HOST    = " `hostname`
+        echo "DATE    = " `date`
+        echo "VERSION =  @VERSION@" 
+        echo "************************************************************************"
+    fi
+
+    #
+    # setup framework goes here
+    #
+
+    # debug me 
+    if test "x$I2G_MPI_START_DEBUG" = "x1" ; then 
+        debug_msg "dump configuration"
+        debug_msg "=> I2G_MPI_APPLICATION=$I2G_MPI_APPLICATION"
+        debug_msg "=> I2G_MPI_APPLICATION_ARGS=$I2G_MPI_APPLICATION_ARGS"
+        debug_msg "=> I2G_MPI_TYPE=$I2G_MPI_TYPE"
+        debug_msg "=> I2G_MPI_VERSION=$I2G_MPI_VERSION"
+        debug_msg "=> I2G_MPI_PRE_RUN_HOOK=$I2G_MPI_PRE_RUN_HOOK"
+        debug_msg "=> I2G_MPI_POST_RUN_HOOK=$I2G_MPI_POST_RUN_HOOK"
+        debug_msg "=> I2G_MPI_PRECOMMAND=$I2G_MPI_PRECOMMAND"
+        debug_msg "=> I2G_MPI_FLAVOUR=$I2G_MPI_FLAVOUR"
+        debug_msg "=> I2G_MPI_JOB_NUMBER=$I2G_MPI_JOB_NUMBER"
+        debug_msg "=> I2G_MPI_STARTUP_INFO=$I2G_MPI_STARTUP_INFO"
+        debug_msg "=> I2G_MPI_RELAY=$I2G_MPI_RELAY"
+    fi
+
+    # trace me
+    if test "x$I2G_MPI_START_TRACE" = "x1"  ; then
+        debug_msg "enable debugging"
+        set -x
+    fi
+
+    # check for valid I2G_MPI_START variable
+    if test "x$I2G_MPI_START" = "x" ; then
+        error_msg "I2G_MPI_START not set"
+        error_msg "dump environment:"
+        dump_env
+        exit 1;
+    fi
+
+    # global environment variables 
+    MPI_START_PREFIX=`dirname $I2G_MPI_START`
+    MPI_START_MACHINEFILE=""
+    MPI_START_READY=-1 
+
+    # check for scheduling system and set environment variables
+    info_msg "search for scheduler"
+    for i in $MPI_START_PREFIX/../etc/mpi-start/*.scheduler  ; do 
+        # source the function definitions
+        unset scheduler
+        unset scheduler_available
+        unset scheduler_get_machinefile
+        debug_msg "source $i"
+        . $i
+        if test $? -ne 0  ; then 
+            warn_msg "failed to source : $i"
+        fi
+
+        scheduler=`basename $i .scheduler`
+
+        # check if support for this kind of schedulers is supported
+        debug_msg "checking for scheduler support : $scheduler"
+        scheduler_available
+        result=$?
+
+        if test "x$result" = "x0" ; then 
+            info_msg "activate support for $scheduler"
+
+            # support for this scheduler is found. So lets setup the internal environment.
+            scheduler_get_machinefile
+            result=$?
+
+            if test $? -ne 0 ; then
+                error_msg "cannot create machine file"
+                dump_env
+                exit 2
+            fi
+    
+            mpi_start_create_hostfile
+
+            # mark MPI_START as ready to go 
+            MPI_START_READY=0
+            export MPI_START_SCHEDULER=$scheduler
+            break
+        fi
+    done
+
+    # check if we have a scheduler 
+    if test $MPI_START_READY -ne 0  ; then 
+        error_msg "cannot find scheduler"
+        error_msg "dump environment:"
+        dump_env
+        exit 1
+    fi
+
+    # check for EGEE environement
+    debug_msg "check for EGEE environment"
+
+    # check if we should should use default MPI falvour
+    if test "x$I2G_MPI_TYPE" = "x"  ; then 
+        debug_msg " check for site default MPI flavour"
+        if test "x$MPI_DEFAULT_FLAVOUR" != "x"  ; then
+            debug_msg "   using default MPI flavour : $MPI_DEFAULT_FLAVOUR"
+            export I2G_MPI_TYPE=$MPI_DEFAULT_FLAVOUR
+        else
+            debug_msg " no MPI flavour specified"
+            dump_env
+            exit 1
+        fi
+    else
+        debug_msg " using user requested MPI flavour"
+    fi 
+
+    # load the mpi plugin
+    MPI_PLUGIN_FILE=$MPI_START_PREFIX/../etc/mpi-start/$I2G_MPI_TYPE.mpi
+    if test ! -e $MPI_PLUGIN_FILE  ; then 
+        error_msg "failed to find requested MPI type : $I2G_MPI_TYPE"
+        error_msg "Dump environment"
+        dump_env 
+        exit 2
+    fi
+
+    MPI_TYPE=`echo $I2G_MPI_TYPE | tr "[:lower:]" "[:upper:]" | tr "-" "_"`
+    US=_
+    MPI_PREFIX="MPI_"
+    MPI_PATH_SUFFIX="_PATH"
+    MPI_MODULE_SUFFIX="_MODULES"
+    MPI_PATH_VERSION="_VERSION"
+
+    if test "x$I2G_MPI_VERSION" != "x" ; then 
+        # check for requested version
+        debug_msg " check for user requested MPI version : $I2G_MPI_VERSION"
+        MPI_VERSION=`echo $I2G_MPI_VERSION | sed -e s/\\\\./__/g`
+        VALUE=`eval echo \\$$MPI_PREFIX$MPI_TYPE$US$MPI_VERSION$MPI_PATH_SUFFIX`
+        if test "x$VALUE" != "x"  ; then
+            debug_msg " found user requested version"
+            export MPI_START_MPI_PREFIX=$VALUE
+        else
+            error_msg " cannot find user request MPI version"
+            dump_env
+            exit 1
+        fi
+    else
+        # check for default prefix 
+        debug_msg "  check for default MPI version"
+        VALUE=`eval echo \\$$MPI_PREFIX$MPI_TYPE$MPI_PATH_SUFFIX`
+        if test "x$VALUE" != "x"  ; then 
+            debug_msg " found default MPI in : $VALUE"
+            export MPI_START_MPI_PREFIX=$VALUE
+        else
+            debug_msg " coulnd't find EGEE environment"
+            export MPI_START_MPI_PREFIX=
+        fi
+
+        if test "x$MPI_START_MPI_PREFIX" != "x" ; then
+            #check for module  hint
+            VALUE=`eval echo \\$$MPI_PREFIX$MPI_TYPE$MPI_MODULE_SUFFIX`
+            if test "x$VALUE" != "x" ; then 
+                debug_msg " found MPI module information : $VALUE"
+                export MPI_START_MPI_MODULE=$VALUE
+            else
+                debug_msg " could not find MPI module information"
+                export MPI_START_MPI_MODULE=
+            fi
+        fi
+
+    fi
+    
+    # source the MPI specific configuration file
+    info_msg "activate support for $I2G_MPI_TYPE"
+    debug_msg "source : $MPI_PLUGIN_FILE"
+    . $MPI_PLUGIN_FILE
+    if test $? -ne 0 ; then
+        error_msg "Error loading the MPI plugin: $MPI_PLUGIN_FILE"
+        error_msg "Dump environment"
+        dump_env
+        exit 1
+    fi
+
+    # call the MPI specific startup functions
+    info_msg "call backend MPI implementation"
+    mpi_start
+    result=$?
+
+    exit $result
+}
+
+#======================================================================
+#  Just call the main function 
+#======================================================================
+main

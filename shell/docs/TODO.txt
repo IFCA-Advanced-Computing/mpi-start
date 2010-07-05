@@ -1,0 +1,5 @@
+TODO:
+- Add design document 
+- Add templates
+- Add specfile
+- Add to autobuild

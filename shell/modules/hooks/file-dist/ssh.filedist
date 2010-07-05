@@ -1,0 +1,79 @@
+#!/bin/sh
+#
+# Copyright (c) 2006-2007 High Performance Computing Center Stuttgart, 
+#                         University of Stuttgart.  All rights reserved. 
+#               2009      Instituto de Fisica de Cantabria - CSIC.
+
+
+check_distribution_method(){
+	result=255
+	if test "x$MPI_SSH_HOST_BASED_AUTH" = "xyes"
+	then
+		result=0		
+	#avoid the risk of not setting anything for OpenMPI
+	elif test "x$I2G_MPI_TYPE"="xopenmpi"
+	then	
+		result=1
+	fi
+	return $result
+}
+
+copy(){
+
+    debug_msg "mpi_start_pre_run_hook_copy_ssh"
+
+    debug_msg "fs not shared -> distribute binary"
+    for MPI_START_REMOTE_NODE in `cat $MPI_START_MACHINEFILE | sort -u`; do
+        debug_msg "distribute tarball $TARBALL to remote node : $MPI_START_REMOTE_NODE"
+        if test $MPI_START_REMOTE_NODE = `hostname` -o $MPI_START_REMOTE_NODE = `hostname -f` -o $MPI_START_REMOTE_NODE = "localhost" ; then
+            debug_msg "skip local machine"
+        else
+            # create directory
+            ssh $MPI_START_REMOTE_NODE "mkdir -p $MYDIR" 2>&1 > /dev/null
+            result=$?
+            if test "x$result" != "x0" ; then 
+                error_msg "failed to create directory on remote machine"
+                return 1
+            fi
+
+            # copy tarball 
+            scp $TARBALL $MPI_START_REMOTE_NODE:$MYDIR 2>&1 > /dev/null
+            result=$?
+            if test "x$result" != "x0" ; then 
+                error_msg "failed to copy binary to remote machine"
+                return 1
+            fi
+
+            # unpack tarball
+            UNPACK_CMD="cd $MYDIR && tar xzf $TARBALL_BASENAME -C / && rm -f $TARBALL_BASENAME"
+            ssh $MPI_START_REMOTE_NODE "$UNPACK_CMD" 2>&1 > /dev/null
+            result=$?
+            if test "x$result" != "x0" ; then 
+                error_msg "failed to unpack files on remote machine"
+                return 1
+            fi
+
+        fi
+    done
+	return 0
+}
+
+clean(){
+    debug_msg "mpi_start_post_run_hook_generic"
+
+    debug_msg "fs not shared -> cleanup binary"
+    for MPI_START_REMOTE_NODE in `cat $MPI_START_MACHINEFILE | sort -u`; do
+        debug_msg "cleanup all files in $MYDIR from remote node : $MPI_START_REMOTE_NODE"
+        if test $MPI_START_REMOTE_NODE = `hostname` -o $MPI_START_REMOTE_NODE = `hostname -f` -o $MPI_START_REMOTE_NODE = "localhost" ; then
+            debug_msg "skip local machine"
+        else 
+            ssh $MPI_START_REMOTE_NODE "rm -rf $MYDIR" 2>&1 > /dev/null
+            result=$?
+            if test "x$result" != "x0" ; then 
+                error_msg "failed to remove directory on remote machine"
+                return 1
+            fi
+        fi
+    done
+    return 0
+}

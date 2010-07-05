@@ -1,0 +1,80 @@
+#!/bin/sh
+#
+# Copyright (c) 2006-2007 High Performance Computing Center Stuttgart, 
+#                         University of Stuttgart.  All rights reserved. 
+#
+
+
+
+# specifies where TEMPLATE MPI is installed
+if [ "x$I2G_TEMPLATE_PREFIX" = "x" ] ; then
+    if [ "x$MPI_START_MPI_PREFIX" != "x" ] ; then    
+        export I2G_TEMPLATE_PREFIX=$MPI_START_MPI_PREFIX
+    else 
+        debug_msg "use default installtion : $I2G_TEMPLATE_PREFIX"
+        export I2G_TEMPLATE_PREFIX=/opt/i2g/template
+    fi
+else 
+    debug_msg "use user provided prefix : $I2G_TEMPLATE_PREFIX"
+fi
+
+
+# activate MPI
+mpi_start_activate_mpi $I2G_TEMPLATE_PREFIX "$MPI_START_MPI_MODULE"
+
+
+#
+# start an mpi job
+#
+mpi_exec () {
+    MPIEXEC=`which mpiexec`
+
+    IFS_OLD="$IFS"
+    export IFS=""
+    CMD="$I2G_MPI_PRECOMMAND $MPIEXEC -x X509_USER_PROXY -machinefile $MPI_START_MACHINEFILE -np $I2G_MPI_NP $I2G_MPI_APPLICATION $I2G_MPI_APPLICATION_ARGS"
+    debug_msg $CMD
+    export IFS="$IFS_OLD"
+    eval $CMD
+    
+    return $?
+}
+
+
+#
+# Start the environment and the job. In fact at least the following
+# steps have to be performed:
+#
+# 1. Setup the MPI environment (e.g. start daemons).
+# 2. trigger pre-run hooks
+# 3. call mpi_exec
+# 4. trigegr post-run hooks
+# 5. shutdown MPI environment (e.g. shutdown daemons)
+#
+# Return value: return value of mpi_exec 
+#
+mpi_start () {
+    info_msg "start program with mpirun"
+
+    # source hook file
+    source $MPI_START_PREFIX/../etc/mpi-start/mpi-start.hooks
+
+    # call pre run hook
+    mpi_start_pre_run_hook
+
+    if [ "x$I2G_MPI_START_VERBOSE" = "x1" ]; then 
+        echo "=[START]================================================================"
+    fi
+    
+    # start it
+    mpi_exec 
+    err=$?
+
+    if [ "x$I2G_MPI_START_VERBOSE" = "x1" ]; then 
+        echo "=[FINISHED]============================================================="
+    fi
+
+    # call pre run hook
+    mpi_start_post_run_hook
+
+    return $err
+}

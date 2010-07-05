@@ -1,0 +1,34 @@
+This file gives an overview about which MPI RPMs need to be 
+installed on which machine in the grid.
+
+
+CrossBroker Machine
+=====================
+- PACX startupserver 
+
+
+Computing Element
+===================
+- Open MPI (base)
+- Open MPI Extras (pbs/tm, infiniband, ...)
+- mpi-start
+
+
+Worker Node
+===================
+- Open MPI (base)
+- Open MPI Extras (pbs/tm, infiniband, ...)
+- mpi-start
+
+
+Build Machine (other than the autobuild server)
+=================================================
+- Open MPI(base)
+- PACX-MPI
+
+
+Relay Machine (if different from CE)
+======================================
+- Open MPI (base)
+- Open MPI Extras (pbs/tm, infiniband, ...)
+- mpi-start
