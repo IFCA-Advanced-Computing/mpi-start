@@ -37,14 +37,19 @@ mpi_exec () {
     if test "x$MPI_MPICH2_MPIEXEC" = "x" -a  "x$MPI_MPICH2_MPIRUN" = "x" ; then
         MPIEXEC=`which mpiexec`
     	debug_msg "user did not configure special mpiexec/mpirun, assume it is safe to set the machinefile and number of processes"
-        export I2G_MACHINEFILE_AND_NP="-machinefile $MPI_START_MACHINEFILE -np $I2G_MPI_NP"
+        if test "x$I2G_MPI_SINGLE_PROCESS" = "x1" ; then
+            MACHINES=$MPI_START_HOSTFILE
+        else
+            MACHINES=$MPI_START_MACHINEFILE
+        fi
+        export I2G_MACHINEFILE_AND_NP="-machinefile $MACHINES -np $I2G_MPI_NP"
 
         # take care that the ".mpd.conf" file is available
         echo "MPD_SECRETWORD=" > $HOME/.mpd.conf
         chmod 0600 $HOME/.mpd.conf
 
         # Start MPICH2 daemon.
-        mpdboot -n `cat $MPI_START_MACHINEFILE | sort -u | wc -l` -f $MPI_START_MACHINEFILE
+        mpdboot -n `cat $MPI_START_MACHINES | sort -u | wc -l` -f $MACHINES
         MPI_SPECIFIC_PARAMS=$MPICH2_PARAMS
         . $MPI_START_PREFIX/../etc/mpi-start/generic_mpiexec.sh
         generic_mpiexec
@@ -64,6 +69,9 @@ mpi_exec () {
         # if a comm method has already been requested don't set
         if `echo $I2G_MPI_MPIEXEC_PARAMS|grep -vq "comm="`; then
             MPI_SPECIFIC_PARAMS="$MPICH2_PARAMS --comm=pmi"
+        fi
+        if test "x$I2G_MPI_SINGLE_PROCESS" = "x1" ; then
+            MPI_SPECIFIC_PARAMS="$MPI_SPECIFIC_PARAMS -pernode"
         fi
 		. $MPI_START_PREFIX/../etc/mpi-start/generic_mpiexec.sh
 		generic_mpiexec

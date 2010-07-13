@@ -47,6 +47,8 @@ def start_job():
     else:
         logging.debug("found openmpi and PBS, don't set machinefile")
         pe = pe + ['-np', '%s' % scheduler.get_np()]
+    if config['single_process']:
+        pe = pe + ['pernode']
     pe += ['-wdir', os.path.realpath(os.path.curdir)]
     if 'I2G_USE_MARMOT' in os.environ and os.environ['I2G_USE_MARMOT'] == '1':
         logging.debug("export LD_PRELOAD for Open MPI")
@@ -56,5 +58,3 @@ def start_job():
     pe += ['--prefix', '%s' % openmpi_prefix]
     config['parallel_env'] =  pe
     return starter.start_job()
-
-

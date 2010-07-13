@@ -56,6 +56,10 @@ mpi_exec () {
         export I2G_MACHINEFILE_AND_NP="-np $I2G_MPI_NP"
     fi
 
+    if test "x$I2G_MPI_SINGLE_PROCESS" = "x1"; then
+        I2G_MACHINEFILE_AND_NP="$I2G_MACHINEFILE_AND_NP -pernode"
+    fi
+
     #set the parameters to be always used with Open MPI:
     MPI_SPECIFIC_PARAMS="-wdir $PWD "
 

@@ -26,10 +26,6 @@ fi
 # activate MPI
 mpi_start_activate_mpi $I2G_MPICH_PREFIX "$MPI_START_MPI_MODULE"
 
-# look for OSC_MPIEXEC
-
-
-
 #
 # start an mpi job
 #
@@ -51,7 +47,22 @@ mpi_exec () {
             MPIEXEC=`which mpirun 2> /dev/null`
     	    debug_msg "mpiexec not found, assume it is safe to set the machinefile and number of processes"
             MPIEXEC="$MPIEXEC $MPI_MPICH_MPIRUN_PARAMS"
+        fi
+    fi
+
+    # how to test if the mpiexec needs the -np and -machinefile args??
+    $MPIEXEC 2>&1 | grep -e "-\<np\>" > /dev/null 2>&1
+    status=$?
+    if test $status -eq 1 ; then
+        if test "x$I2G_MPI_SINGLE_PROCESS" = "x1" ; then
+            export I2G_MACHINEFILE_AND_NP="-machinefile $MPI_START_HOSTFILE -np $I2G_MPI_NP"
+        else
             export I2G_MACHINEFILE_AND_NP="-machinefile $MPI_START_MACHINEFILE -np $I2G_MPI_NP"
+        fi
+    else
+        if test "x$I2G_MPI_SINGLE_PROCESS" = "x1" ; then
+            # assume OSC mpiexec, that accepts -pernode
+            export I2G_MACHINEFILE_AND_NP="-pernode"
         fi
     fi
 

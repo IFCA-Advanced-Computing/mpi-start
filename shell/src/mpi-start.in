@@ -10,7 +10,8 @@
 # 0   - Success
 
 clean_up () {
-    echo "hello world"
+    #debug_msg "Cleaning up mpi-start execution."
+    return 0
 }
 
 trap clean_up EXIT
