@@ -45,8 +45,8 @@ scheduler_get_machinefile () {
             slots=`expr $slots - 1`
         done
     done < $PE_HOSTFILE
-    export MPI_START_HOSTS=`cat $MPI_START_HOSTFILE | wc -l`
-    export MPI_START_SLOTS=`cat $MPI_START_MACHINEFILE | wc -l`
-    export MPI_START_SLOTS_PER_HOST=`cat $MPI_START_HOST_SLOTS_FILE | cut -f2 -d" " | sort -n | head -1`
+    export MPI_START_NHOSTS=`cat $MPI_START_HOSTFILE | wc -l`
+    export MPI_START_NSLOTS=`cat $MPI_START_MACHINEFILE | wc -l`
+    export MPI_START_NSLOTS_PER_HOST=`cat $MPI_START_HOST_SLOTS_FILE | cut -f2 -d" " | sort -n | head -1`
     return 0
 }

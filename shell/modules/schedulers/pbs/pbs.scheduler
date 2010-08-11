@@ -42,8 +42,8 @@ scheduler_get_machinefile () {
          done
          # this only works in bash
          # < <( cat $MPI_START_MACHINEFILE | sort | uniq -c | tr -s " " )
-    export MPI_START_HOSTS=`cat $MPI_START_HOSTFILE | wc -l`
-    export MPI_START_SLOTS_PER_HOST=`cat $MPI_START_HOST_SLOTS_FILE | cut -f2 -d" " | sort -n | head -1`
-    export MPI_START_SLOTS=`cat $MPI_START_MACHINEFILE | wc -l`
+    export MPI_START_NHOSTS=`cat $MPI_START_HOSTFILE | wc -l`
+    export MPI_START_NSLOTS_PER_HOST=`cat $MPI_START_HOST_SLOTS_FILE | cut -f2 -d" " | sort -n | head -1`
+    export MPI_START_NSLOTS=`cat $MPI_START_MACHINEFILE | wc -l`
     return 0
 }

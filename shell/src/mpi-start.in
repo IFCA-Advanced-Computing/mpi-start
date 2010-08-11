@@ -84,10 +84,7 @@ dump_env () {
 
 
 #======================================================================
-# Create the hostfile: a file with a line per host with the
-# host name and the number of slots allocated there
-# Also modify the machinefile to just include one entry per host
-# if the I2G_MPI_SINGLE_PROCESS is defined
+# 
 #======================================================================
 mpi_start_create_hostfile() {
         
@@ -97,10 +94,6 @@ mpi_start_create_hostfile() {
     MPI_START_HOSTSFILE=`mktemp`
     cat $MPI_START_HOSTS_SLOTS | cut -f1 > $MPI_START_HOSTSFILE
 
-    debug_msg "dump hosts:"
-    for i in `cat $MPI_START_HOSTSFILE` ; do
-        debug_msg "=> $i"
-    done
 
     if test "x${I2G_MPI_SINGLE_PROCESS}" == "x1" ; then
         # define I2G_MPI_NUM_SLOTS as the minimum number of slots in all hosts
@@ -228,11 +221,22 @@ main() {
                 exit 2
             fi
     
-            mpi_start_create_hostfile
+            debug_msg "dump hosts:"
+            for i in `cat $MPI_START_HOSTSFILE` ; do
+                debug_msg "=> $i"
+            done
+            if test "x${I2G_MPI_SINGLE_PROCESS}" == "x1" ; then
+                I2G_MPI_NP=$MPI_START_NSLOTS
+            else
+                I2G_MPI_NP=$MPI_START_NHOSTS
+            fi
+
+            # setup the np count 
+            debug_msg "starting with $I2G_MPI_NP processes."
 
             # mark MPI_START as ready to go 
             MPI_START_READY=0
-            export MPI_START_SCHEDULER=$scheduler
+            export MPI_START_SCHEDULER=$SCHEDULER_NAME
             break
         fi
     done

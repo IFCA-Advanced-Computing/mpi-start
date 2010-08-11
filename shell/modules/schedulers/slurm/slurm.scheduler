@@ -48,9 +48,9 @@ scheduler_get_machinefile () {
              echo $host $slots >> $MPI_START_HOST_SLOTS_FILE
          done
 	export MPI_START_MACHINEFILE
-    export MPI_START_SLOTS=$SLURM_NPROCS
-    export MPI_START_HOSTS=$SLURM_NNODES
-    export MPI_START_SLOTS_PER_HOST=`echo $SLURM_TASK_PER_NODE | cut -f1 -d"("`
+    export MPI_START_NSLOTS=$SLURM_NPROCS
+    export MPI_START_NHOSTS=$SLURM_NNODES
+    export MPI_START_NSLOTS_PER_HOST=`echo $SLURM_TASK_PER_NODE | cut -f1 -d"("`
 
     return 0
 }
