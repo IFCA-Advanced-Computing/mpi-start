@@ -65,23 +65,7 @@ dump_env () {
     for i in `env`; do
         echo "mpi-start [DUMPENV]:" $i
     done
-}  info_msg "activate support for $I2G_MPI_TYPE"
-    debug_msg "source : $MPI_PLUGIN_FILE"
-    . $MPI_PLUGIN_FILE
-    if test $? -ne 0 ; then
-        error_msg "Error loading the MPI plugin: $MPI_PLUGIN_FILE"
-        error_msg "Dump environment"
-        dump_env
-        exit 1
-    fi
-
-    # call the MPI specific startup functions
-    info_msg "call backend MPI implementation"
-    mpi_start
-    result=$?
-
-    exit $result
-
+}
 
 #======================================================================
 # Activate a MPI by the given information. If there are module
