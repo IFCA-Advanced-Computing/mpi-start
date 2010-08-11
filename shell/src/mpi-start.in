@@ -84,34 +84,6 @@ dump_env () {
 
 
 #======================================================================
-# 
-#======================================================================
-mpi_start_create_hostfile() {
-        
-    MPI_START_HOSTS_SLOTS=`mktemp`
-    cat $MPI_START_MACHINEFILE | sort | uniq -c | sed 's/^ *\([1-9]*\) \(.*\)$/\2\t\1/' \
-        > $MPI_START_HOSTS_SLOTS
-    MPI_START_HOSTSFILE=`mktemp`
-    cat $MPI_START_HOSTS_SLOTS | cut -f1 > $MPI_START_HOSTSFILE
-
-
-    if test "x${I2G_MPI_SINGLE_PROCESS}" == "x1" ; then
-        # define I2G_MPI_NUM_SLOTS as the minimum number of slots in all hosts
-        # XXX Should be fixed to handle heterogeneous cases
-        I2G_MPI_NUM_SLOTS=`cat $MPI_START_HOSTS_SLOTS | cut -f2 | sort -n | head -1`
-        export OMP_NUM_THREADS=$I2G_MPI_NUM_SLOTS
-        debug_msg "$I2G_MPI_NUM_SLOTS slots per host allocated"
-        I2G_MPI_NP=`cat $MPI_START_HOSTSFILE | wc -l`
-    else
-        I2G_MPI_NP=`cat $MPI_START_MACHINEFILE | wc -l`
-    fi
-
-    # setup the np count 
-    debug_msg "starting with $I2G_MPI_NP processes."
-}
- 
-
-#======================================================================
 # Activate a MPI by the given information. If there are module
 # informations available then the modules system will be used
 # otherwise the PATH and LD_LIBRARY_PATH is updated manually.
