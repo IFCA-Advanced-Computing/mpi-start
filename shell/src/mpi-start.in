@@ -10,7 +10,10 @@
 # 0   - Success
 
 clean_up () {
-    #debug_msg "Cleaning up mpi-start execution."
+    debug_msg "Cleaning up mpi-start temporary files."
+    for file in $MPI_START_HOSTFILE $MPI_START_HOST_SLOTS_FILE $MPI_START_MACHINEFILE; do
+        [ -f $file ] && rm -f $file
+    done
     return 0
 }
 
