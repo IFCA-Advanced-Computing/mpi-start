@@ -2,13 +2,16 @@ all:
 	$(MAKE) -C pbs all
 	$(MAKE) -C sge all
 	$(MAKE) -C lsf all
+	$(MAKE) -C slurm all
 
 clean:
 	$(MAKE) -C pbs clean
 	$(MAKE) -C sge clean
 	$(MAKE) -C lsf clean
+	$(MAKE) -C slurm clean
 
 install:
 	$(MAKE) -C pbs install
 	$(MAKE) -C sge install
 	$(MAKE) -C lsf install
+	$(MAKE) -C slurm install
