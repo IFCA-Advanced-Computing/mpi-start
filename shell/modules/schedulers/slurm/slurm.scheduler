@@ -1,0 +1,56 @@
+#!/bin/sh
+#
+# Copyright (c) 2010 Instituto de Física de Cantabria. CSIC.
+#                    All rights reserved.
+#
+
+SCHEDULER_NAME="slurm"
+
+#
+# This function checks if the current job is running in a slurm
+# environment.
+#
+# Return values :
+#  0     - Support for this kind of scheduler is found.
+#  else  - NO support for this of scheduler is found. 
+#
+scheduler_available () {
+    debug_msg " checking for \$SLURM_NODELIST"
+	if test "x$SLURM_JOB_NODELIST" = "x" ; then 
+		return 26;
+	else
+		return 0
+	fi
+}
+
+#
+# This function is called to setup 
+scheduler_get_machinefile () {
+    debug_msg " convert machine list into standard format"
+    MPI_START_MACHINEFILE=`mktemp`
+    MPI_START_HOSTFILE=`mktemp`
+    MPI_START_HOST_SLOTS_FILE=`mktemp`
+
+    sl_get_machine_list > $MPI_START_MACHINEFILE 2> /dev/null
+    if test $? != 0 ; then
+        scontrol show hostnames $SLURM_NODELIST > $MPI_START_MACHINEFILE 2> /dev/null
+        if test $? != 0 ; then
+            error_msg "Could not create machine list, both sl_get_machine_list and scontrol failed."
+            return 13
+        fi
+    fi
+    cat $MPI_START_MACHINEFILE | sort | uniq -c | tr -s " " |
+         # this is a subshell, variables changes here are not changed outside!
+         while read line; do
+             slots=`echo $line | cut -f1 -d" "`
+             host=`echo $line | cut -f2 -d" "`
+             echo $host >> $MPI_START_HOSTFILE
+             echo $host $slots >> $MPI_START_HOST_SLOTS_FILE
+         done
+	export MPI_START_MACHINEFILE
+    export MPI_START_SLOTS=$SLURM_NPROCS
+    export MPI_START_HOSTS=$SLURM_NNODES
+    export MPI_START_SLOTS_PER_HOST=`echo $SLURM_TASK_PER_NODE | cut -f1 -d"("`
+
+    return 0
+}
