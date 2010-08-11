@@ -6,9 +6,11 @@
 #                         University of Lisbon.  All rights reserved.
 #
 
+SCHEDULER_NAME="sge"
+
 
 #
-# This function checks if the current job is running in a PBS 
+# This function checks if the current job is running in a SGE
 # environment.
 #
 # Return values :
@@ -25,31 +27,26 @@ scheduler_available () {
 }
 
 #
-# Convert sge machinefile to "standard" format.
-# Provided by Jorge Gomes.
-#
-openmpi_sge_wn_list()
-{
-  while true; do
-    read line
-    if test -z "$line" ; then
-      break
-    fi
-    wn_name=`echo $line | cut -d' ' -f1`
-    wn_slots=`echo $line | cut -d' ' -f2`
-    for (( n=1 ; $n<=$wn_slots ; n=$n+1 )); do
-      echo $wn_name
-    done
-  done
-}
-
-
-#
 # This function is called to setup 
 scheduler_get_machinefile () {
     debug_msg " convert PE_HOSTFILE into standard format"
-    MPI_START_MACHINEFILE=`mktemp`
-    cat "$PE_HOSTFILE" | openmpi_sge_wn_list > $MPI_START_MACHINEFILE
-	export MPI_START_MACHINEFILE
+    [ ! -f "$PE_HOSTFILE" ] && return 13
+    export MPI_START_MACHINEFILE=`mktemp`
+    export MPI_START_HOSTFILE=`mktemp`
+    export MPI_START_HOST_SLOTS_FILE=`mktemp`
+    while read line; do
+        [ -z "$line" ] && break
+        host=`echo $line | cut -f1 -d" "`
+        slots=`echo $line | cut -f2 -d" "`
+        echo $host >> $MPI_START_HOSTFILE
+        echo $host $slots >> $MPI_START_HOST_SLOTS_FILE
+        while [ $slots -ne 0 ]; do
+            echo $host >> $MPI_START_MACHINEFILE
+            slots=`expr $slots - 1`
+        done
+    done < $PE_HOSTFILE
+    export MPI_START_HOSTS=`cat $MPI_START_HOSTFILE | wc -l`
+    export MPI_START_SLOTS=`cat $MPI_START_MACHINEFILE | wc -l`
+    export MPI_START_SLOTS_PER_HOST=`cat $MPI_START_HOST_SLOTS_FILE | cut -f2 -d" " | sort -n | head -1`
     return 0
 }
