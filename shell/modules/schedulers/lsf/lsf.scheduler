@@ -4,6 +4,8 @@
 #                         University of Stuttgart.  All rights reserved.
 #
 
+SCHEDULER_NAME="lsf"
+
 #
 # This function checks if the current job is running in a LSF
 # environment.
@@ -29,16 +31,27 @@ scheduler_available () {
 # This function is called to setup 
 #
 scheduler_get_machinefile () {
-	if test "x$LSB_HOSTS" != "x" ; then
-    	debug_msg " build machinefile based on LSB_HOSTS"
-		LSF_NODEFILE=`mktemp`
-		for i in $LSB_HOSTS; do 
-			echo $i >> $LSF_NODEFILE
-		done
-		export MPI_START_MACHINEFILE=$LSF_NODEFILE
-    	return 0
-	fi
-
-	return 13
+    if test "x$LSB_HOSTS" = "x" ; then
+        return 13
+    fi
+    debug_msg " build machinefile based on LSB_HOSTS"
+    export MPI_START_MACHINEFILE=`mktemp`
+    export MPI_START_HOSTFILE=`mktemp`
+    export MPI_START_HOST_SLOTS_FILE=`mktemp`
+    for host in $LSB_HOSTS; do
+        echo $host >> $MPI_START_MACHINEFILE
+    done
+    cat $MPI_START_MACHINEFILE | sort | uniq -c | tr -s " " |
+        # this is a subshell, variables changes here are not changed outside!
+        while read line; do
+            slots=`echo $line | cut -f1 -d" "`
+            host=`echo $line | cut -f2 -d" "`
+            echo $host >> $MPI_START_HOSTFILE
+            echo $host $slots >> $MPI_START_HOST_SLOTS_FILE
+        done
+    export MPI_START_HOSTS=`cat $MPI_START_HOSTFILE | wc -l`
+    export MPI_START_SLOTS_PER_HOST=`cat $MPI_START_HOST_SLOTS_FILE | cut -f2 -d" " | sort -n | head -1`
+    export MPI_START_SLOTS=`cat $MPI_START_MACHINEFILE | wc -l`
+    return 0
 }
 
