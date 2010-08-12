@@ -2,34 +2,16 @@
 #
 # Copyright (c) 2006-2007 High Performance Computing Center Stuttgart,
 #                         University of Stuttgart.  All rights reserved.
-#           (c) 2009      Instituto de Fisica de Cantabria - CSIC. 
-#
+#           (c) 2009-2010 Instituto de Fisica de Cantabria - CSIC. 
+#                         All rights reserved.
 
-# specifies where Open MPI is installed
-if test "x$I2G_OPENMPI_PREFIX" = "x" ; then
-    if test "x$MPI_OPENMPI_PATH" = "x" ; then
-        if test "x$MPI_START_MPI_PREFIX" != "x"  ; then    
-            export I2G_OPENMPI_PREFIX=$MPI_START_MPI_PREFIX
-        else 
-            export I2G_OPENMPI_PREFIX=/opt/i2g/openmpi
-            debug_msg "use default installtion : $I2G_OPENMPI_PREFIX"
-        fi
-    else
-        export I2G_OPENMPI_PREFIX=$MPI_OPENMPI_PATH
-        debug_msg "use user provided prefix : $MPI_OPENMPI_PATH"
-    fi
-else 
-    debug_msg "use user provided prefix : $I2G_OPENMPI_PREFIX"
+if test "x$MPI_START_MPI_PREFIX" = "x"  ; then    
+    export MPI_START_MPI_PREFIX=/usr/lib64/openmpi/1.4-gcc
+    debug_msg "use default mpi path: $MPI_START_MPI_PREFIX"
 fi
 
-
 # activate MPI
-mpi_start_activate_mpi $I2G_OPENMPI_PREFIX "$MPI_START_MPI_MODULE"
-
-# add necessary PATH to the environment variables
-#debug_msg "prepend Open MPI to PATH and LD_LIBRARY_PATH"
-#export PATH=$I2G_OPENMPI_PREFIX/bin:$PATH
-#export LD_LIBRARY_PATH=$I2G_OPENMPI_PREFIX/lib:$LD_LIBRARY_PATH
+mpi_start_activate_mpi $MPI_START_MPI_PREFIX "$MPI_START_MPI_MODULE"
 
 if test "x$I2G_MPI_TYPE" != "xopenmpi" ; then
     # we are not the primary MPI 
@@ -63,32 +45,26 @@ mpi_exec () {
     #set the parameters to be always used with Open MPI:
     MPI_SPECIFIC_PARAMS="-wdir $PWD "
 
-    #check for Marmot
-    if test "x$I2G_USE_MARMOT" = "x1" ; then
-        debug_msg "export LD_PRELOAD for Open MPI"
-        MPI_SPECIFIC_PARAMS="$MPI_SPECIFIC_PARAMS -x LD_PRELOAD -x MARMOT_MAX_TIMEOUT_DEADLOCK -x MARMOT_LOGFILE_PATH"
-    fi
-
-    #if test "x$I2G_USE_MPITRACE" ="x1" ; then
-    	#MPI_SPECIFIC_PARAMS="-x MPITRACE_ON -x MPTRACE_DIR"
-    #fi
+    for vars in $MPI_START_ENV_VARIABLES; do
+        MPI_SPECIFIC_PARAMS="$MPI_SPECIFIC_PARAMS -x $var"
+    done
 
     # check for user supplied mpiexec 
     MPIEXEC=`which mpiexec`
     if test "x$MPI_OPENMPI_MPIEXEC" != "x"  ; then
         MPIEXEC="$MPI_OPENMPI_MPIEXEC $I2G_MPI_MPIEXEC_PARAMS"
         debug_msg "using user supplied startup : '$MPIEXEC'"
-        MPI_SPECIFIC_PARAMS="$MPI_SPECIFIC_PARAMS -x X509_USER_PROXY --prefix $I2G_OPENMPI_PREFIX $OPENMPI_PARAMS"
+        MPI_SPECIFIC_PARAMS="$MPI_SPECIFIC_PARAMS -x X509_USER_PROXY --prefix $MPI_START_MPI_PREFIX $OPENMPI_PARAMS"
         . $MPI_START_PREFIX/../etc/mpi-start/generic_mpiexec.sh
         generic_mpiexec
     elif test "x$MPI_OPENMPI_MPIRUN" != "x" ; then
         MPIEXEC="$MPI_OPENMPI_MPIRUN $MPI_OPENMPI_MPIRUN_PARAMS"
         debug_msg "using user supplied startup : '$MPIEXEC'"
-        MPI_SPECIFIC_PARAMS="$MPI_SPECIFIC_PARAMS -x X509_USER_PROXY --prefix $I2G_OPENMPI_PREFIX $OPENMPI_PARAMS"
+        MPI_SPECIFIC_PARAMS="$MPI_SPECIFIC_PARAMS -x X509_USER_PROXY --prefix $MPI_START_MPI_PREFIX $OPENMPI_PARAMS"
         . $MPI_START_PREFIX/../etc/mpi-start/generic_mpiexec.sh
         generic_mpiexec
     else
-        MPI_SPECIFIC_PARAMS="$MPI_SPECIFIC_PARAMS -x X509_USER_PROXY --prefix $I2G_OPENMPI_PREFIX $OPENMPI_PARAMS"
+        MPI_SPECIFIC_PARAMS="$MPI_SPECIFIC_PARAMS -x X509_USER_PROXY --prefix $MPI_START_MPI_PREFIX $OPENMPI_PARAMS"
         . $MPI_START_PREFIX/../etc/mpi-start/generic_mpiexec.sh
         generic_mpiexec
     fi
