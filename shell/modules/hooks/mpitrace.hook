@@ -1,0 +1,47 @@
+#!/bin/sh 
+#
+# Copyright (c) 2009-2010  Instituto de Fisica de Cantabria - CSIC. 
+#                          All rights reserved.
+
+pre_run_hook () {
+
+    if test "x$I2G_USE_MPITRACE" != "x1" ; then
+        debug_msg "mpitrace not enabled."
+        return 0
+    fi
+
+    MPITRACE_INSTALLATION=/opt/i2g/mpitrace
+    debug_msg "Enabling mpitrace at $MPITRACE_INSTALLATION."
+    I2G_MPI_PRECOMMAND="$I2G_MPI_PRECOMMAND $MPITRACE_INSTALLATION/bin/mpitrace"
+    mpi_start_export_variable MPITRACE_ON 
+    mpi_start_export_variable MPITRACE_DIR 
+    return 0
+}
+
+copy_from_node () {
+    host=$1
+    if test $host = `hostname` -o $host = `hostname -f` -o $host = "localhost" ; then
+        debug_msg "skip local machine"
+    else
+        scp $host:$PWD/*.mpit . 2>&1 > /dev/null
+        result=$?
+        if test "x$result" != "x0" ; then 
+            error_msg "mpitrace files: failed to copy binary from remote machine"
+            return 1
+        fi
+    fi
+}
+
+post_run_hook () {
+    if test "x$I2G_USE_MPITRACE" = "x1" ; then
+        if test "x$MPI_START_SHARED_FS" != "x1" ; then
+            mpi_start_foreach_host copy_from_node
+        fi
+        MPITRACE_INSTALLATION=/opt/i2g/mpitrace
+        CMD="$MPITRACE_INSTALLATION/bin/mpi2prv *.mpit -o $I2G_MPI_APPLICATION.prv"
+        debug_msg "$CMD"
+        debug_msg "files here:"
+        ls .
+        $CMD
+    fi
+}
