@@ -49,7 +49,7 @@ mpi_exec () {
         chmod 0600 $HOME/.mpd.conf
 
         # Start MPICH2 daemon.
-        mpdboot -n `cat $MPI_START_MACHINES | sort -u | wc -l` -f $MACHINES
+        mpdboot -n $MPI_START_NHOSTS -f $MACHINES
         MPI_SPECIFIC_PARAMS=$MPICH2_PARAMS
         . $MPI_START_PREFIX/../etc/mpi-start/generic_mpiexec.sh
         generic_mpiexec
