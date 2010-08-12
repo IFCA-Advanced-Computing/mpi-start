@@ -1,0 +1,42 @@
+#!/bin/sh
+#
+# Copyright (c) 2006-2007 High Performance Computing Center Stuttgart,
+#                         University of Stuttgart.  All rights reserved.
+#           (c) 2009-2010 Instituto de Fisica de Cantabria - CSIC. 
+#                         All rights reserved.
+
+#if test "x$MPI_START_MPI_PREFIX" = "x"  ; then    
+#    export MPI_START_MPI_PREFIX=/usr/lib64/openmpi/1.4-gcc
+#    debug_msg "use default mpi path: $MPI_START_MPI_PREFIX"
+#fi
+
+# activate MPI
+#mpi_start_activate_mpi $MPI_START_MPI_PREFIX "$MPI_START_MPI_MODULE"
+
+#
+# start an mpi job
+#
+mpi_exec () {
+    if test "x$I2G_MPI_SINGLE_PROCESS" = "x1"; then
+        I2G_MACHINEFILE_AND_NP="-machinefile $MPI_START_HOSTFILE -np $I2G_MPI_NP"
+    else
+        I2G_MACHINEFILE_AND_NP="-machinefile $MPI_START_MACHINEFILE -np $I2G_MPI_NP"
+    fi
+
+    MPIEXEC=`which mpirun`
+    st=$?
+    if test $? -ne 0 ; then
+        debug_msg "No mpirun found"
+    fi
+   
+    . $MPI_START_PREFIX/../etc/mpi-start/generic_mpiexec.sh
+    generic_mpiexec
+    return $?
+}
+
+
+mpi_start () {
+    . $MPI_START_PREFIX/../etc/mpi-start/generic_mpi_start.sh
+    generic_mpi_start
+    return $?
+}
