@@ -25,7 +25,6 @@ fi
 # start an mpi job
 #
 mpi_exec () {
-
     #handle Open MPI 1.2.2 + PBS bug
     if test "x$MPI_START_SCHEDULER" != "xPBS" ; then
         debug_msg "found openmpi and a non-PBS batch system, set machinefile and np parameters"

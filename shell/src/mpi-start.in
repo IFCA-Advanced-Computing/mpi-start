@@ -79,8 +79,10 @@ dump_env () {
 mpi_start_activate_mpi () {
     if test "x$2" = "x" ; then
         debug_msg "activate MPI via manually update"
-        export PATH=$1/bin:$PATH
-        export LD_LIBRARY_PATH=$1/lib:$LD_LIBRARY_PATH
+        if test -d "$1" ; then
+            export PATH=$1/bin:$PATH
+            export LD_LIBRARY_PATH=$1/lib:$LD_LIBRARY_PATH
+        fi
     else
         debug_msg "activate MPI via modules : $2"
         for mod in $2 ; do
@@ -99,7 +101,10 @@ mpi_start_create_wrapper() {
     if test "x$MPI_START_MPI_WRAPPER" = "x" ; then
         export MPI_START_MPI_WRAPPER=`mktemp`
         export MPI_START_CLEANUP_FILES="$MPI_START_CLEANUP_FILES $MPI_START_MPI_WRAPPER"
-        echo "#!/bin/sh" > $MPI_START_MPI_WRAPPER
+        cat > $MPI_START_MPI_WRAPPER << EOF
+#!/bin/sh
+test "x\$I2G_MPI_START_TRACE" = "x1" && set -x
+EOF
     fi
 }
 

@@ -3,30 +3,17 @@
 # Copyright (c) 2006-2007 High Performance Computing Center Stuttgart,
 #                         University of Stuttgart.  All rights reserved.
 # Copyright (c) 2006-2007 Charles Loomis
-#           (c) 2009      Instituto de Fisica de Cantabria - CSIC. 
+#           (c) 2009-2010 Instituto de Fisica de Cantabria - CSIC. 
 #
 
-
-# specifies where Open MPI is installed
-if test "x$I2G_MPICH2_PREFIX" = "x" ; then
-    if test "x$MPI_MPICH2_PATH" = "x" ; then
-        if test "x$MPI_START_MPI_PREFIX" != "x" ; then
-            export I2G_MPICH2_PREFIX=$MPI_START_MPI_PREFIX
-        else 
-            export I2G_MPICH2_PREFIX=/opt/mpich2-1.0.4p1
-            debug_msg "use default installtion : $I2G_MPICH2_PREFIX"
-        fi
-    else
-        export I2G_MPICH2_PREFIX=$MPI_MPICH2_PATH
-        debug_msg "use user provided prefix : $MPI_MPICH2_PATH"
-    fi
-else 
-    debug_msg "use user provided prefix : $I2G_MPICH2_PREFIX"
+if test "x$MPI_START_MPI_PREFIX" = "x"  ; then    
+    # TODO: find correct path for mpich in SL5
+    export MPI_START_MPI_PREFIX=/opt/mpich2-1.0.4p1
+    debug_msg "use default mpi path: $MPI_START_MPI_PREFIX"
 fi
 
 # activate MPI
-mpi_start_activate_mpi $I2G_MPICH2_PREFIX "$MPI_START_MPI_MODULE"
-
+mpi_start_activate_mpi $MPI_START_MPI_PREFIX "$MPI_START_MPI_MODULE"
 
 #
 # start an mpi job
