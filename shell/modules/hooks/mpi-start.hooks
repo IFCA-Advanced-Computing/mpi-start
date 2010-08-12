@@ -210,10 +210,14 @@ mpi_start_run_pre_hook() {
             return 0
         fi
 		debug_msg "call pre_run hook"
-        if test "x$I2G_MPI_START_VERBOSE" = "x1" ; then echo "-<START PRE-RUN HOOK>---------------------------------------------------"; fi
+        if test "x$I2G_MPI_START_VERBOSE" = "x1" -a "x$2" = "1"; then
+            echo "-<START PRE-RUN HOOK>---------------------------------------------------";
+        fi
         pre_run_hook
         result=$?
-        if test "x$I2G_MPI_START_VERBOSE" = "x1" ; then echo "-<STOP PRE-RUN HOOK>----------------------------------------------------"; fi
+        if test "x$I2G_MPI_START_VERBOSE" = "x1" -a "x$2" = "1"; then
+            echo "-<STOP  PRE-RUN HOOK>---------------------------------------------------"; 
+        fi
         if test $result -ne 0 ; then 
             error_msg "pre-run hook returned : $i"
             error_msg "pre-run hook returned : $result"
@@ -245,9 +249,9 @@ mpi_start_pre_run_hook_generic () {
     mpi_start_detect_shared_fs
 
     MPI_START_HOOKS_LOCAL=$MPI_START_PREFIX/../etc/mpi-start/mpi-start.hooks.local
-    mpi_start_run_pre_hook $MPI_START_HOOKS_LOCAL
+    mpi_start_run_pre_hook $MPI_START_HOOKS_LOCAL 1
 
-    mpi_start_run_pre_hook $I2G_MPI_PRE_RUN_HOOK
+    mpi_start_run_pre_hook $I2G_MPI_PRE_RUN_HOOK 1
 
     if  test "x$MPI_START_SHARED_FS" != "x1" -o "x$MPI_START_DISTRIBUTE_PROXY" = "x1" ; then 
         mpi_start_pre_run_hook_copy
@@ -278,10 +282,14 @@ mpi_start_run_post_hook() {
             return 0
         fi
         debug_msg "call post-run hook"
-        if test "x$I2G_MPI_START_VERBOSE" = "x1" ; then echo "-<START POST-RUN HOOK>---------------------------------------------------"; fi
+        if test "x$I2G_MPI_START_VERBOSE" = "x1" -a "x$2" = "1"; then
+            echo "-<START POST-RUN HOOK>--------------------------------------------------";
+        fi
         post_run_hook
         result=$?
-        if test "x$I2G_MPI_START_VERBOSE" = "x1" ; then echo "-<STOP POST-RUN HOOK>----------------------------------------------------"; fi
+        if test "x$I2G_MPI_START_VERBOSE" = "x1" -a "x$2" = "1"; then
+            echo "-<STOP  POST-RUN HOOK>--------------------------------------------------"; 
+        fi
         if test $result -ne 0 ; then 
             error_msg "post-run hook returned : $i"
             dump_env
@@ -304,9 +312,9 @@ mpi_start_post_run_hook_generic () {
     done
 
     MPI_START_HOOKS_LOCAL=$MPI_START_PREFIX/../etc/mpi-start/mpi-start.hooks.local
-    mpi_start_run_post_hook $MPI_START_HOOKS_LOCAL
+    mpi_start_run_post_hook $MPI_START_HOOKS_LOCAL 1
 
-    mpi_start_run_post_hook $I2G_MPI_POST_RUN_HOOK
+    mpi_start_run_post_hook $I2G_MPI_POST_RUN_HOOK 1
 
     if  test "x$MPI_START_SHARED_FS" != "x1" -o "x$MPI_START_DISTRIBUTE_PROXY" = "x1"  ; then 
         # this may be unset if only running on localhost
