@@ -99,7 +99,6 @@ mpi_start_create_wrapper() {
     if test "x$MPI_START_MPI_WRAPPER" = "x" ; then
         export MPI_START_MPI_WRAPPER=`mktemp`
         export MPI_START_CLEANUP_FILES="$MPI_START_CLEANUP_FILES $MPI_START_MPI_WRAPPER"
-        chmod +x $MPI_START_MPI_WRAPPER
         echo "#!/bin/sh" > $MPI_START_MPI_WRAPPER
     fi
 }
@@ -131,18 +130,34 @@ mpi_start_export_variable () {
 # $* command line to execute 
 #======================================================================
 mpi_start_execute_wrapper() {
-    mpi_start_create_wrapper
-    if [ "x$I2G_MPI_APPLICATION_STDIN" != "x" -a "x$I2G_MPI_APPLICATION_STDOUT" != "x" ] ; then
-        debug_msg "redirecting stdin and stdout"
-        echo "$* \> $I2G_MPI_APPLICATION_STDOUT < $I2G_MPI_APPLICATION_STDIN" >> $MPI_START_MPI_WRAPPER
+
+    if test "x$MPI_START_DO_NOT_USE_WRAPPER" = "x1" ; then
+        if [ "x$I2G_MPI_APPLICATION_STDIN" != "x" -a "x$I2G_MPI_APPLICATION_STDOUT" != "x" ] ; then
+            debug_msg "redirecting stdin and stdout"
+            $* \> $I2G_MPI_APPLICATION_STDOUT < $I2G_MPI_APPLICATION_STDIN
+        else
+            $*
+        fi
+        return $?
     else
-        echo "$*" >> $MPI_START_MPI_WRAPPER
+        mpi_start_create_wrapper
+        # we create a new wrapper for each execution so we can have more than
+        # one MPI execution in a single mpi-start call (not sure if it has any use)
+        CMD_WRAPPER=`mktemp`
+        chmod +x $CMD_WRAPPER
+        cat $MPI_START_MPI_WRAPPER > $CMD_WRAPPER
+        if [ "x$I2G_MPI_APPLICATION_STDIN" != "x" -a "x$I2G_MPI_APPLICATION_STDOUT" != "x" ] ; then
+            debug_msg "redirecting stdin and stdout"
+            echo "$* \> $I2G_MPI_APPLICATION_STDOUT < $I2G_MPI_APPLICATION_STDIN" >> $CMD_WRAPPER
+        else
+            echo "$*" >> $CMD_WRAPPER
+        fi
+        echo "exit \$?" >> $CMD_WRAPPER
+        $CMD_WRAPPER
+        err=$?
+        rm -f $CMD_WRAPPER
+        return $err
     fi
-    echo "exit \$?" >> $MPI_START_MPI_WRAPPER
-    $MPI_START_MPI_WRAPPER
-    err=$?
-    MPI_START_MPI_WRAPPER=""
-    return $err
 }
 
 #======================================================================
