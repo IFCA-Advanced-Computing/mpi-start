@@ -19,9 +19,6 @@ if test "x$I2G_MPI_TYPE" != "xopenmpi" ; then
     debug_msg ""
     debug_msg "disable PBS, SGE"
     OPENMPI_PARAMS="-mca pls ^tm,gridengine -mca ras ^tm,gridengine  "
-    #OPENMPI_PARAMS="$OPENMPI_PARAMS -x PACX_DEBUG_NODE=$PACX_DEBUG_NODE"
-    debug_msg "export GLOBUS_TCP_PORT_RANGE : $GLOBUS_TCP_PORT_RANGE"
-    OPENMPI_PARAMS="$OPENMPI_PARAMS -x GLOBUS_TCP_PORT_RANGE "
 fi
 
 #
@@ -30,7 +27,7 @@ fi
 mpi_exec () {
 
     #handle Open MPI 1.2.2 + PBS bug
-    if test "x$PBS_NODEFILE" = "x" ; then
+    if test "x$MPI_START_SCHEDULER" != "xPBS" ; then
         debug_msg "found openmpi and a non-PBS batch system, set machinefile and np parameters"
         export I2G_MACHINEFILE_AND_NP="-machinefile $MPI_START_MACHINEFILE -np $I2G_MPI_NP"
     else
@@ -42,32 +39,27 @@ mpi_exec () {
         I2G_MACHINEFILE_AND_NP="$I2G_MACHINEFILE_AND_NP -pernode"
     fi
 
-    #set the parameters to be always used with Open MPI:
+    # set the parameters to be always used with Open MPI:
     MPI_SPECIFIC_PARAMS="-wdir $PWD "
-
     for vars in $MPI_START_ENV_VARIABLES; do
         MPI_SPECIFIC_PARAMS="$MPI_SPECIFIC_PARAMS -x $var"
     done
+    MPI_SPECIFIC_PARAMS="$MPI_SPECIFIC_PARAMS --prefix $MPI_START_MPI_PREFIX $OPENMPI_PARAMS"
 
+    # TODO: try to fix the mess of mpiruns mpiexec and everything in between.
     # check for user supplied mpiexec 
     MPIEXEC=`which mpiexec`
     if test "x$MPI_OPENMPI_MPIEXEC" != "x"  ; then
-        MPIEXEC="$MPI_OPENMPI_MPIEXEC $I2G_MPI_MPIEXEC_PARAMS"
-        debug_msg "using user supplied startup : '$MPIEXEC'"
-        MPI_SPECIFIC_PARAMS="$MPI_SPECIFIC_PARAMS -x X509_USER_PROXY --prefix $MPI_START_MPI_PREFIX $OPENMPI_PARAMS"
-        . $MPI_START_PREFIX/../etc/mpi-start/generic_mpiexec.sh
-        generic_mpiexec
+        MPIEXEC="$MPI_OPENMPI_MPIEXEC"
+        MPI_SPECIFIC_PARAMS="$MPI_SPECIFIC_PARAMS $I2G_MPI_MPIEXEC_PARAMS"
+        debug_msg "using user supplied startup: '$MPIEXEC'"
     elif test "x$MPI_OPENMPI_MPIRUN" != "x" ; then
-        MPIEXEC="$MPI_OPENMPI_MPIRUN $MPI_OPENMPI_MPIRUN_PARAMS"
-        debug_msg "using user supplied startup : '$MPIEXEC'"
-        MPI_SPECIFIC_PARAMS="$MPI_SPECIFIC_PARAMS -x X509_USER_PROXY --prefix $MPI_START_MPI_PREFIX $OPENMPI_PARAMS"
-        . $MPI_START_PREFIX/../etc/mpi-start/generic_mpiexec.sh
-        generic_mpiexec
-    else
-        MPI_SPECIFIC_PARAMS="$MPI_SPECIFIC_PARAMS -x X509_USER_PROXY --prefix $MPI_START_MPI_PREFIX $OPENMPI_PARAMS"
-        . $MPI_START_PREFIX/../etc/mpi-start/generic_mpiexec.sh
-        generic_mpiexec
+        MPIEXEC="$MPI_OPENMPI_MPIRUN"
+        MPI_SPECIFIC_PARAMS="$MPI_SPECIFIC_PARAMS $MPI_OPENMPI_MPIRUN_PARAMS"
+        debug_msg "using user supplied startup: '$MPIEXEC'"
     fi
+    . $MPI_START_PREFIX/../etc/mpi-start/generic_mpiexec.sh
+    generic_mpiexec
     return $?
 }
 

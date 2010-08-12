@@ -366,6 +366,11 @@ main() {
         exit 1
     fi
 
+    # export X509_USER_PROXY if it's there.
+    if test "x$X509_USER_PROXY" != "x" ; then
+        mpi_start_export_variable X509_USER_PROXY
+    fi
+
     # call the MPI specific startup functions
     info_msg "call backend MPI implementation"
     mpi_start
