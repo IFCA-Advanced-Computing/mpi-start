@@ -108,6 +108,12 @@ mpi_start_pre_run_hook_copy () {
     debug_msg "mpi_start_pre_run_hook_copy"
 
     debug_msg "fs not shared -> distribute binary"
+
+    if test $MPI_START_NHOSTS -eq 1 ; then
+        debug_msg "only localhost, skip distribution"
+        return 0
+    fi
+
     # create hostfile, with 
     # one process per host, and localhost must be the first entry.
     COPY_MACHINEFILE=`mktemp`
@@ -231,24 +237,9 @@ mpi_start_pre_run_hook () {
 mpi_start_pre_run_hook_generic () {
     debug_msg "mpi_start_pre_run_hook_generic"
 
-    # set any compiler environment variables
-    MPI_START_COMPILER_HOOKS=$MPI_START_PREFIX/../etc/mpi-start/compiler.hooks
-    if test -e $MPI_START_COMPILER_HOOKS ; then
-        unset mpi_start_compiler_hooks
-        source $MPI_START_COMPILER_HOOKS
-        type mpi_start_compiler_hooks &> /dev/null
-        result=$?
-        if test $result -ne 0 ; then
-            debug_msg "mpi_start_compiler_hooks function not found, ignoring" 
-        fi
-        mpi_start_compiler_hooks
-        result=$?
-        if test $result -ne 0 ; then
-            error_msg "compiler hook returned : $result"
-            dump_env
-            exit $result
-        fi
-    fi
+    for hook in $MPI_START_PREFIX/../etc/mpi-start/*.hook; do
+        mpi_start_run_pre_hook $hook
+    done
 
     # determine local filesystem
     mpi_start_detect_shared_fs
@@ -308,40 +299,14 @@ mpi_start_post_run_hook_generic () {
     # determine local filesystem
     mpi_start_detect_shared_fs
 
+    for hook in $MPI_START_PREFIX/../etc/mpi-start/*.hook; do
+        mpi_start_run_post_hook $hook
+    done
+
     MPI_START_HOOKS_LOCAL=$MPI_START_PREFIX/../etc/mpi-start/mpi-start.hooks.local
     mpi_start_run_post_hook $MPI_START_HOOKS_LOCAL
 
     mpi_start_run_post_hook $I2G_MPI_POST_RUN_HOOK
-
-    if test "x$I2G_USE_MARMOT" = "x1" ; then
-	if test "x$MPI_START_SHARED_FS" != "x1" ; then
-		export LAST_MACHINE_NAME=`tail -n 1 $MPI_START_MACHINEFILE`
-		debug_msg "LAST_MACHINE_NAME => $LAST_MACHINE_NAME"
-                scp "$LAST_MACHINE_NAME":$MARMOT_LOGFILE_PATH/MarmotLog.* .
-        fi
-fi
-
-    if test "x$I2G_USE_MPITRACE" = "x1" ; then
-	for MPI_START_REMOTE_NODE in `cat $MPI_START_MACHINEFILE | sort -u`; do
-		if test $MPI_START_REMOTE_NODE = `hostname` -o $MPI_START_REMOTE_NODE = `hostname -f` -o $MPI_START_REMOTE_NODE = "localhost" ; then
-			debug_msg "skip local machine"
-		else
-			scp $MPI_START_REMOTE_NODE:$PWD/*.mpit . 2>&1 > /dev/null
-			result=$?
-			if test "x$result" != "x0" ; then 
-				error_msg "mpitrace files: failed to copy binary from remote machine"
-				return 1
-			fi
-		fi
-	done
-
-	MPITRACE_INSTALLATION=/opt/i2g/mpitrace
-	CMD="$MPITRACE_INSTALLATION/bin/mpi2prv *.mpit -o $I2G_MPI_APPLICATION.prv"
-	debug_msg "$CMD"
-	debug_msg "files here:"
-	ls .
-	$CMD
-    fi
 
     if  test "x$MPI_START_SHARED_FS" != "x1" -o "x$MPI_START_DISTRIBUTE_PROXY" = "x1"  ; then 
         # this may be unset if only running on localhost
