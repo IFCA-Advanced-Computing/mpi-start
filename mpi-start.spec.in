@@ -13,8 +13,8 @@ Release: 1
 License: other
 Group: Application
 Source: @NAME_PREFIX@mpi-start-@VERSION@.tar.gz
-URL: dsds
-Packager: stork@hlrs.de
+URL: http://devel.ifca.es/mpi-start/
+Packager: enolfc@ifca.unican.es
 BuildRoot: %{_tmppath}/%{name}-%{version}-root
 BuildArch:  noarch
 
