@@ -28,10 +28,16 @@ mpi_exec () {
     . $MPI_START_PREFIX/../etc/mpi-start/common.sh
     mpi_start_search_mpiexec
 
+    if test "x$I2G_MPI_SINGLE_PROCESS" = "x1" ; then
+        MACHINEFILE=$MPI_START_HOSTFILE
+    else
+        MACHINEFILE=$MPI_START_MACHINEFILE
+    fi
+
     #handle Open MPI 1.2.2 + PBS bug
     if test "x$MPI_START_SCHEDULER" != "xpbs" ; then
         debug_msg "found openmpi and a non-PBS batch system, set machinefile and np parameters"
-        export I2G_MACHINEFILE_AND_NP="-machinefile $MPI_START_MACHINEFILE -np $I2G_MPI_NP"
+        export I2G_MACHINEFILE_AND_NP="-machinefile $MACHINEFILE -np $I2G_MPI_NP"
     else
         debug_msg "found openmpi and PBS, don't set machinefile"
         export I2G_MACHINEFILE_AND_NP="-np $I2G_MPI_NP"
