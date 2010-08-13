@@ -18,6 +18,7 @@ install:
 	mkdir -p $(DESTDIR)/$(PREFIX)/etc/mpi-start
 	install -m 0644 generic_mpiexec.sh $(DESTDIR)/$(PREFIX)/etc/mpi-start/
 	install -m 0644 generic_mpi_start.sh $(DESTDIR)/$(PREFIX)/etc/mpi-start/
+	install -m 0644 common.sh $(DESTDIR)/$(PREFIX)/etc/mpi-start/
 	$(MAKE) -C openmpi install
 	$(MAKE) -C pacx install
 	$(MAKE) -C mpich2 install
