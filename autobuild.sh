@@ -5,12 +5,19 @@ set -x
 echo "Print environment"
 env
 
-echo "List : $AUTOBUILD_PACKAGE_ROOT"
-ls -al $AUTOBUILD_PACKAGE_ROOT
+if test "x$AUTOBUILD_PACKAGE_ROOT" = "x" ; then
+    export AUTOBUILD_PACKAGE_ROOT=build
+fi 
+
+for dir in SPECS RPMS SRPMS; do
+    if test ! -d "$AUTOBUILD_PACKAGE_ROOT/$dir" ; then
+        mkdir -p "$AUTOBUILD_PACKAGE_ROOT/$dir"
+    fi
+done
 
 VERSION=`cat VERSION`
 
-TMPDIR=/var/tmp
+TMPDIR=/tmp
 if test "x$AUTOBUILD_INSTALL_ROOT" != "x" ; then
     TMPDIR=$AUTOBUILD_INSTALL_ROOT
 fi
