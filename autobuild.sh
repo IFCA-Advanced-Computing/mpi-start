@@ -9,9 +9,9 @@ if test "x$AUTOBUILD_PACKAGE_ROOT" = "x" ; then
     export AUTOBUILD_PACKAGE_ROOT=build
 fi 
 
-for dir in SPECS RPMS SRPMS; do
-    if test ! -d "$AUTOBUILD_PACKAGE_ROOT/$dir" ; then
-        mkdir -p "$AUTOBUILD_PACKAGE_ROOT/$dir"
+for dir in SPECS RPMS SRPMS SOURCES BUILD; do
+    if test ! -d "$AUTOBUILD_PACKAGE_ROOT/rpm/$dir" ; then
+        mkdir -p "$AUTOBUILD_PACKAGE_ROOT/rpm/$dir"
     fi
 done
 

@@ -35,7 +35,7 @@ tarball:all
 
 dist:	
 	rm -rf i2g-mpi-start-$(VERSION)
-	svn export . i2g-mpi-start-$(VERSION)
+	hg archive i2g-mpi-start-$(VERSION)
 	sed -e "s/@NAME_PREFIX@/i2g-/" -e "s/@VERSION@/$(VERSION)/" mpi-start.spec.in > i2g-mpi-start-$(VERSION)/i2g-mpi-start-$(VERSION).spec
 	tar cvzf i2g-mpi-start-$(VERSION).tar.gz i2g-mpi-start-$(VERSION)
 	rm -rf i2g-mpi-start-$(VERSION)
