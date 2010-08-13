@@ -17,6 +17,11 @@ mpi_start_activate_mpi $MPI_START_MPI_PREFIX "$MPI_START_MPI_MODULE"
 # start an mpi job
 #
 mpi_exec () {
+    if $MPI_START_SCHEDULER = "slurm" ; then
+        slurm_mpiexec
+        return $?
+    fi
+
     . $MPI_START_PREFIX/../etc/mpi-start/common.sh
     mpi_start_search_mpiexec
 

@@ -54,3 +54,17 @@ scheduler_get_machinefile () {
 
     return 0
 }
+
+#
+# Most MPI implementations under slurm do not use mpirun/mpiexec but srun to start
+# this function executes the job for them
+slurm_mpiexec() {
+    MPIEXEC=srun
+    MPI_SPECIFIC_PARAMS=""
+    I2G_MACHINEFILE_AND_NP=""
+
+    . $MPI_START_PREFIX/../etc/mpi-start/generic_mpiexec.sh
+    generic_mpiexec
+    err=$?
+    return $err
+}

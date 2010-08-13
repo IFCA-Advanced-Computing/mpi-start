@@ -45,6 +45,11 @@ mpich2_with_mpd () {
 # start an mpi job
 #
 mpi_exec () {
+    if $MPI_START_SCHEDULER = "slurm" ; then
+        slurm_mpiexec
+        return $?
+    fi
+
     . $MPI_START_PREFIX/../etc/mpi-start/common.sh
     mpi_start_search_mpiexec
 

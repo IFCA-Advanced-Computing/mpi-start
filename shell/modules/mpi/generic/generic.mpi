@@ -17,6 +17,11 @@
 # start an mpi job
 #
 mpi_exec () {
+    if $MPI_START_SCHEDULER = "slurm" ; then
+        slurm_mpiexec
+        return $?
+    fi
+
     if test "x$I2G_MPI_SINGLE_PROCESS" = "x1"; then
         I2G_MACHINEFILE_AND_NP="-machinefile $MPI_START_HOSTFILE -np $I2G_MPI_NP"
     else

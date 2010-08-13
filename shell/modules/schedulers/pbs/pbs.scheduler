@@ -4,7 +4,7 @@
 #                         University of Stuttgart.  All rights reserved.
 #
 
-SCHEDULER_NAME="PBS"
+SCHEDULER_NAME="pbs"
 
 #
 # This function checks if the current job is running in a PBS 

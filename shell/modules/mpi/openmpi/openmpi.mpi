@@ -29,7 +29,7 @@ mpi_exec () {
     mpi_start_search_mpiexec
 
     #handle Open MPI 1.2.2 + PBS bug
-    if test "x$MPI_START_SCHEDULER" != "xPBS" ; then
+    if test "x$MPI_START_SCHEDULER" != "xpbs" ; then
         debug_msg "found openmpi and a non-PBS batch system, set machinefile and np parameters"
         export I2G_MACHINEFILE_AND_NP="-machinefile $MPI_START_MACHINEFILE -np $I2G_MPI_NP"
     else
