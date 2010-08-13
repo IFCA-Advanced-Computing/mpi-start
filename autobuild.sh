@@ -6,7 +6,7 @@ echo "Print environment"
 env
 
 if test "x$AUTOBUILD_PACKAGE_ROOT" = "x" ; then
-    export AUTOBUILD_PACKAGE_ROOT=build
+    export AUTOBUILD_PACKAGE_ROOT=$PWD/build
 fi 
 
 for dir in SPECS RPMS SRPMS SOURCES BUILD; do
