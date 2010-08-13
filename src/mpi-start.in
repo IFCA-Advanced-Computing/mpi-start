@@ -187,17 +187,13 @@ main() {
     # debug me 
     if test "x$I2G_MPI_START_DEBUG" = "x1" ; then 
         debug_msg "dump configuration"
-        debug_msg "=> I2G_MPI_APPLICATION=$I2G_MPI_APPLICATION"
-        debug_msg "=> I2G_MPI_APPLICATION_ARGS=$I2G_MPI_APPLICATION_ARGS"
-        debug_msg "=> I2G_MPI_TYPE=$I2G_MPI_TYPE"
-        debug_msg "=> I2G_MPI_VERSION=$I2G_MPI_VERSION"
-        debug_msg "=> I2G_MPI_PRE_RUN_HOOK=$I2G_MPI_PRE_RUN_HOOK"
-        debug_msg "=> I2G_MPI_POST_RUN_HOOK=$I2G_MPI_POST_RUN_HOOK"
-        debug_msg "=> I2G_MPI_PRECOMMAND=$I2G_MPI_PRECOMMAND"
-        debug_msg "=> I2G_MPI_FLAVOUR=$I2G_MPI_FLAVOUR"
-        debug_msg "=> I2G_MPI_JOB_NUMBER=$I2G_MPI_JOB_NUMBER"
-        debug_msg "=> I2G_MPI_STARTUP_INFO=$I2G_MPI_STARTUP_INFO"
-        debug_msg "=> I2G_MPI_RELAY=$I2G_MPI_RELAY"
+        for var in I2G_MPI_APPLICATION I2G_MPI_APPLICATION_ARGS I2G_MPI_TYPE \
+                   I2G_MPI_VERSION I2G_MPI_PRE_RUN_HOOK I2G_MPI_POST_RUN_HOOK \
+                   I2G_MPI_PRECOMMAND I2G_MPI_FLAVOUR I2G_MPI_JOB_NUMBER \
+                   I2G_MPI_STARTUP_INFO I2G_MPI_RELAY I2G_MPI_SINGLE_PROCESS ; do
+            eval value="\${$var}"
+            debug_msg "=> ${var}=${value}"
+        done
     fi
 
     # trace me
