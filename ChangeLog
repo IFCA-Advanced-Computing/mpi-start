@@ -1,3 +1,8 @@
+2010-09-13 Enol Fernandez <enolfc _AT_ ifca.unican.es>
+	* Moved to mercurial
+	* Lots of code cleanup
+	* Changed versioning schema, now we are at 0.1.0
+
 2010-03-18 Enol Fernandez <enolfc _AT_ ifca.unican.es>
 	* Code cleanup, fix in cptoshared.
 
