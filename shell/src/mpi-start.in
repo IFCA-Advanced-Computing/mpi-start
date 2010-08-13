@@ -109,7 +109,6 @@ EOF
 }
 
 
-
 #======================================================================
 # Export a variable for the MPI job. It will be defined only in the
 # context of the job (executed in a different process)

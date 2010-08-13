@@ -25,6 +25,9 @@ fi
 # start an mpi job
 #
 mpi_exec () {
+    . $MPI_START_PREFIX/../etc/mpi-start/common.sh
+    mpi_start_search_mpiexec
+
     #handle Open MPI 1.2.2 + PBS bug
     if test "x$MPI_START_SCHEDULER" != "xPBS" ; then
         debug_msg "found openmpi and a non-PBS batch system, set machinefile and np parameters"
@@ -39,24 +42,24 @@ mpi_exec () {
     fi
 
     # set the parameters to be always used with Open MPI:
-    MPI_SPECIFIC_PARAMS="-wdir $PWD "
+    MPI_SPECIFIC_PARAMS="$MPI_SPECIFIC_PARAMS -wdir $PWD "
     for vars in $MPI_START_ENV_VARIABLES; do
         MPI_SPECIFIC_PARAMS="$MPI_SPECIFIC_PARAMS -x $var"
     done
     MPI_SPECIFIC_PARAMS="$MPI_SPECIFIC_PARAMS --prefix $MPI_START_MPI_PREFIX $OPENMPI_PARAMS"
 
-    # TODO: try to fix the mess of mpiruns mpiexec and everything in between.
-    # check for user supplied mpiexec 
-    MPIEXEC=`which mpiexec`
-    if test "x$MPI_OPENMPI_MPIEXEC" != "x"  ; then
-        MPIEXEC="$MPI_OPENMPI_MPIEXEC"
+    if test "x$MPI_MPIEXEC" != "x"; then
+        MPIEXEC=$MPI_MPIEXEC
+        # TODO: What is I2G_MPI_MPIEXEC_PARAMS exactly???
         MPI_SPECIFIC_PARAMS="$MPI_SPECIFIC_PARAMS $I2G_MPI_MPIEXEC_PARAMS"
-        debug_msg "using user supplied startup: '$MPIEXEC'"
-    elif test "x$MPI_OPENMPI_MPIRUN" != "x" ; then
-        MPIEXEC="$MPI_OPENMPI_MPIRUN"
-        MPI_SPECIFIC_PARAMS="$MPI_SPECIFIC_PARAMS $MPI_OPENMPI_MPIRUN_PARAMS"
-        debug_msg "using user supplied startup: '$MPIEXEC'"
+    elif test "x$MPI_MPIRUN" != "x"; then
+        MPIEXEC=$MPI_MPIRUN
+    else
+        debug_msg "no mpiexec/mpirun found!"
+        dump_env
+        exit 1
     fi
+
     . $MPI_START_PREFIX/../etc/mpi-start/generic_mpiexec.sh
     generic_mpiexec
     return $?

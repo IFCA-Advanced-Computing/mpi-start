@@ -17,42 +17,30 @@ mpi_start_activate_mpi $MPI_START_MPI_PREFIX "$MPI_START_MPI_MODULE"
 # start an mpi job
 #
 mpi_exec () {
-    # check for user supplied mpiexec 
-    if test "x$MPI_MPICH_MPIEXEC" != "x" ; then
-        MPIEXEC="$MPI_MPICH_MPIEXEC $I2G_MPI_MPIEXEC_PARAMS"
-        debug_msg "using user supplied startup : '$MPIEXEC'"
-    elif test "x$MPI_MPICH_MPIRUN" != "x" ; then
-        MPIEXEC="$MPI_MPICH_MPIRUN $MPI_MPICH_MPIRUN_PARAMS"
-        debug_msg "using user supplied startup : '$MPIEXEC'"
+    . $MPI_START_PREFIX/../etc/mpi-start/common.sh
+    mpi_start_search_mpiexec
+
+    if test "x$I2G_MPI_SINGLE_PROCESS" = "x1" ; then
+        export I2G_MACHINEFILE_AND_NP="-machinefile $MPI_START_HOSTFILE -np $I2G_MPI_NP"
     else
-    	debug_msg "user supplied mpiexec/mpirun not found, try with system defaults"
-        MPIEXEC=`which mpiexec 2> /dev/null`
-        err=$?
-        MPIEXEC="$MPIEXEC $I2G_MPI_MPIEXEC_PARAMS"
-        if test $err -eq 1 ; then
-            MPIEXEC=`which mpirun 2> /dev/null`
-    	    debug_msg "mpiexec not found, assume it is safe to set the machinefile and number of processes"
-            MPIEXEC="$MPIEXEC $MPI_MPICH_MPIRUN_PARAMS"
+        export I2G_MACHINEFILE_AND_NP="-machinefile $MPI_START_MACHINEFILE -np $I2G_MPI_NP"
+    fi
+ 
+    if test "x$MPI_MPIEXEC" != "x"; then
+        MPIEXEC=$MPI_MPIEXEC
+
+        # how to test if the mpiexec needs the -np and -machinefile args??
+        $MPIEXEC 2>&1 | grep -e "-\<np\>" > /dev/null 2>&1
+        status=$?
+        if test $status -ne 0 ; then
+            # OSC mpiexec! 
+            debug_msg "Found OSC MPIEXEC, do not set machinefile!"
+            if test "x$I2G_MPI_SINGLE_PROCESS" = "x1" ; then
+                MPI_SPECIFIC_PARAMS="$MPI_SPECIFIC_PARAMS -pernode"
+            fi
         fi
     fi
 
-    # how to test if the mpiexec needs the -np and -machinefile args??
-    $MPIEXEC 2>&1 | grep -e "-\<np\>" > /dev/null 2>&1
-    status=$?
-    if test $status -eq 1 ; then
-        if test "x$I2G_MPI_SINGLE_PROCESS" = "x1" ; then
-            export I2G_MACHINEFILE_AND_NP="-machinefile $MPI_START_HOSTFILE -np $I2G_MPI_NP"
-        else
-            export I2G_MACHINEFILE_AND_NP="-machinefile $MPI_START_MACHINEFILE -np $I2G_MPI_NP"
-        fi
-    else
-        if test "x$I2G_MPI_SINGLE_PROCESS" = "x1" ; then
-            # assume OSC mpiexec, that accepts -pernode
-            export I2G_MACHINEFILE_AND_NP="-pernode"
-        fi
-    fi
-
-    MPI_SPECIFIC_PARAMS=$MPICH_PARAMS
     . $MPI_START_PREFIX/../etc/mpi-start/generic_mpiexec.sh
     generic_mpiexec
     err=$?
