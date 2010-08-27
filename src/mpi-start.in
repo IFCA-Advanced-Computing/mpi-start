@@ -210,9 +210,11 @@ main() {
         exit 1;
     fi
 
-    # global environment variables 
+    # global variables 
     MPI_START_PREFIX=`dirname $I2G_MPI_START`
     MPI_START_MACHINEFILE=""
+    MPI_START_HOSTFILE=""
+    MPI_START_MPI_WRAPPER=""
     MPI_START_READY=-1 
 
     # check for scheduling system and set environment variables
