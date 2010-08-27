@@ -210,12 +210,18 @@ main() {
         exit 1;
     fi
 
-    # global variables 
+    # set global variables 
     MPI_START_PREFIX=`dirname $I2G_MPI_START`
     MPI_START_MACHINEFILE=""
     MPI_START_HOSTFILE=""
+    MPI_START_HOST_SLOTS_FILE=""
+    MPI_START_NHOSTS=0
+    MPI_START_NSLOTS=0
+    MPI_START_NSLOTS_PER_HOST=0
     MPI_START_MPI_WRAPPER=""
     MPI_START_READY=-1 
+    MPI_START_MPI_PREFIX=""
+    MPI_START_CLEANUP_FILES=""
 
     # check for scheduling system and set environment variables
     info_msg "search for scheduler"
@@ -278,8 +284,7 @@ main() {
         exit 1
     fi
 
-    # check for EGEE environement
-    debug_msg "check for EGEE environment"
+    debug_msg "check for site environment"
 
     # check if we should should use default MPI falvour
     if test "x$I2G_MPI_TYPE" = "x"  ; then 
@@ -329,7 +334,8 @@ main() {
     fi
 
     # FIXME: why there is I2G_<flavour>_PREFIX and MPI_<flavour>_PATH ?
-    #        will keep both to keep compatibility, but one of them should be removed
+    #        will keep both to keep compatibility, but one of them should
+    #        be removed
     #        I2G_<flavour>_PREFIX takes precedence over the others
     #        then MPI_<flavour>_<version>_PATH and last
     #        MPI_<flavour>_PATH
