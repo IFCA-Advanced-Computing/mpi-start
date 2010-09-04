@@ -71,7 +71,7 @@ clean(){
 
     # create hostfile, with 
     # one process per host, and localhost must be the first entry.
-    COPY_MACHINEFILE=`mktemp`
+    COPY_MACHINEFILE=`$MPI_START_MKTEMP`
     echo `hostname -s` > $COPY_MACHINEFILE
     cat $MPI_START_MACHINEFILE | sort -u | grep -v `hostname` | grep -v `hostname -f` | grep -v `hostname -s` >> $COPY_MACHINEFILE
     

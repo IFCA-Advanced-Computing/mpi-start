@@ -45,7 +45,7 @@ mpich2_with_mpd () {
 # start an mpi job
 #
 mpi_exec () {
-    if $MPI_START_SCHEDULER = "slurm" ; then
+    if test $MPI_START_SCHEDULER = "slurm" ; then
         slurm_mpiexec
         return $?
     fi

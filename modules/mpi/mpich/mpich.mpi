@@ -17,7 +17,7 @@ mpi_start_activate_mpi $MPI_START_MPI_PREFIX "$MPI_START_MPI_MODULE"
 # start an mpi job
 #
 mpi_exec () {
-    if $MPI_START_SCHEDULER = "slurm" ; then
+    if test $MPI_START_SCHEDULER = "slurm" ; then
         slurm_mpiexec
         return $?
     fi

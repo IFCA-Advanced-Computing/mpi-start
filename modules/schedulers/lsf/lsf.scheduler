@@ -35,9 +35,9 @@ scheduler_get_machinefile () {
         return 13
     fi
     debug_msg " build machinefile based on LSB_HOSTS"
-    export MPI_START_MACHINEFILE=`mktemp`
-    export MPI_START_HOSTFILE=`mktemp`
-    export MPI_START_HOST_SLOTS_FILE=`mktemp`
+    export MPI_START_MACHINEFILE=`$MPI_START_MKTEMP`
+    export MPI_START_HOSTFILE=`$MPI_START_MKTEMP`
+    export MPI_START_HOST_SLOTS_FILE=`$MPI_START_MKTEMP`
     for host in $LSB_HOSTS; do
         echo $host >> $MPI_START_MACHINEFILE
     done

@@ -28,9 +28,9 @@ scheduler_available () {
 scheduler_get_machinefile () {
     debug_msg " return PBS_NODEFILE"
     [ ! -f "$PBS_NODEFILE" ] && return 13
-    export MPI_START_MACHINEFILE=`mktemp`
-    export MPI_START_HOSTFILE=`mktemp`
-    export MPI_START_HOST_SLOTS_FILE=`mktemp`
+    export MPI_START_MACHINEFILE=`$MPI_START_MKTEMP`
+    export MPI_START_HOSTFILE=`$MPI_START_MKTEMP`
+    export MPI_START_HOST_SLOTS_FILE=`$MPI_START_MKTEMP`
     cat $PBS_NODEFILE > $MPI_START_MACHINEFILE
     cat $MPI_START_MACHINEFILE | sort | uniq -c | tr -s " " |
          # this is a subshell, variables changes here are not changed outside!
