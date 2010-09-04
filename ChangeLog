@@ -1,4 +1,9 @@
-2010-09-13 Enol Fernandez <enolfc _AT_ ifca.unican.es>
+2010-09-04 Enol Fernandez <enolfc _AT_ ifca.unican.es>
+	* Make mpi-start runnable at MacOS.
+	* Fixed typos in mpich/mpich2 modules.
+	* Added automatic check for prefix in openmpi module.
+
+2010-08-13 Enol Fernandez <enolfc _AT_ ifca.unican.es>
 	* Moved to mercurial
 	* Lots of code cleanup
 	* Changed versioning schema, now we are at 0.1.0
