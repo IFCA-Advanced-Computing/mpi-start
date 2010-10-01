@@ -21,7 +21,7 @@ fi
 # activate MPI
 mpi_start_activate_mpi $MPI_START_MPI_PREFIX "$MPI_START_MPI_MODULE"
 
-if test "x$I2G_MPI_TYPE" != "xopenmpi" ; then
+if test "x$MPI_START_DISABLE_LRMS_INTEGRATION" == "xyes"; then
     # we are not the primary MPI 
     # fall back to save settings that should work always
     debug_msg ""
