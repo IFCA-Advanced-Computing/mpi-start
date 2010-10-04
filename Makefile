@@ -42,7 +42,7 @@ dist:
 
 rpm: dist
 	mkdir -p rpm/SOURCES rpm/SRPMS rpm/SPECS rpm/BUILD rpm/RPMS
-	rpmbuild --define "__topdir `pwd`/rpm" -ta i2g-mpi-start-$(VERSION).tar.gz
+	rpmbuild --define "_topdir `pwd`/rpm" -ta i2g-mpi-start-$(VERSION).tar.gz
 
 
 export VERSION
