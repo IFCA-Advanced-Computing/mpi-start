@@ -40,7 +40,7 @@ dist:
 	tar cvzf i2g-mpi-start-$(VERSION).tar.gz i2g-mpi-start-$(VERSION)
 	rm -rf i2g-mpi-start-$(VERSION)
 
-rpm: dist
+rpm: dist 
 	mkdir -p rpm/SOURCES rpm/SRPMS rpm/SPECS rpm/BUILD rpm/RPMS
 	rpmbuild --define "_topdir `pwd`/rpm" -ta i2g-mpi-start-$(VERSION).tar.gz
 
