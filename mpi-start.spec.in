@@ -26,11 +26,11 @@ A generic startup mechanism for different MPI installation in a cluster/grid.
 
 %build
 cd $RPM_BUILD_DIR/@NAME_PREFIX@mpi-start-@VERSION@
-make PREFIX=%{mpi_start_prefix}
+%{__make} PREFIX=%{mpi_start_prefix}
 
 %install
 cd $RPM_BUILD_DIR/@NAME_PREFIX@mpi-start-@VERSION@
-%{__make} DESTDIR=$RPM_BUILD_ROOT  PREFIX=%{mpi_start_prefix} install
+%{__make} DESTDIR=$RPM_BUILD_ROOT PREFIX=%{mpi_start_prefix} install
 mkdir -p $RPM_BUILD_ROOT/etc/profile.d
 echo "export I2G_MPI_START=%{mpi_start_prefix}/bin/mpi-start" > $RPM_BUILD_ROOT/etc/profile.d/mpi_start.sh
 echo "setenv I2G_MPI_START %{mpi_start_prefix}/bin/mpi-start" > $RPM_BUILD_ROOT/etc/profile.d/mpi_start.csh
