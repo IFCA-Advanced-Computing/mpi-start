@@ -10,9 +10,9 @@ all:
 	$(MAKE) -C templates all
 	$(MAKE) -C docs all
 
-
 clean:
 	rm -f *.tar.gz
+	rm -rf bin etc
 	$(MAKE) -C src clean
 	$(MAKE) -C modules clean
 	$(MAKE) -C templates clean
@@ -23,14 +23,18 @@ distclean:clean
 install:
 	mkdir -p $(DESTDIR)/$(PREFIX)/bin
 	mkdir -p $(DESTDIR)/$(PREFIX)/etc/mpi-start
+	mkdir -p $(DESTDIR)/etc
 	install COPYING $(DESTDIR)/$(PREFIX)/etc/mpi-start
 	$(MAKE) -C src install
 	$(MAKE) -C modules install
 	$(MAKE) -C templates install
 	$(MAKE) -C docs install
+	mkdir -p $(DESTDIR)/etc/profile.d
+	echo "export I2G_MPI_START=$(PREFIX)/bin/mpi-start" > $(DESTDIR)/etc/profile.d/mpi_start.sh
+	echo "setenv I2G_MPI_START $(PREFIX)/bin/mpi-start" > $(DESTDIR)/etc/profile.d/mpi_start.csh
 
 tarball:all
-	$(MAKE) install PREFIX=`pwd`
+	$(MAKE) install PREFIX="" DESTDIR=`pwd` 
 	tar czvf mpi-start-$(VERSION).tar.gz bin/* etc/*
 
 dist:	
