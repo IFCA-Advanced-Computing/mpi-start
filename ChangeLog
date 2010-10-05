@@ -1,3 +1,6 @@
+2010-10-05 Enol Fernandez <enolfc _AT_ ifca.unican.es>
+	* Better packaging from makefile.
+
 2010-09-04 Enol Fernandez <enolfc _AT_ ifca.unican.es>
 	* Make mpi-start runnable at MacOS.
 	* Fixed typos in mpich/mpich2 modules.
