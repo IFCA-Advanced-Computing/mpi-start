@@ -2,6 +2,7 @@
 VERSION=$(shell cat VERSION)
 DESTDIR=
 PREFIX=/opt/i2g
+NAME_PREFIX=i2g
 
 all:
 	$(MAKE) -C src all 
@@ -33,15 +34,15 @@ tarball:all
 	tar czvf mpi-start-$(VERSION).tar.gz bin/* etc/*
 
 dist:	
-	rm -rf i2g-mpi-start-$(VERSION)
-	hg archive i2g-mpi-start-$(VERSION)
-	sed -e "s/@NAME_PREFIX@/i2g-/" -e "s/@VERSION@/$(VERSION)/" mpi-start.spec.in > i2g-mpi-start-$(VERSION)/i2g-mpi-start-$(VERSION).spec
-	tar cvzf i2g-mpi-start-$(VERSION).tar.gz i2g-mpi-start-$(VERSION)
-	rm -rf i2g-mpi-start-$(VERSION)
+	rm -rf $(NAME_PREFIX)-mpi-start-$(VERSION)
+	hg archive $(NAME_PREFIX)-mpi-start-$(VERSION)
+	sed -e "s/@NAME_PREFIX@/$(NAME_PREFIX)-/" -e "s/@VERSION@/$(VERSION)/" mpi-start.spec.in > $(NAME_PREFIX)-mpi-start-$(VERSION)/$(NAME_PREFIX)-mpi-start-$(VERSION).spec
+	tar cvzf $(NAME_PREFIX)-mpi-start-$(VERSION).tar.gz $(NAME_PREFIX)-mpi-start-$(VERSION)
+	rm -rf $(NAME_PREFIX)-mpi-start-$(VERSION)
 
 rpm: dist
 	mkdir -p rpm/SOURCES rpm/SRPMS rpm/SPECS rpm/BUILD rpm/RPMS
-	rpmbuild --define "_topdir `pwd`/rpm" --define "mpi-start-prefix ''" -ta i2g-mpi-start-$(VERSION).tar.gz
+	rpmbuild --define "_topdir `pwd`/rpm" --define "mpi-start-prefix $(PREFIX)" -ta $(NAME_PREFIX)-mpi-start-$(VERSION).tar.gz
 
 
 export VERSION
