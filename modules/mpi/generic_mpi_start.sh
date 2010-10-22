@@ -14,17 +14,13 @@ generic_mpi_start () {
     # call pre run hook
     mpi_start_pre_run_hook
 
-    if test "x$I2G_MPI_START_VERBOSE" = "x1" ; then
-        echo "=[START]================================================================"
-    fi
+    info_msg "=[START]================================================================" 
 
     # start it
     mpi_exec
     err=$?
 
-    if test "x$I2G_MPI_START_VERBOSE" = "x1" ; then
-        echo "=[FINISHED]============================================================="
-    fi
+    info_msg "=[FINISHED]============================================================="
 
     # call pre run hook
     mpi_start_post_run_hook
