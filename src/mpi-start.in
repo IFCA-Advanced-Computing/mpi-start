@@ -25,7 +25,7 @@ trap clean_up EXIT
 #======================================================================
 warn_msg () {
     if test "x$I2G_MPI_START_VERBOSE" = "x1" ; then 
-        echo "mpi-start [WARNING]:" $@
+        echo "mpi-start [WARNING]:" $@ 1>&2
     fi
 }
 
@@ -33,7 +33,7 @@ warn_msg () {
 # Displays a warning message
 #======================================================================
 error_msg () {
-    echo "mpi-start [ERROR  ]:" $@
+    echo "mpi-start [ERROR  ]:" $@ 1>&2
 }
 
 #======================================================================
@@ -43,7 +43,7 @@ error_msg () {
 debug_msg () {
     if test "x$I2G_MPI_START_VERBOSE" = "x1" ; then 
         if test "x$I2G_MPI_START_DEBUG" = "x1"  ; then
-            echo "mpi-start [DEBUG  ]: "$@
+            echo "mpi-start [DEBUG  ]: "$@ 1>&2
         fi
     fi
 }
@@ -54,7 +54,7 @@ debug_msg () {
 #======================================================================
 info_msg () {
     if test "x$I2G_MPI_START_VERBOSE" = "x1" ; then 
-        echo "mpi-start [INFO   ]: "$@
+        echo "mpi-start [INFO   ]: "$@ 1>&2
     fi
 }
 
@@ -63,9 +63,11 @@ info_msg () {
 # $1 level
 #======================================================================
 dump_env () {
-    for i in `env`; do
-        echo "mpi-start [DUMPENV]:" $i
-    done
+    if test "x$I2G_MPI_START_VERBOSE" = "x1" ; then 
+        for i in `env`; do
+            echo "mpi-start [DUMPENV]:" $i 1>&2
+        done
+    fi
 }
 
 #
@@ -190,14 +192,12 @@ main() {
     #
     # Output general information
     #
-    if test "x$I2G_MPI_START_VERBOSE" = "x1" ; then 
-        echo "************************************************************************"
-        echo "UID     = " `whoami`
-        echo "HOST    = " `hostname`
-        echo "DATE    = " `date`
-        echo "VERSION =  @VERSION@" 
-        echo "************************************************************************"
-    fi
+    info_msg "************************************************************************" 
+    info_msg "UID     = " `whoami` 
+    info_msg "HOST    = " `hostname` 
+    info_msg "DATE    = " `date`
+    info_msg "VERSION =  @VERSION@"  
+    info_msg "************************************************************************"
 
     #
     # setup framework goes here
@@ -224,7 +224,6 @@ main() {
     # check for valid I2G_MPI_START variable
     if test "x$I2G_MPI_START" = "x" ; then
         error_msg "I2G_MPI_START not set"
-        error_msg "dump environment:"
         dump_env
         exit 1
     fi
@@ -283,9 +282,9 @@ main() {
                 debug_msg "=> $i"
             done
             if test "x${I2G_MPI_SINGLE_PROCESS}" = "x1" ; then
-                I2G_MPI_NP=$MPI_START_NHOSTS
+                export I2G_MPI_NP=$MPI_START_NHOSTS
             else
-                I2G_MPI_NP=$MPI_START_NSLOTS
+                export I2G_MPI_NP=$MPI_START_NSLOTS
             fi
 
             # setup the np count 
@@ -301,7 +300,6 @@ main() {
     # check if we have a scheduler 
     if test $MPI_START_READY -ne 0  ; then 
         error_msg "cannot find scheduler"
-        error_msg "dump environment:"
         dump_env
         exit 3 
     fi
@@ -326,7 +324,6 @@ main() {
     MPI_PLUGIN_FILE=$MPI_START_PREFIX/../etc/mpi-start/$I2G_MPI_TYPE.mpi
     if test ! -e $MPI_PLUGIN_FILE  ; then 
         error_msg "failed to find requested MPI type : $I2G_MPI_TYPE"
-        error_msg "Dump environment"
         dump_env 
         exit 2
     fi
@@ -391,7 +388,6 @@ main() {
     . $MPI_PLUGIN_FILE
     if test $? -ne 0 ; then
         error_msg "Error loading the MPI plugin: $MPI_PLUGIN_FILE"
-        error_msg "Dump environment"
         dump_env
         exit 1
     fi
