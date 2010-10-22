@@ -44,7 +44,7 @@ dist:
 	tar cvzf $(NAME_PREFIX)-mpi-start-$(VERSION).tar.gz $(NAME_PREFIX)-mpi-start-$(VERSION)
 	rm -rf $(NAME_PREFIX)-mpi-start-$(VERSION)
 
-rpm: dist
+rpm: dist 
 	mkdir -p rpm/SOURCES rpm/SRPMS rpm/SPECS rpm/BUILD rpm/RPMS
 	rpmbuild --define "_topdir `pwd`/rpm" --define "mpi-start-prefix $(PREFIX)" -ta $(NAME_PREFIX)-mpi-start-$(VERSION).tar.gz
 
