@@ -147,7 +147,8 @@ mpi_start_pre_run_hook_copy () {
 
     HIDDEN_FILES="$PWD/.[a-zA-Z0-9]*"
 
-    tar czf $TARBALL --ignore-failed-read $MYDIR $X509_USER_PROXY $HIDDEN_FILES
+    # XXX check this was done ok!
+    tar czf $TARBALL --ignore-failed-read $MYDIR $X509_USER_PROXY $HIDDEN_FILES 
  
 	#check all available file distribution plugins
     priority=255
