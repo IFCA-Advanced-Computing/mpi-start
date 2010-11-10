@@ -119,6 +119,7 @@ mpi_start_pre_run_hook_copy () {
     COPY_MACHINEFILE=`$MPI_START_MKTEMP`
     echo `hostname -s` > $COPY_MACHINEFILE
     cat $MPI_START_MACHINEFILE | sort -u | grep -v `hostname` | grep -v `hostname -f` | grep -v `hostname -s` >> $COPY_MACHINEFILE
+    export MPI_START_CLEANUP_FILES="$MPI_START_CLEANUP_FILES $COPY_MACHINEFILE"
     
     # get node count
     COPY_NP=`cat $COPY_MACHINEFILE | wc -l`
@@ -133,10 +134,12 @@ mpi_start_pre_run_hook_copy () {
     TARBALL=`$MPI_START_MKTEMP`
     status=$?
     if [ $status -ne 0 -o "x$TARBALL" = "x" ]; then
-        error_msg "failed to create tarball for file distribution"
+        error_msg "Failed to create tarball for file distribution"
         exit 1
     fi
     TARBALL_BASENAME=`basename $TARBALL`
+    # add tarball to files that must be cleaned
+    export MPI_START_CLEANUP_FILES="$MPI_START_CLEANUP_FILES $TARBALL"
    
     # try and get the whole job directory
     if [ "x$EDG_WL_RB_BROKERINFO" = "x" ]; then
@@ -183,11 +186,15 @@ mpi_start_pre_run_hook_copy () {
     fi
 
     unset copy
-    source $chosenDistrMethod
+    source $chosenDistrMethod &> /dev/null
+    if test $? -ne 0 ; then
+        error_msg "Unable to load distribution method $chosenDistrMethod"
+        dump_env
+        exit 1
+    fi
     copy
 
-    rm $TARBALL
-    rm $COPY_MACHINEFILE
+    rm -f $TARBALL
 }
 
 
