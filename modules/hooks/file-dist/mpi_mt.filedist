@@ -22,18 +22,16 @@ check_distribution_method(){
 }
 
 copy(){
-
     # backup old values
-    OLD_I2G_MPI_APPLICATION=$I2G_MPI_APPLICATION
-    OLD_I2G_MPI_APPLICATION_ARGS=$I2G_MPI_APPLICATION_ARGS
-    OLD_I2G_MPI_NP=$I2G_MPI_NP
-    OLD_I2G_MPI_PRECOMMAND=$I2G_MPI_PRECOMMAND
-    OLD_MPI_START_MACHINEFILE=$MPI_START_MACHINEFILE   
+    old_i2g_mpi_application=$I2G_MPI_APPLICATION
+    old_i2g_mpi_application_args=$I2G_MPI_APPLICATION_ARGS
+    old_i2g_mpi_np=$I2G_MPI_NP
+    old_i2g_mpi_precommand=$I2G_MPI_PRECOMMAND
+    old_mpi_start_machinefile=$MPI_START_MACHINEFILE   
     I2G_MPI_MPIEXEC_PARAMS=`printenv MPI_${MPI_TYPE}_MPIEXEC_PARAMS`
-	OLD_I2G_MPI_MPIEXEC_PARAMS=$I2G_MPIEXEC_PARAMS
+	old_i2g_mpi_mpiexec_params=$I2G_MPI_MPIEXEC_PARAMS
     debug_msg "distribute using mpi_mt"
 	# set to tmp. values
-	I2G_MPI_RESET_ARGS="yes"
 	I2G_MPI_APPLICATION=$I2G_MPI_MT
 	I2G_MPI_APPLICATION_ARGS="cp $TARBALL $PWD/$TARBALL_BASENAME"
 	I2G_MPI_NP=$COPY_NP
@@ -54,30 +52,18 @@ copy(){
     # launch the mpi job
     mpi_exec
 
-    if test "x$I2G_MPI_RESET_ARGS" = "xyes"; then
-        # reset to original values
-        I2G_MPI_APPLICATION=$OLD_I2G_MPI_APPLICATION
-        I2G_MPI_APPLICATION_ARGS=$OLD_I2G_MPI_APPLICATION_ARGS
-        I2G_MPI_NP=$OLD_I2G_MPI_NP
-        I2G_MPI_PRECOMMAND=$OLD_I2G_MPI_PRECOMMAND
-        MPI_START_MACHINEFILE=$OLD_MPI_START_MACHINEFILE
-        I2G_MPI_MPIEXEC_PARAMS=$OLD_I2G_MPIEXEC_PARAMS
-    fi
+    # reset to original values
+    I2G_MPI_APPLICATION=$old_i2g_mpi_application
+    I2G_MPI_APPLICATION_ARGS=$old_i2g_mpi_application_args
+    I2G_MPI_NP=$old_i2g_mpi_np
+    I2G_MPI_PRECOMMAND=$old_i2g_mpi_precommand
+    MPI_START_MACHINEFILE=$old_mpi_start_machinefile
+    I2G_MPI_MPIEXEC_PARAMS=$old_i2g_mpiexec_params
     unset MPI_START_DO_NOT_USE_WRAPPER
     return 0
 }
 
 clean(){
-
-    # create hostfile, with 
-    # one process per host, and localhost must be the first entry.
-    COPY_MACHINEFILE=`$MPI_START_MKTEMP`
-    echo `hostname -s` > $COPY_MACHINEFILE
-    cat $MPI_START_MACHINEFILE | sort -u | grep -v `hostname` | grep -v `hostname -f` | grep -v `hostname -s` >> $COPY_MACHINEFILE
-    
-    # get node count
-    COPY_NP=`cat $COPY_MACHINEFILE  | wc -l`
-
     # check of there are several hosts or not
     if test "x$COPY_NP" = "x1"  ; then
         debug_msg "only localhost -> skip distribution"
@@ -85,11 +71,11 @@ clean(){
     fi
 
     # backup old values
-    OLD_I2G_MPI_APPLICATION=$I2G_MPI_APPLICATION
-    OLD_I2G_MPI_APPLICATION_ARGS=$I2G_MPI_APPLICATION_ARGS
-    OLD_I2G_MPI_NP=$I2G_MPI_NP
-    OLD_I2G_MPI_PRECOMMAND=$I2G_MPI_PRECOMMAND
-    OLD_MPI_START_MACHINEFILE=$MPI_START_MACHINEFILE   
+    old_i2g_mpi_application=$I2G_MPI_APPLICATION
+    old_i2g_mpi_application_args=$I2G_MPI_APPLICATION_ARGS
+    old_i2g_mpi_np=$I2G_MPI_NP
+    old_i2g_mpi_precommand=$I2G_MPI_PRECOMMAND
+    old_mpi_start_machinefile=$MPI_START_MACHINEFILE   
     
     # reset to tmp. values
     I2G_MPI_APPLICATION=$I2G_MPI_MT
@@ -102,13 +88,12 @@ clean(){
     mpi_exec
 
     # reset to original values
-    I2G_MPI_APPLICATION=$OLD_I2G_MPI_APPLICATION
-    I2G_MPI_APPLICATION_ARGS=$OLD_I2G_MPI_APPLICATION_ARGS
-    I2G_MPI_NP=$OLD_I2G_MPI_NP
-    I2G_MPI_PRECOMMAND=$OLD_I2G_MPI_PRECOMMAND
-    MPI_START_MACHINEFILE=$OLD_MPI_START_MACHINEFILE
+    I2G_MPI_APPLICATION=$old_i2g_mpi_application
+    I2G_MPI_APPLICATION_ARGS=$old_i2g_mpi_application_args
+    I2G_MPI_NP=$old_i2g_mpi_np
+    I2G_MPI_PRECOMMAND=$old_i2g_mpi_precommand
+    MPI_START_MACHINEFILE=$old_mpi_start_machinefile
 
     rm $COPY_MACHINEFILE
     return 0
-
 }
