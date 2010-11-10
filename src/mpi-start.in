@@ -70,8 +70,9 @@ dump_env () {
     fi
 }
 
-#
-#
+#======================================================================
+# Find the correct parameter for the mktemp program.
+#======================================================================
 mpi_start_find_mktemp () {
     tempfile=`mktemp 2> /dev/null`
     if test $? -eq 0 ; then
@@ -243,6 +244,7 @@ main() {
     MPI_START_READY=-1 
     MPI_START_MPI_PREFIX=""
     MPI_START_CLEANUP_FILES=""
+    MPI_START_SCHEDULER=""
 
     # check for scheduling system and set environment variables
     info_msg "search for scheduler"
