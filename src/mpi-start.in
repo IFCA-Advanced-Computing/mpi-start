@@ -9,6 +9,9 @@
 # Return values of this script:
 # 0   - Success
 
+#======================================================================
+# Cleans up temporary files upon finishing execution 
+#======================================================================
 clean_up () {
     debug_msg "Cleaning up mpi-start temporary files."
     MPI_START_CLEANUP_FILES="$MPI_START_CLEANUP_FILES $MPI_START_HOSTFILE $MPI_START_HOST_SLOTS_FILE $MPI_START_MACHINEFILE"
@@ -70,8 +73,9 @@ dump_env () {
     fi
 }
 
-#
-#
+#======================================================================
+# Find the correct parameter for the mktemp program.
+#======================================================================
 mpi_start_find_mktemp () {
     tempfile=`mktemp 2> /dev/null`
     if test $? -eq 0 ; then
@@ -243,6 +247,7 @@ main() {
     MPI_START_READY=-1 
     MPI_START_MPI_PREFIX=""
     MPI_START_CLEANUP_FILES=""
+    MPI_START_SCHEDULER=""
 
     # check for scheduling system and set environment variables
     info_msg "search for scheduler"

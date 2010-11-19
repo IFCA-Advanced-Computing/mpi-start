@@ -85,7 +85,6 @@ EOF
     rm -f $I2G_MPI_APPLICATION
 }
 
-
 testSGEScheduler() {
     export PE_HOSTFILE=`mktemp`
     cat > $PE_HOSTFILE << EOF
