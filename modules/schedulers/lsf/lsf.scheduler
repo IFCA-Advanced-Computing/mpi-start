@@ -19,6 +19,10 @@ scheduler_available () {
 	if test "x$LSB_HOSTS" != "x" ; then 
 		return 0;
 	fi
+    debug_msg " checking for \$LSB_MCPU_HOSTS"
+	if test "x$LSB_MCPU_HOSTS" != "x" ; then 
+		return 0;
+	fi
 	
 	# TODO: fix for the case of more that 128 nodes. In this case
 	#       the hosts are not longer provided by the environment 
@@ -27,13 +31,7 @@ scheduler_available () {
 	return 13
 }
 
-#
-# This function is called to setup 
-#
-scheduler_get_machinefile () {
-    if test "x$LSB_HOSTS" = "x" ; then
-        return 13
-    fi
+build_lsb_hosts () {
     debug_msg " build machinefile based on LSB_HOSTS"
     export MPI_START_MACHINEFILE=`$MPI_START_MKTEMP`
     export MPI_START_HOSTFILE=`$MPI_START_MKTEMP`
@@ -53,5 +51,51 @@ scheduler_get_machinefile () {
     export MPI_START_NSLOTS_PER_HOST=`cat $MPI_START_HOST_SLOTS_FILE | cut -f2 -d" " | sort -n | head -1`
     export MPI_START_NSLOTS=`cat $MPI_START_MACHINEFILE | wc -l`
     return 0
+}
+
+build_lsb_mcpu_hosts () {
+    debug_msg " build machinefile based on LSB_MCPU_HOSTS"
+    export MPI_START_MACHINEFILE=`$MPI_START_MKTEMP`
+    export MPI_START_HOSTFILE=`$MPI_START_MKTEMP`
+    export MPI_START_HOST_SLOTS_FILE=`$MPI_START_MKTEMP`
+    is_host=1
+    last_host=""
+    total_slots=0
+    total_hosts=0
+    for field in $LSB_MCPU_HOSTS; do
+        if test $is_host -eq 1; then
+            last_host=$field
+            echo $last_host >> $MPI_START_HOSTFILE
+            total_hosts=`expr $total_hosts + 1`
+            is_host=0
+        else
+            is_host=1
+            slots=$field
+            echo $last_host $slots >> $MPI_START_HOST_SLOTS_FILE
+            while [ $slots -ne 0 ]; do
+                echo $last_host >> $MPI_START_MACHINEFILE
+                slots=`expr $slots - 1`
+            done
+            total_slots=`expr $total_slots + $slots`
+        fi
+    done
+    export MPI_START_NHOSTS=$total_hosts
+    export MPI_START_NSLOTS=$total_slots
+    export MPI_START_NSLOTS_PER_HOST=`cat $MPI_START_HOST_SLOTS_FILE | cut -f2 -d" " | sort -n | head -1`
+    return 0
+}
+
+#
+# This function is called to setup 
+#
+scheduler_get_machinefile () {
+    if test "x$LSB_HOSTS" = "x" -o "x$LSB_MCPU_HOSTS" = "x" ; then
+        return 13
+    fi
+    if test "x$LSB_HOSTS" != "x" ; then
+        build_lsb_hosts
+    else
+        build_lsb_mcpu_hosts
+    fi
 }
 

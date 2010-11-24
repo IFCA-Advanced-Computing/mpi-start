@@ -30,7 +30,7 @@ mpich2_with_mpd () {
     chmod 0600 $HOME/.mpd.conf
 
     # Start MPICH2 daemon.
-    mpdboot -n $MPI_START_NHOSTS -f $MACHINES
+    mpdboot -n $MPI_START_NHOSTS -f $MPI_START_HOSTFILE
     MPI_SPECIFIC_PARAMS=$MPICH2_PARAMS
     . $MPI_START_PREFIX/../etc/mpi-start/generic_mpiexec.sh
     generic_mpiexec
