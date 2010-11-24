@@ -25,6 +25,7 @@ scheduler_available () {
 
 #
 # This function is called to setup 
+#
 scheduler_get_machinefile () {
     debug_msg " convert machine list into standard format"
     MPI_START_MACHINEFILE=`$MPI_START_MKTEMP`
@@ -56,8 +57,9 @@ scheduler_get_machinefile () {
 }
 
 #
-# Most MPI implementations under slurm do not use mpirun/mpiexec but srun to start
-# this function executes the job for them
+# Most MPI implementations under slurm do not use mpirun/mpiexec
+# but srun to start, this function executes the job for them
+#
 slurm_mpiexec() {
     MPIEXEC=srun
     MPI_SPECIFIC_PARAMS=""
