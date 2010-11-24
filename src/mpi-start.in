@@ -133,7 +133,6 @@ EOF
     fi
 }
 
-
 #======================================================================
 # Export a variable for the MPI job. It will be defined only in the
 # context of the job (executed in a different process)
@@ -189,6 +188,73 @@ mpi_start_execute_wrapper() {
     fi
 }
 
+
+#======================================================================
+# Checks that mpi-start are corrent and coherent
+#======================================================================
+check_options() {
+    # check for valid I2G_MPI_START variable
+    # XXX
+    # this should not be necessary... but how to figure out our correct location
+    if test "x$I2G_MPI_START" = "x" ; then
+        error_msg "I2G_MPI_START not set"
+        dump_env
+        exit 1
+    fi
+
+    # debug me 
+    if test "x$I2G_MPI_START_DEBUG" = "x1" ; then 
+        debug_msg "dump configuration"
+        for var in I2G_MPI_APPLICATION I2G_MPI_APPLICATION_ARGS I2G_MPI_TYPE \
+                   I2G_MPI_VERSION I2G_MPI_PRE_RUN_HOOK I2G_MPI_POST_RUN_HOOK \
+                   I2G_MPI_PRECOMMAND I2G_MPI_FLAVOUR I2G_MPI_JOB_NUMBER \
+                   I2G_MPI_STARTUP_INFO I2G_MPI_RELAY I2G_MPI_PER_NODE \
+                   I2G_MPI_NP I2G_MPI_SINGLE_PROCESS ; 
+        do
+            eval value="\${$var}"
+            debug_msg "=> ${var}=${value}"
+        done
+    fi
+
+
+    if test "x${I2G_MPI_SINGLE_PROCESS}" = "x1" ; then
+        if test "x${I2G_MPI_PER_NODE}" != "x" ; then
+            warn_msg "Process per node option ($I2G_MPI_PER_NODE) overriding single process option! "
+        else
+            export I2G_MPI_PER_NODE=1
+        fi
+    fi
+
+    if test "x${I2G_MPI_NP}" != "x" -a "x${I2G_MPI_PER_NODE}" != "x" ; then
+        warn_msg "Process per node option ($I2G_MPI_PER_NODE) overriding total requested number of processes ($I2G_MPI_NP)!"
+        unset I2G_MPI_NP
+    fi
+
+    # check for correct mktemp
+    mpi_start_find_mktemp
+
+    # set global internal variables 
+    MPI_START_PREFIX=`dirname $I2G_MPI_START`
+    MPI_START_MACHINEFILE=""
+    MPI_START_HOSTFILE=""
+    MPI_START_HOST_SLOTS_FILE=""
+    MPI_START_NHOSTS=0
+    MPI_START_NSLOTS=0
+    MPI_START_NSLOTS_PER_HOST=0
+    MPI_START_MPI_WRAPPER=""
+    MPI_START_READY=-1 
+    MPI_START_MPI_PREFIX=""
+    MPI_START_CLEANUP_FILES=""
+    MPI_START_SCHEDULER=""
+    MPI_START_NP=$I2G_MPI_NP
+
+    # trace me
+    if test "x$I2G_MPI_START_TRACE" = "x1"  ; then
+        debug_msg "enable debugging"
+        set -x
+    fi
+}
+
 #======================================================================
 # The main function that binds everything together
 #======================================================================
@@ -203,53 +269,10 @@ main() {
     info_msg "VERSION =  @VERSION@"  
     info_msg "************************************************************************"
 
-    #
-    # setup framework goes here
-    #
-
-    # debug me 
-    if test "x$I2G_MPI_START_DEBUG" = "x1" ; then 
-        debug_msg "dump configuration"
-        for var in I2G_MPI_APPLICATION I2G_MPI_APPLICATION_ARGS I2G_MPI_TYPE \
-                   I2G_MPI_VERSION I2G_MPI_PRE_RUN_HOOK I2G_MPI_POST_RUN_HOOK \
-                   I2G_MPI_PRECOMMAND I2G_MPI_FLAVOUR I2G_MPI_JOB_NUMBER \
-                   I2G_MPI_STARTUP_INFO I2G_MPI_RELAY I2G_MPI_SINGLE_PROCESS ; do
-            eval value="\${$var}"
-            debug_msg "=> ${var}=${value}"
-        done
-    fi
-
-    # trace me
-    if test "x$I2G_MPI_START_TRACE" = "x1"  ; then
-        debug_msg "enable debugging"
-        set -x
-    fi
-
-    # check for valid I2G_MPI_START variable
-    if test "x$I2G_MPI_START" = "x" ; then
-        error_msg "I2G_MPI_START not set"
-        dump_env
-        exit 1
-    fi
-
-    # check for correct mktemp
-    mpi_start_find_mktemp
-
-    # set global variables 
-    MPI_START_PREFIX=`dirname $I2G_MPI_START`
-    MPI_START_MACHINEFILE=""
-    MPI_START_HOSTFILE=""
-    MPI_START_HOST_SLOTS_FILE=""
-    MPI_START_NHOSTS=0
-    MPI_START_NSLOTS=0
-    MPI_START_NSLOTS_PER_HOST=0
-    MPI_START_MPI_WRAPPER=""
-    MPI_START_READY=-1 
-    MPI_START_MPI_PREFIX=""
-    MPI_START_CLEANUP_FILES=""
-    MPI_START_SCHEDULER=""
-
+    check_options
+    
     # check for scheduling system and set environment variables
+    # XXX Should have a fallback scheduler "No scheduler..."
     info_msg "search for scheduler"
     for i in $MPI_START_PREFIX/../etc/mpi-start/*.scheduler  ; do 
         # source the function definitions
@@ -272,7 +295,8 @@ main() {
         if test "x$result" = "x0" ; then 
             info_msg "activate support for $scheduler"
 
-            # support for this scheduler is found. So lets setup the internal environment.
+            # support for this scheduler is found.
+            # So lets setup the internal environment.
             scheduler_get_machinefile
             result=$?
 
@@ -286,8 +310,8 @@ main() {
             for i in `cat $MPI_START_HOSTFILE` ; do
                 debug_msg "=> $i"
             done
-            if test "x${I2G_MPI_SINGLE_PROCESS}" = "x1" ; then
-                export I2G_MPI_NP=$MPI_START_NHOSTS
+            if test "x${I2G_MPI_PER_NODE}" != "x" ; then
+                export I2G_MPI_NP=`expr $MPI_START_NHOSTS '*' $I2G_MPI_PER_NODE`
             else
                 export I2G_MPI_NP=$MPI_START_NSLOTS
             fi
@@ -410,7 +434,35 @@ main() {
     exit $result
 }
 
+
+print_usage () {
+    echo "mpi-start"
+    echo 
+}
+
+parse_args () {
+    #for var in I2G_MPI_APPLICATION I2G_MPI_APPLICATION_ARGS I2G_MPI_TYPE \
+    #           I2G_MPI_VERSION I2G_MPI_PRE_RUN_HOOK I2G_MPI_POST_RUN_HOOK \
+    #           I2G_MPI_PRECOMMAND I2G_MPI_FLAVOUR I2G_MPI_JOB_NUMBER \
+    #           I2G_MPI_STARTUP_INFO I2G_MPI_RELAY I2G_MPI_SINGLE_PROCESS ;
+    #do
+    #    echo $var
+    #done
+    while [ "x$1" != "x" ] ; do
+        arg=$1
+        case $arg in 
+            -h)
+                print_usage
+                exit 0
+                ;;
+        esac
+        shift
+    done
+}
+
+
 #======================================================================
-#  Just call the main function 
+#  Parse the command line arguments and call the main function 
 #======================================================================
+#parse_args $*
 main
