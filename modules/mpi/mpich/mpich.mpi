@@ -25,7 +25,7 @@ mpi_exec () {
     . $MPI_START_PREFIX/../etc/mpi-start/common.sh
     mpi_start_search_mpiexec
 
-    if test "x$I2G_MPI_SINGLE_PROCESS" = "x1" ; then
+    if test "x$I2G_MPI_PER_NODE" = "x1" ; then
         export I2G_MACHINEFILE_AND_NP="-machinefile $MPI_START_HOSTFILE -np $I2G_MPI_NP"
     else
         export I2G_MACHINEFILE_AND_NP="-machinefile $MPI_START_MACHINEFILE -np $I2G_MPI_NP"
@@ -40,7 +40,7 @@ mpi_exec () {
         if test $status -ne 0 ; then
             # OSC mpiexec! 
             debug_msg "Found OSC MPIEXEC, do not set machinefile!"
-            if test "x$I2G_MPI_SINGLE_PROCESS" = "x1" ; then
+            if test "x$I2G_MPI_PER_NODE" = "x1" ; then
                 MPI_SPECIFIC_PARAMS="$MPI_SPECIFIC_PARAMS -pernode"
             fi
         fi

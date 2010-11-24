@@ -19,7 +19,7 @@ mpi_start_activate_mpi $MPI_START_MPI_PREFIX "$MPI_START_MPI_MODULE"
 mpi_exec () {
 	debug_msg "found LAM-MPI, set machinefile and np parameters"
 
-    if test "x$I2G_MPI_SINGLE_PROCESS" = "x1"; then
+    if test "x$I2G_MPI_PER_NODE" = "x1"; then
 	    export I2G_MACHINEFILE_AND_NP="-machinefile $MPI_START_HOSTFILE -np $I2G_MPI_NP"
     else 
 	    export I2G_MACHINEFILE_AND_NP="-machinefile $MPI_START_MACHINEFILE -np $I2G_MPI_NP"

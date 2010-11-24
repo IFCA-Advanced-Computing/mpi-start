@@ -18,7 +18,7 @@ mpi_start_activate_mpi $MPI_START_MPI_PREFIX "$MPI_START_MPI_MODULE"
 # start an mpi job with mpd
 mpich2_with_mpd () {
     debug_msg "assume it is safe to set the machinefile and number of processes"
-    if test "x$I2G_MPI_SINGLE_PROCESS" = "x1" ; then
+    if test "x$I2G_MPI_PER_NODE" = "x1" ; then
         MACHINES=$MPI_START_HOSTFILE
     else
         MACHINES=$MPI_START_MACHINEFILE
@@ -65,7 +65,7 @@ mpi_exec () {
             if `echo $MPI_SPECIFIC_PARAMS | grep -vq "comm=" 2> /dev/null`; then
                 MPI_SPECIFIC_PARAMS="$MPI_SPECIFIC_PARAMS --comm=pmi"
             fi
-            if test "x$I2G_MPI_SINGLE_PROCESS" = "x1" ; then
+            if test "x$I2G_MPI_PER_NODE" = "x1" ; then
                 MPI_SPECIFIC_PARAMS="$MPI_SPECIFIC_PARAMS -pernode"
             fi
             . $MPI_START_PREFIX/../etc/mpi-start/generic_mpiexec.sh

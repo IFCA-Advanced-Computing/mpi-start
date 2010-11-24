@@ -36,23 +36,22 @@ mpi_exec () {
     . $MPI_START_PREFIX/../etc/mpi-start/common.sh
     mpi_start_search_mpiexec
 
-    if test "x$I2G_MPI_SINGLE_PROCESS" = "x1" ; then
-        MACHINEFILE=$MPI_START_HOSTFILE
-    else
-        MACHINEFILE=$MPI_START_MACHINEFILE
-    fi
-
     #handle Open MPI 1.2.2 + PBS bug
-    if test "x$MPI_START_SCHEDULER" != "xpbs" ; then
-        debug_msg "found openmpi and a non-PBS batch system, set machinefile and np parameters"
-        export I2G_MACHINEFILE_AND_NP="-machinefile $MACHINEFILE -np $I2G_MPI_NP"
-    else
+    if test "x$MPI_START_SCHEDULER" = "xpbs" ; then
         debug_msg "found openmpi and PBS, don't set machinefile"
         export I2G_MACHINEFILE_AND_NP="-np $I2G_MPI_NP"
+    else
+        debug_msg "found openmpi and a non-PBS batch system, set machinefile and np parameters"
+        export I2G_MACHINEFILE_AND_NP="-machinefile $MPI_START_MACHINEFILE -np $I2G_MPI_NP"
     fi
 
-    if test "x$I2G_MPI_SINGLE_PROCESS" = "x1"; then
-        I2G_MACHINEFILE_AND_NP="$I2G_MACHINEFILE_AND_NP -pernode"
+    if test "x{$I2G_MPI_PER_NODE}" != "x" ; then
+        # Open MPI does not like to have npernode if it oversubscribes nodes in some systems
+        if test $I2G_MPI_PER_NODE -le $MPI_START_NSLOTS_PER_HOST ; then
+            I2G_MACHINEFILE_AND_NP="$I2G_MACHINEFILE_AND_NP -npernode $I2G_MPI_PER_NODE"
+        else
+            warn_msg "Per node count option will not be used in order to avoid node oversubscription!"
+        fi
     fi
 
     # set the parameters to be always used with Open MPI:
@@ -71,7 +70,7 @@ mpi_exec () {
     elif test "x$MPI_MPIRUN" != "x"; then
         MPIEXEC=$MPI_MPIRUN
     else
-        debug_msg "no mpiexec/mpirun found!"
+        error_msg "no mpiexec/mpirun found!"
         dump_env
         exit 1
     fi
