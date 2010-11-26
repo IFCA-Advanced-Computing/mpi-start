@@ -116,7 +116,7 @@ mpi_start_pre_run_hook_copy () {
 
     # create hostfile, with 
     # one process per host, and localhost must be the first entry.
-    COPY_MACHINEFILE=`$MPI_START_MKTEMP`
+    COPY_MACHINEFILE=`mktemp`
     echo `hostname -s` > $COPY_MACHINEFILE
     cat $MPI_START_MACHINEFILE | sort -u | grep -v `hostname` | grep -v `hostname -f` | grep -v `hostname -s` >> $COPY_MACHINEFILE
     export MPI_START_CLEANUP_FILES="$MPI_START_CLEANUP_FILES $COPY_MACHINEFILE"
@@ -131,7 +131,7 @@ mpi_start_pre_run_hook_copy () {
     fi
 
     # create tarball
-    TARBALL=`$MPI_START_MKTEMP`
+    TARBALL=`mktemp`
     status=$?
     if [ $status -ne 0 -o "x$TARBALL" = "x" ]; then
         error_msg "Failed to create tarball for file distribution"

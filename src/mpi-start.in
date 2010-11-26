@@ -14,7 +14,7 @@
 #======================================================================
 clean_up () {
     debug_msg "Cleaning up mpi-start temporary files."
-    MPI_START_CLEANUP_FILES="$MPI_START_CLEANUP_FILES $MPI_START_HOSTFILE $MPI_START_HOST_SLOTS_FILE $MPI_START_MACHINEFILE"
+    #MPI_START_CLEANUP_FILES="$MPI_START_CLEANUP_FILES $MPI_START_HOSTFILE $MPI_START_HOST_SLOTS_FILE $MPI_START_MACHINEFILE"
     for file in $MPI_START_CLEANUP_FILES; do
         [ -f $file ] && rm -f $file
     done
@@ -78,17 +78,15 @@ dump_env () {
 #======================================================================
 mpi_start_find_mktemp () {
     tempfile=`mktemp 2> /dev/null`
-    if test $? -eq 0 ; then
-        MPI_START_MKTEMP="mktemp"
-    else
+    if test $? -ne 0 ; then
         # BSD style mktemp
-        tempfile=`mktemp -t MPI_START 2> /dev/null`
+        alias mktemp="mktemp -t MPI_START"
+        tempfile=`mktemp 2> /dev/null`
         if test $? -ne 0 ; then
             error_msg "Could not find a proper mktemp utility"
             dump_env
             exit 1
         fi
-        MPI_START_MKTEMP="mktemp -t MPI_START"
     fi
     rm -f $tempfile
 }
@@ -124,7 +122,7 @@ mpi_start_activate_mpi () {
 #======================================================================
 mpi_start_create_wrapper() {
     if test "x$MPI_START_MPI_WRAPPER" = "x" ; then
-        export MPI_START_MPI_WRAPPER=`$MPI_START_MKTEMP`
+        export MPI_START_MPI_WRAPPER=`mktemp`
         export MPI_START_CLEANUP_FILES="$MPI_START_CLEANUP_FILES $MPI_START_MPI_WRAPPER"
         cat > $MPI_START_MPI_WRAPPER << EOF
 #!/bin/sh
@@ -171,7 +169,7 @@ mpi_start_execute_wrapper() {
         mpi_start_create_wrapper
         # we create a new wrapper for each execution so we can have more than
         # one MPI execution in a single mpi-start call (not sure if it has any use)
-        CMD_WRAPPER=`$MPI_START_MKTEMP`
+        CMD_WRAPPER=`mktemp`
         chmod +x $CMD_WRAPPER
         cat $MPI_START_MPI_WRAPPER > $CMD_WRAPPER
         if [ "x$I2G_MPI_APPLICATION_STDIN" != "x" -a "x$I2G_MPI_APPLICATION_STDOUT" != "x" ] ; then
@@ -312,7 +310,9 @@ main() {
             done
             if test "x${I2G_MPI_PER_NODE}" != "x" ; then
                 export I2G_MPI_NP=`expr $MPI_START_NHOSTS '*' $I2G_MPI_PER_NODE`
+                #export MPI_START_NP=`expr $MPI_START_NHOSTS '*' $I2G_MPI_PER_NODE`
             else
+                #export MPI_START_NP=$MPI_START_NSLOTS
                 export I2G_MPI_NP=$MPI_START_NSLOTS
             fi
 

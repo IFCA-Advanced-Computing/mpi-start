@@ -18,8 +18,15 @@ mpi_start_activate_mpi $MPI_START_MPI_PREFIX "$MPI_START_MPI_MODULE"
 # start an mpi job with mpd
 mpich2_with_mpd () {
     debug_msg "assume it is safe to set the machinefile and number of processes"
-    if test "x$I2G_MPI_PER_NODE" = "x1" ; then
-        MACHINES=$MPI_START_HOSTFILE
+    if test "x${I2G_MPI_PER_NODE}" != "x" ; then
+        debug_msg "Creating machine file for per node option"
+        MACHINES=`mktemp`
+        for host in `cat $MPI_START_HOSTFILE` ; do 
+            for ((i=0; i < I2G_MPI_PER_NODE; i++)) ; do
+                echo $host >> $MACHINES
+            done
+        done
+        export MPI_START_CLEANUP_FILES="$MPI_START_CLEANUP_FILES $MACHINES" 
     else
         MACHINES=$MPI_START_MACHINEFILE
     fi
@@ -67,6 +74,8 @@ mpi_exec () {
             fi
             if test "x$I2G_MPI_PER_NODE" = "x1" ; then
                 MPI_SPECIFIC_PARAMS="$MPI_SPECIFIC_PARAMS -pernode"
+            elif test "x${I2G_MPI_PER_NODE}" != "x" ; then
+                warn_msg "Per node option ignored when using OSC mpiexec"
             fi
             . $MPI_START_PREFIX/../etc/mpi-start/generic_mpiexec.sh
             generic_mpiexec

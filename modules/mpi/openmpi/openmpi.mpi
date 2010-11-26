@@ -45,9 +45,9 @@ mpi_exec () {
         export I2G_MACHINEFILE_AND_NP="-machinefile $MPI_START_MACHINEFILE -np $I2G_MPI_NP"
     fi
 
-    if test "x{$I2G_MPI_PER_NODE}" != "x" ; then
-        # Open MPI does not like to have npernode if it oversubscribes nodes in some systems
-        if test $I2G_MPI_PER_NODE -le $MPI_START_NSLOTS_PER_HOST ; then
+    if test "x${I2G_MPI_PER_NODE}" != "x" ; then
+        # Open MPI does not like to have npernode if it oversubscribes nodes in version 1.2.8 
+        if test ${I2G_MPI_PER_NODE} -le ${MPI_START_NSLOTS_PER_HOST} ; then
             I2G_MACHINEFILE_AND_NP="$I2G_MACHINEFILE_AND_NP -npernode $I2G_MPI_PER_NODE"
         else
             warn_msg "Per node count option will not be used in order to avoid node oversubscription!"
