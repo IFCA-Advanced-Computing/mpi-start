@@ -14,7 +14,7 @@
 #======================================================================
 clean_up () {
     debug_msg "Cleaning up mpi-start temporary files."
-    #MPI_START_CLEANUP_FILES="$MPI_START_CLEANUP_FILES $MPI_START_HOSTFILE $MPI_START_HOST_SLOTS_FILE $MPI_START_MACHINEFILE"
+    MPI_START_CLEANUP_FILES="$MPI_START_CLEANUP_FILES $MPI_START_HOSTFILE $MPI_START_HOST_SLOTS_FILE $MPI_START_MACHINEFILE"
     for file in $MPI_START_CLEANUP_FILES; do
         [ -f $file ] && rm -f $file
     done
