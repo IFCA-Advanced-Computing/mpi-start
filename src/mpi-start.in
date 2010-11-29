@@ -446,91 +446,7 @@ print_usage () {
     echo "  --             separator for application and arguments" 1>&2
 }
 
-parse_args () {
-    while [ "x$1" != "x" ] ; do
-        case $1 in 
-            -h)
-                print_usage
-                exit 0
-                ;;
-            -t)
-                shift
-                export I2G_MPI_TYPE=$1
-                shift
-                ;;
-            -v)
-                shift
-                if test "x${1}" = "x1" ; then
-                    export I2G_MPI_START_VERBOSE=1
-                elif test "x${1}" = "x2" ; then
-                    export I2G_MPI_START_VERBOSE=1
-                    export I2G_MPI_START_DEBUG=1
-                elif test "x${1}" = "x3" ; then
-                    export I2G_MPI_START_VERBOSE=1
-                    export I2G_MPI_START_DEBUG=1
-                    export I2G_MPI_START_TRACE=1
-                else
-                    error_msg "Invalid verbose level ($1), not setting any"
-                fi
-                shift
-                ;;
-            -pre)
-                shift
-                export I2G_MPI_PRE_RUN_HOOK=$1
-                shift
-                ;;
-            -post)
-                shift
-                export I2G_MPI_POST_RUN_HOOK=$1
-                shift
-                ;;
-            -pcmd)
-                shift
-                echo $1
-                export I2G_MPI_PRECOMMAND=$1
-                shift
-                ;;
-            -pnode)
-                export I2G_MPI_SINGLE_PROCESS=1
-                shift
-                ;;
-            -npnode)
-                shift
-                export I2G_MPI_PER_NODE=$1
-                shift
-                ;;
-            -np)
-                shift
-                export I2G_MPI_NP=$1
-                shift
-                ;;
-            -c)
-                shift
-                export I2G_MPI_CONFIG=$1
-                shift
-                ;;
-            --)
-                shift
-                break
-                ;;
-            *)
-                if test "${1:0:1}" = "-" ; then
-                    error_msg "Invalid option $1"
-                    print_usage
-                    exit 1
-                fi
-                break
-                ;;
-        esac
-    done
-    if test "x$1" != "x" ; then
-        export I2G_MPI_APPLICATION=$1
-        shift
-    fi
-    if test "x$*" != "x" ; then
-        export I2G_MPI_APPLICATION_ARGS="$*"
-    fi
-}
+
 
 #======================================================================
 #  Parse the command line arguments and call the main function 
@@ -538,5 +454,86 @@ parse_args () {
 if test "x${I2G_MPI_START}" = "x" ; then
     export I2G_MPI_START=$0
 fi
-parse_args $*
+while [ "x$1" != "x" ] ; do
+    case $1 in 
+        -h)
+            print_usage
+            exit 0
+            ;;
+        -t)
+            shift
+            export I2G_MPI_TYPE=$1
+            shift
+            ;;
+        -v)
+            shift
+            if test "x${1}" = "x1" ; then
+                export I2G_MPI_START_VERBOSE=1
+            elif test "x${1}" = "x2" ; then
+                export I2G_MPI_START_VERBOSE=1
+                export I2G_MPI_START_DEBUG=1
+            elif test "x${1}" = "x3" ; then
+                export I2G_MPI_START_VERBOSE=1
+                export I2G_MPI_START_DEBUG=1
+                export I2G_MPI_START_TRACE=1
+            else
+                error_msg "Invalid verbose level ($1), not setting any"
+            fi
+            shift
+            ;;
+        -pre)
+            shift
+            export I2G_MPI_PRE_RUN_HOOK=$1
+            shift
+            ;;
+        -post)
+            shift
+            export I2G_MPI_POST_RUN_HOOK=$1
+            shift
+            ;;
+        -pcmd)
+            shift
+            export I2G_MPI_PRECOMMAND=$1
+            shift
+            ;;
+        -pnode)
+            export I2G_MPI_SINGLE_PROCESS=1
+            shift
+            ;;
+        -npnode)
+            shift
+            export I2G_MPI_PER_NODE=$1
+            shift
+            ;;
+        -np)
+            shift
+            export I2G_MPI_NP=$1
+            shift
+            ;;
+        -c)
+            shift
+            export I2G_MPI_CONFIG=$1
+            shift
+            ;;
+        --)
+            shift
+            break
+            ;;
+        *)
+            if test "${1:0:1}" = "-" ; then
+                error_msg "Invalid option $1"
+                print_usage
+                exit 1
+            fi
+            break
+            ;;
+    esac
+done
+if test "x$1" != "x" ; then
+    export I2G_MPI_APPLICATION=$1
+    shift
+fi
+if test "x$*" != "x" ; then
+    export I2G_MPI_APPLICATION_ARGS="$*"
+fi
 main

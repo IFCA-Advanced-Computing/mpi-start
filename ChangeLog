@@ -1,3 +1,6 @@
+2010-11-29 Enol Fernandez <enolfc _AT_ ifca.unican.es>
+	* Added per node option.
+
 2010-10-05 Enol Fernandez <enolfc _AT_ ifca.unican.es>
 	* Better packaging from makefile.
 
