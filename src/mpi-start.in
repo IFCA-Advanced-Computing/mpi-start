@@ -425,6 +425,9 @@ main() {
 }
 
 
+#======================================================================
+#  Print command line usage.
+#======================================================================
 print_usage () {
     echo "mpi-start [-h] [-t mpi_type] [-v level] [-pre hook] [-post hook]" 1>&2
     echo "    [-pcmd cmd] [-npnode n] [-pnode] [-np n] [--]" 1>&2
@@ -445,8 +448,6 @@ print_usage () {
     echo "  -c file        use file for sourcing mpi-start variables" 1>&2
     echo "  --             separator for application and arguments" 1>&2
 }
-
-
 
 #======================================================================
 #  Parse the command line arguments and call the main function 
