@@ -205,6 +205,15 @@ check_options() {
         done
     fi
 
+    if test -r "${I2G_MPI_CONFIG}" ; then 
+        . ${I2G_MPI_CONFIG}
+        if test $? -ne 0 ; then
+            error_msg "Failed to load config file $I2G_MPI_CONFIG"
+            dump_env
+            exit 2
+        fi
+    fi
+
     if test "x${I2G_MPI_SINGLE_PROCESS}" = "x1" ; then
         if test "x${I2G_MPI_PER_NODE}" != "x" ; then
             warn_msg "Process per node option ($I2G_MPI_PER_NODE) overriding single process option! "
