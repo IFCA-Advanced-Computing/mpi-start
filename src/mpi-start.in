@@ -531,7 +531,8 @@ while [ "x$1" != "x" ] ; do
             ;;
         *)
             if test "${1:0:1}" = "-" ; then
-                error_msg "Invalid option $1"
+                echo "Invalid option $1" 1>&2
+                echo 1>&2
                 print_usage
                 exit 1
             fi
