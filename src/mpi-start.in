@@ -191,15 +191,6 @@ mpi_start_execute_wrapper() {
 # Checks that mpi-start are corrent and coherent
 #======================================================================
 check_options() {
-    # check for valid I2G_MPI_START variable
-    # XXX
-    # this should not be necessary... but how to figure out our correct location
-    if test "x$I2G_MPI_START" = "x" ; then
-        error_msg "I2G_MPI_START not set"
-        dump_env
-        exit 1
-    fi
-
     # debug me 
     if test "x$I2G_MPI_START_DEBUG" = "x1" ; then 
         debug_msg "dump configuration"
@@ -207,13 +198,12 @@ check_options() {
                    I2G_MPI_VERSION I2G_MPI_PRE_RUN_HOOK I2G_MPI_POST_RUN_HOOK \
                    I2G_MPI_PRECOMMAND I2G_MPI_FLAVOUR I2G_MPI_JOB_NUMBER \
                    I2G_MPI_STARTUP_INFO I2G_MPI_RELAY I2G_MPI_PER_NODE \
-                   I2G_MPI_NP I2G_MPI_SINGLE_PROCESS ; 
+                   I2G_MPI_NP I2G_MPI_SINGLE_PROCESS I2G_MPI_CONFIG; 
         do
             eval value="\${$var}"
             debug_msg "=> ${var}=${value}"
         done
     fi
-
 
     if test "x${I2G_MPI_SINGLE_PROCESS}" = "x1" ; then
         if test "x${I2G_MPI_PER_NODE}" != "x" ; then
@@ -436,33 +426,117 @@ main() {
 
 
 print_usage () {
-    echo "mpi-start"
-    echo 
+    echo "mpi-start [-h] [-t mpi_type] [-v level] [-pre hook] [-post hook]" 1>&2
+    echo "    [-pcmd cmd] [-npnode n] [-pnode] [-np n] [--]" 1>&2
+    echo "    application [...]" 1>&2
+    echo  1>&2
+    echo "Parallel job starter" 1>&2
+    echo  1>&2
+    echo "optional arguments:" 1>&2
+    echo "  -h             show this help message and exit" 1>&2
+    echo "  -t type        use the mpi type (sets I2G_MPI_TYPE)" 1>&2
+    echo "  -v level       set debug level (1, 2, 3)" 1>&2
+    echo "  -pre hook      set pre run hook script" 1>&2
+    echo "  -post hook     set post run hook script" 1>&2
+    echo "  -pcmd cmd      set pre command" 1>&2
+    echo "  -npnode n      set number of processes per node" 1>&2
+    echo "  -pnode         start only one process per node" 1>&2
+    echo "  -np n          set total number of processes" 1>&2
+    echo "  -c file        use file for sourcing mpi-start variables" 1>&2
+    echo "  --             separator for application and arguments" 1>&2
 }
 
 parse_args () {
-    #for var in I2G_MPI_APPLICATION I2G_MPI_APPLICATION_ARGS I2G_MPI_TYPE \
-    #           I2G_MPI_VERSION I2G_MPI_PRE_RUN_HOOK I2G_MPI_POST_RUN_HOOK \
-    #           I2G_MPI_PRECOMMAND I2G_MPI_FLAVOUR I2G_MPI_JOB_NUMBER \
-    #           I2G_MPI_STARTUP_INFO I2G_MPI_RELAY I2G_MPI_SINGLE_PROCESS ;
-    #do
-    #    echo $var
-    #done
     while [ "x$1" != "x" ] ; do
-        arg=$1
-        case $arg in 
+        case $1 in 
             -h)
                 print_usage
                 exit 0
                 ;;
+            -t)
+                shift
+                export I2G_MPI_TYPE=$1
+                shift
+                ;;
+            -v)
+                shift
+                if test "x${1}" = "x1" ; then
+                    export I2G_MPI_START_VERBOSE=1
+                elif test "x${1}" = "x2" ; then
+                    export I2G_MPI_START_VERBOSE=1
+                    export I2G_MPI_START_DEBUG=1
+                elif test "x${1}" = "x3" ; then
+                    export I2G_MPI_START_VERBOSE=1
+                    export I2G_MPI_START_DEBUG=1
+                    export I2G_MPI_START_TRACE=1
+                else
+                    error_msg "Invalid verbose level ($1), not setting any"
+                fi
+                shift
+                ;;
+            -pre)
+                shift
+                export I2G_MPI_PRE_RUN_HOOK=$1
+                shift
+                ;;
+            -post)
+                shift
+                export I2G_MPI_POST_RUN_HOOK=$1
+                shift
+                ;;
+            -pcmd)
+                shift
+                echo $1
+                export I2G_MPI_PRECOMMAND=$1
+                shift
+                ;;
+            -pnode)
+                export I2G_MPI_SINGLE_PROCESS=1
+                shift
+                ;;
+            -npnode)
+                shift
+                export I2G_MPI_PER_NODE=$1
+                shift
+                ;;
+            -np)
+                shift
+                export I2G_MPI_NP=$1
+                shift
+                ;;
+            -c)
+                shift
+                export I2G_MPI_CONFIG=$1
+                shift
+                ;;
+            --)
+                shift
+                break
+                ;;
+            *)
+                if test "${1:0:1}" = "-" ; then
+                    error_msg "Invalid option $1"
+                    print_usage
+                    exit 1
+                fi
+                break
+                ;;
         esac
-        shift
     done
+    if test "x$1" != "x" ; then
+        export I2G_MPI_APPLICATION=$1
+        shift
+    fi
+    if test "x$*" != "x" ; then
+        export I2G_MPI_APPLICATION_ARGS="$*"
+    fi
 }
-
 
 #======================================================================
 #  Parse the command line arguments and call the main function 
 #======================================================================
-#parse_args $*
+if test "x${I2G_MPI_START}" = "x" ; then
+    export I2G_MPI_START=$0
+fi
+parse_args $*
 main
