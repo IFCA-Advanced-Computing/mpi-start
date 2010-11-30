@@ -6,7 +6,6 @@
 #
 
 
-
 #======================================================================
 # MPI_START_SHARED_FS
 # Global variable that specifies if we are on a 
@@ -100,34 +99,15 @@ mpi_start_detect_shared_fs() {
 }
 
 
-
 #======================================================================
 # This hook will use mpi_mt, mpiexec or cptoshared to distribute files.
 #======================================================================
 mpi_start_pre_run_hook_copy () {
     debug_msg "mpi_start_pre_run_hook_copy"
 
-    debug_msg "fs not shared -> distribute binary"
-
     if test $MPI_START_NHOSTS -eq 1 ; then
         debug_msg "only localhost, skip distribution"
         return 0
-    fi
-
-    # create hostfile, with 
-    # one process per host, and localhost must be the first entry.
-    COPY_MACHINEFILE=`mktemp`
-    echo `hostname -s` > $COPY_MACHINEFILE
-    cat $MPI_START_MACHINEFILE | sort -u | grep -v `hostname` | grep -v `hostname -f` | grep -v `hostname -s` >> $COPY_MACHINEFILE
-    export MPI_START_CLEANUP_FILES="$MPI_START_CLEANUP_FILES $COPY_MACHINEFILE"
-    
-    # get node count
-    COPY_NP=`cat $COPY_MACHINEFILE | wc -l`
-
-    # check of there are several hosts or not
-    if test "x$COPY_NP" = "x1"  ; then
-        debug_msg "only localhost -> skip distribution"
-        return
     fi
 
     # create tarball
@@ -247,6 +227,7 @@ mpi_start_run_pre_hook() {
 	fi	
 }
 
+
 #======================================================================
 # This hook is called before the "mpirun" is started.
 #======================================================================
@@ -258,6 +239,10 @@ mpi_start_pre_run_hook () {
     return $?
 }
 
+
+#======================================================================
+# This hook is called befor the "mpirun" has been finished.
+#======================================================================
 mpi_start_pre_run_hook_generic () {
     debug_msg "mpi_start_pre_run_hook_generic"
 
@@ -318,6 +303,7 @@ mpi_start_run_post_hook() {
     fi
 }
  
+
 #======================================================================
 # This hook is called after the "mpirun" has been finished.
 #======================================================================
@@ -337,17 +323,20 @@ mpi_start_post_run_hook_generic () {
     mpi_start_run_post_hook $I2G_MPI_POST_RUN_HOOK 1
 
     if  test "x$MPI_START_SHARED_FS" != "x1" -o "x$MPI_START_DISTRIBUTE_PROXY" = "x1"  ; then 
-        # this may be unset if only running on localhost
-        if test "x$chosenDistrMethod" != "x"; then
-            unset clean
-            source $chosenDistrMethod
-            clean
+        if test $MPI_START_NHOSTS -eq 1 ; then
+            debug_msg "only localhost, skip cleanup"
+        else
+            # this may be unset if only running on localhost
+            if test "x$chosenDistrMethod" != "x"; then
+                unset clean
+                source $chosenDistrMethod
+                clean
+            fi
         fi
     else
        debug_msg "fs shared -> do not cleanup"
     fi
 }
-
 
 
 #======================================================================
@@ -360,3 +349,4 @@ mpi_start_post_run_hook () {
     mpi_start_post_run_hook_generic
     return $?
 }
+
