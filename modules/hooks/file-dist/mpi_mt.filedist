@@ -12,7 +12,6 @@ check_distribution_method(){
 	if test "x$I2G_MPI_MT" = "x"  ; then 
 		    export I2G_MPI_MT=$MPI_START_PREFIX/i2g-${I2G_MPI_TYPE}_mpi-mt
 	fi
-
 	result=255
         if test -e $I2G_MPI_MT ; then 
 		result=0	
@@ -21,22 +20,21 @@ check_distribution_method(){
 
 }
 
-copy(){
+copy() {
+    debug_msg "distribute using mpi_mt"
     # backup old values
     old_i2g_mpi_application=$I2G_MPI_APPLICATION
     old_i2g_mpi_application_args=$I2G_MPI_APPLICATION_ARGS
-    old_i2g_mpi_np=$I2G_MPI_NP
     old_i2g_mpi_precommand=$I2G_MPI_PRECOMMAND
-    old_mpi_start_machinefile=$MPI_START_MACHINEFILE   
+    old_mpi_start_pernode=$MPI_START_PERNODE
     I2G_MPI_MPIEXEC_PARAMS=`printenv MPI_${MPI_TYPE}_MPIEXEC_PARAMS`
 	old_i2g_mpi_mpiexec_params=$I2G_MPI_MPIEXEC_PARAMS
-    debug_msg "distribute using mpi_mt"
+
 	# set to tmp. values
 	I2G_MPI_APPLICATION=$I2G_MPI_MT
 	I2G_MPI_APPLICATION_ARGS="cp $TARBALL $PWD/$TARBALL_BASENAME"
-	I2G_MPI_NP=$COPY_NP
 	I2G_MPI_PRECOMMAND=
-	MPI_START_MACHINEFILE=$COPY_MACHINEFILE
+    MPI_START_PERNODE=1
     MPI_START_DO_NOT_USE_WRAPPER=1
 	
     # launch the mpi job
@@ -45,9 +43,7 @@ copy(){
     # set to tmp. values
     I2G_MPI_APPLICATION=$I2G_MPI_MT
     I2G_MPI_APPLICATION_ARGS="shell tar xzf $TARBALL_BASENAME -C /"
-    I2G_MPI_NP=$COPY_NP
     I2G_MPI_PRECOMMAND=
-    MPI_START_MACHINEFILE=$COPY_MACHINEFILE
 
     # launch the mpi job
     mpi_exec
@@ -55,34 +51,25 @@ copy(){
     # reset to original values
     I2G_MPI_APPLICATION=$old_i2g_mpi_application
     I2G_MPI_APPLICATION_ARGS=$old_i2g_mpi_application_args
-    I2G_MPI_NP=$old_i2g_mpi_np
     I2G_MPI_PRECOMMAND=$old_i2g_mpi_precommand
-    MPI_START_MACHINEFILE=$old_mpi_start_machinefile
+    MPI_START_PERNODE=$old_mpi_start_pernode
     I2G_MPI_MPIEXEC_PARAMS=$old_i2g_mpiexec_params
     unset MPI_START_DO_NOT_USE_WRAPPER
     return 0
 }
 
 clean(){
-    # check of there are several hosts or not
-    if test "x$COPY_NP" = "x1"  ; then
-        debug_msg "only localhost -> skip distribution"
-        return
-    fi
-
     # backup old values
     old_i2g_mpi_application=$I2G_MPI_APPLICATION
     old_i2g_mpi_application_args=$I2G_MPI_APPLICATION_ARGS
-    old_i2g_mpi_np=$I2G_MPI_NP
     old_i2g_mpi_precommand=$I2G_MPI_PRECOMMAND
-    old_mpi_start_machinefile=$MPI_START_MACHINEFILE   
+    old_mpi_start_pernode=$MPI_START_PERNODE
     
     # reset to tmp. values
     I2G_MPI_APPLICATION=$I2G_MPI_MT
     I2G_MPI_APPLICATION_ARGS="shell rm -rf `pwd`"
-    I2G_MPI_NP=$COPY_NP
+    MPI_START_PERNODE=1
     I2G_MPI_PRECOMMAND=
-    MPI_START_MACHINEFILE=$COPY_MACHINEFILE
     
     # lunch the mpi job
     mpi_exec
@@ -90,10 +77,8 @@ clean(){
     # reset to original values
     I2G_MPI_APPLICATION=$old_i2g_mpi_application
     I2G_MPI_APPLICATION_ARGS=$old_i2g_mpi_application_args
-    I2G_MPI_NP=$old_i2g_mpi_np
     I2G_MPI_PRECOMMAND=$old_i2g_mpi_precommand
-    MPI_START_MACHINEFILE=$old_mpi_start_machinefile
+    MPI_START_PERNODE=$old_mpi_start_pernode
 
-    rm $COPY_MACHINEFILE
     return 0
 }

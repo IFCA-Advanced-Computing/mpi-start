@@ -6,7 +6,6 @@
 #
 
 check_distribution_method(){
-
 	result=255
 	if test "x$MPI_SHARED_HOME" = "xyes" ; then
 		result=0
@@ -16,9 +15,9 @@ check_distribution_method(){
 }
 
 
-copy(){
+copy() {
     debug_msg "distribute using cptoshared"
-	tar xzf ${TARBALL} -C ${MPI_SHARED_HOME_PATH}
+	tar xzf ${TARBALL} -C ${MPI_SHARED_HOME_PATH} 
     # change the permissions of the "prefix" to allow
     # other users to create files there
     if test "x$EDG_WL_SCRATCH" != "x"; then
@@ -40,7 +39,7 @@ copy(){
 	return 0
 }
 
-clean(){
+clean() {
     debug_msg "removing distributed files"
     rm -rf ${MPI_SHARED_HOME_PATH}/${MYDIR}
     return 0
