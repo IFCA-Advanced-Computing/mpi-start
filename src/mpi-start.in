@@ -66,6 +66,9 @@ info_msg () {
 # $1 level
 #======================================================================
 dump_env () {
+    if test "x$I2G_MPI_START_TRACE" = "x1"  ; then
+        set +x
+    fi
     if test "x$I2G_MPI_START_VERBOSE" = "x1" ; then 
         for i in `env`; do
             echo "mpi-start [DUMPENV]:" $i 1>&2
@@ -186,6 +189,24 @@ mpi_start_execute_wrapper() {
     fi
 }
 
+#======================================================================
+# Create dummy scheduler environment with just the current host 
+#======================================================================
+dummy_scheduler() {
+    warn_msg "no scheduler found, using dummy environment with localhost"
+    export MPI_START_MACHINEFILE=`mktemp`
+    export MPI_START_HOSTFILE=`mktemp`
+    export MPI_START_HOST_SLOTS_FILE=`mktemp`
+    myhost=`hostname`
+    echo $myhost > $MPI_START_MACHINEFILE
+    echo $myhost > $MPI_START_HOSTFILE
+    echo "$myhost 1"> $MPI_START_HOST_SLOTS_FILE
+    export MPI_START_NSLOTS=1
+    export MPI_START_NHOSTS=1
+    export MPI_START_NSLOTS_PER_HOST=1
+    SCHEDULER_NAME="mpi-start-dummy"
+}
+
 
 #======================================================================
 # Checks that mpi-start are corrent and coherent
@@ -245,6 +266,9 @@ check_options() {
     MPI_START_SCHEDULER=""
     MPI_START_NP=$I2G_MPI_NP
 
+    # default values
+    MPI_START_DUMMY_SCHEDULER=${MPI_START_DUMMY_SCHEDULER:-1}
+
     # trace me
     if test "x$I2G_MPI_START_TRACE" = "x1"  ; then
         debug_msg "enable debugging"
@@ -302,35 +326,40 @@ main() {
                 dump_env
                 exit 2
             fi
-    
-            debug_msg "dump hosts:"
-            for i in `cat $MPI_START_HOSTFILE` ; do
-                debug_msg "=> $i"
-            done
-            if test "x${I2G_MPI_PER_NODE}" != "x" ; then
-                export I2G_MPI_NP=`expr $MPI_START_NHOSTS '*' $I2G_MPI_PER_NODE`
-                #export MPI_START_NP=`expr $MPI_START_NHOSTS '*' $I2G_MPI_PER_NODE`
-            else
-                #export MPI_START_NP=$MPI_START_NSLOTS
-                export I2G_MPI_NP=$MPI_START_NSLOTS
-            fi
 
-            # setup the np count 
-            debug_msg "starting with $I2G_MPI_NP processes."
-
-            # mark MPI_START as ready to go 
-            MPI_START_READY=0
-            export MPI_START_SCHEDULER=$SCHEDULER_NAME
             break
         fi
     done
 
     # check if we have a scheduler 
     if test $MPI_START_READY -ne 0  ; then 
-        error_msg "cannot find scheduler"
-        dump_env
-        exit 3 
+        if test "x${MPI_START_DUMMY_SCHEDULER}" == "x1" ; then
+            dummy_scheduler
+        else
+            error_msg "cannot find scheduler"
+            dump_env
+            exit 3 
+        fi
     fi
+
+    debug_msg "dump hosts:"
+    for i in `cat $MPI_START_HOSTFILE` ; do
+        debug_msg "=> $i"
+    done
+    if test "x${I2G_MPI_PER_NODE}" != "x" ; then
+        export I2G_MPI_NP=`expr $MPI_START_NHOSTS '*' $I2G_MPI_PER_NODE`
+        #export MPI_START_NP=`expr $MPI_START_NHOSTS '*' $I2G_MPI_PER_NODE`
+    else
+        #export MPI_START_NP=$MPI_START_NSLOTS
+        export I2G_MPI_NP=$MPI_START_NSLOTS
+    fi
+
+    # setup the np count 
+    debug_msg "starting with $I2G_MPI_NP processes."
+
+    # mark MPI_START as ready to go 
+    MPI_START_READY=0
+    export MPI_START_SCHEDULER=$SCHEDULER_NAME
 
     debug_msg "check for site environment"
 
@@ -448,9 +477,9 @@ print_usage () {
     echo "  -h             show this help message and exit" 1>&2
     echo "  -t type        use the mpi type (sets I2G_MPI_TYPE)" 1>&2
     echo "  -v level       set debug level (1, 2, 3)" 1>&2
-    echo "  -pre hook      set pre run hook script" 1>&2
-    echo "  -post hook     set post run hook script" 1>&2
-    echo "  -pcmd cmd      set pre command" 1>&2
+    echo "  -pre hook      use specified pre run hook script" 1>&2
+    echo "  -post hook     use specified post run hook script" 1>&2
+    echo "  -pcmd cmd      use specified pre command" 1>&2
     echo "  -npnode n      set number of processes per node" 1>&2
     echo "  -pnode         start only one process per node" 1>&2
     echo "  -np n          set total number of processes" 1>&2

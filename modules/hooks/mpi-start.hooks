@@ -105,7 +105,7 @@ mpi_start_detect_shared_fs() {
 mpi_start_pre_run_hook_copy () {
     debug_msg "mpi_start_pre_run_hook_copy"
 
-    if test $MPI_START_NHOSTS -eq 1 ; then
+    if test $MPI_START_NHOSTS -le 1 ; then
         debug_msg "only localhost, skip distribution"
         return 0
     fi
@@ -323,7 +323,7 @@ mpi_start_post_run_hook_generic () {
     mpi_start_run_post_hook $I2G_MPI_POST_RUN_HOOK 1
 
     if  test "x$MPI_START_SHARED_FS" != "x1" -o "x$MPI_START_DISTRIBUTE_PROXY" = "x1"  ; then 
-        if test $MPI_START_NHOSTS -eq 1 ; then
+        if test $MPI_START_NHOSTS -le 1 ; then
             debug_msg "only localhost, skip cleanup"
         else
             # this may be unset if only running on localhost
