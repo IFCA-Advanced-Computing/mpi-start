@@ -34,6 +34,10 @@ mpich2_with_mpd () {
     MPDBOOT_PARAMS="-n $MPI_START_NHOSTS -f $MPI_START_HOSTFILE"
 
     # take care that the ".mpd.conf" file is available
+    # make sure that we have a home, of not use pwd
+    if test "x$HOME" == "x" ; then
+        export HOME=$PWD
+    fi
     echo "MPD_SECRETWORD=" > $HOME/.mpd.conf
     chmod 0600 $HOME/.mpd.conf
 
