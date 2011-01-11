@@ -24,9 +24,14 @@ mpi_start_activate_mpi $MPI_START_MPI_PREFIX "$MPI_START_MPI_MODULE"
 if test "x$MPI_START_DISABLE_LRMS_INTEGRATION" == "xyes"; then
     # we are not the primary MPI 
     # fall back to save settings that should work always
-    debug_msg ""
     debug_msg "disable PBS, SGE"
     OPENMPI_PARAMS="-mca pls ^tm,gridengine -mca ras ^tm,gridengine  "
+fi
+
+if test "x$MPI_START_SSH_AGENT" != "x"; then
+    # we are not using default start methods, setting specific ssh 
+    debug_msg "setting specific ssh agent"
+    OPENMPI_PARAMS="-mca pls ^tm,gridengine -mca ras ^tm,gridengine -mca orte_rsh_agent $MPI_START_SSH_AGENT"
 fi
 
 #

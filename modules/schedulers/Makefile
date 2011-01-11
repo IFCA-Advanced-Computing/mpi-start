@@ -3,15 +3,18 @@ all:
 	$(MAKE) -C sge all
 	$(MAKE) -C lsf all
 	$(MAKE) -C slurm all
+	$(MAKE) -C condor all
 
 clean:
 	$(MAKE) -C pbs clean
 	$(MAKE) -C sge clean
 	$(MAKE) -C lsf clean
 	$(MAKE) -C slurm clean
+	$(MAKE) -C condor clean
 
 install:
 	$(MAKE) -C pbs install
 	$(MAKE) -C sge install
 	$(MAKE) -C lsf install
 	$(MAKE) -C slurm install
+	$(MAKE) -C condor install

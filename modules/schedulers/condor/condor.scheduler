@@ -1,0 +1,74 @@
+#!/bin/sh
+#
+# Copyright (c) 2011 Instituto de Fisica de Cantabria, CSIC-UC
+#                    All rights reserved.
+#
+
+SCHEDULER_NAME="condor"
+
+#
+# This function checks if the current job is running in a condor
+# environment.
+#
+# Return values :
+#  0     - Support for this kind of scheduler is found.
+#  else  - NO support for this of scheduler is found. 
+#
+scheduler_available () {
+    debug_msg " checking for \$_CONDOR_PROCNO"
+	if test "x$_CONDOR_PROCNO" = "x" ; then 
+		return 13;
+	else
+		return 0
+	fi
+}
+
+#
+# This function is called to setup 
+scheduler_get_machinefile () {
+    CONDOR_SSH=`condor_config_val libexec`
+    CONDOR_SSH=$CONDOR_SSH/condor_ssh
+
+    SSHD_SH=`condor_config_val libexec`
+    SSHD_SH=$SSHD_SH/sshd.sh
+
+    debug_msg "Starting ssh in proc $_CONDOR_PROCNO"
+    . $SSHD_SH $_CONDOR_PROCNO $_CONDOR_NPROCS
+
+    # If not the head node, just sleep forever, to let the
+    # sshds run
+    if [ $_CONDOR_PROCNO -ne 0 ]
+    then
+        wait
+        sshd_cleanup
+        exit 0
+    fi
+ 
+    CONDOR_CONTACT_FILE=$_CONDOR_SCRATCH_DIR/contact
+    [ ! -f "$CONDOR_CONTACT_FILE" ] && return 13
+    cat $CONDOR_CONTACT_FILE
+    export MPI_START_MACHINEFILE=`mktemp`
+    export MPI_START_HOSTFILE=`mktemp`
+    export MPI_START_HOST_SLOTS_FILE=`mktemp`
+    sort -n < $CONDOR_CONTACT_FILE | awk '{print $2}' > $MPI_START_MACHINEFILE
+    # assume CONDOR allocation of machines is "sane"
+    cat $MPI_START_MACHINEFILE | sort | uniq -c | tr -s " " |
+         # this is a subshell, variables changes here are not changed outside!
+         while read line; do
+             slots=`echo $line | cut -f1 -d" "`
+             host=`echo $line | cut -f2 -d" "`
+             echo $host >> $MPI_START_HOSTFILE
+             echo $host $slots >> $MPI_START_HOST_SLOTS_FILE
+         done
+         # this only works in bash
+         # < <( cat $MPI_START_MACHINEFILE | sort | uniq -c | tr -s " " )
+    export MPI_START_NHOSTS=`cat $MPI_START_HOSTFILE | wc -l`
+    export MPI_START_NSLOTS_PER_HOST=`cat $MPI_START_HOST_SLOTS_FILE | cut -f2 -d" " | sort -n | head -1`
+    export MPI_START_NSLOTS=`cat $MPI_START_MACHINEFILE | wc -l`
+
+    # condor uses its condor_ssh executable for spawning processes in other machines
+    # setting the MPI_START_SSH_AGENT variable will make mpi implementations prefer this 
+    # way of starting the jobs
+    export MPI_START_SSH_AGENT=$CONDOR_SSH
+    return 0
+}

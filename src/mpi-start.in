@@ -327,6 +327,9 @@ main() {
                 exit 2
             fi
 
+            # mark MPI_START as ready to go 
+            MPI_START_READY=0
+            export MPI_START_SCHEDULER=$SCHEDULER_NAME
             break
         fi
     done
@@ -357,9 +360,6 @@ main() {
     # setup the np count 
     debug_msg "starting with $I2G_MPI_NP processes."
 
-    # mark MPI_START as ready to go 
-    MPI_START_READY=0
-    export MPI_START_SCHEDULER=$SCHEDULER_NAME
 
     debug_msg "check for site environment"
 
