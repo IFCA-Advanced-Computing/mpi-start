@@ -1,3 +1,7 @@
+2011-01-11 Enol Fernandez <enolfc _AT_ ifca.unican.es>
+	* Added command line options
+	* Added dummy scheduler in case none is found
+
 2010-11-29 Enol Fernandez <enolfc _AT_ ifca.unican.es>
 	* Added per node option.
 
