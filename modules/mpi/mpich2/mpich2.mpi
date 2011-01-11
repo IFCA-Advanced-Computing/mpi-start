@@ -31,13 +31,20 @@ mpich2_with_mpd () {
         MACHINES=$MPI_START_MACHINEFILE
     fi
     export I2G_MACHINEFILE_AND_NP="-machinefile $MACHINES -np $I2G_MPI_NP"
+    MPDBOOT_PARAMS="-n $MPI_START_NHOSTS -f $MPI_START_HOSTFILE"
 
     # take care that the ".mpd.conf" file is available
     echo "MPD_SECRETWORD=" > $HOME/.mpd.conf
     chmod 0600 $HOME/.mpd.conf
 
+    if test "x$MPI_START_SSH_AGENT" != "x"; then
+        # we are not using default start methods, setting specific ssh 
+        debug_msg "setting specific ssh agent"
+        MPDBOOT_PARAMS="$MPDBOOT_PARAMS --rsh=$MPI_START_SSH_AGENT"
+    fi
+
     # Start MPICH2 daemon.
-    mpdboot -n $MPI_START_NHOSTS -f $MPI_START_HOSTFILE
+    mpdboot $MPDBOOT_PARAMS 
     MPI_SPECIFIC_PARAMS=$MPICH2_PARAMS
     . $MPI_START_PREFIX/../etc/mpi-start/generic_mpiexec.sh
     generic_mpiexec

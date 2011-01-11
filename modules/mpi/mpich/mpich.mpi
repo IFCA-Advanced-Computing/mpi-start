@@ -46,6 +46,12 @@ mpi_exec () {
         fi
     fi
 
+    if test "x$MPI_START_SSH_AGENT" != "x"; then
+        # we are not using default start methods, setting specific ssh 
+        debug_msg "setting specific ssh agent"
+        export P4_RSHCOMMAND=$MPI_START_SSH_AGENT
+    fi
+
     . $MPI_START_PREFIX/../etc/mpi-start/generic_mpiexec.sh
     generic_mpiexec
     err=$?
