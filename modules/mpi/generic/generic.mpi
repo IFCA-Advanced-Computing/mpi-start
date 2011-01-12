@@ -15,9 +15,9 @@ mpi_exec () {
     fi
 
     if test "x${I2G_MPI_PER_NODE}" != "x" ; then
-        I2G_MACHINEFILE_AND_NP="-machinefile $MPI_START_HOSTFILE -np $I2G_MPI_NP"
+        I2G_MACHINEFILE_AND_NP="-machinefile $MPI_START_HOSTFILE -np $MPI_START_NP"
     else
-        I2G_MACHINEFILE_AND_NP="-machinefile $MPI_START_MACHINEFILE -np $I2G_MPI_NP"
+        I2G_MACHINEFILE_AND_NP="-machinefile $MPI_START_MACHINEFILE -np $MPI_START_NP"
     fi
 
     MPIEXEC=`which mpirun`

@@ -26,9 +26,9 @@ mpi_exec () {
     mpi_start_search_mpiexec
 
     if test "x$I2G_MPI_PER_NODE" = "x1" ; then
-        export I2G_MACHINEFILE_AND_NP="-machinefile $MPI_START_HOSTFILE -np $I2G_MPI_NP"
+        export I2G_MACHINEFILE_AND_NP="-machinefile $MPI_START_HOSTFILE -np $MPI_START_NP"
     else
-        export I2G_MACHINEFILE_AND_NP="-machinefile $MPI_START_MACHINEFILE -np $I2G_MPI_NP"
+        export I2G_MACHINEFILE_AND_NP="-machinefile $MPI_START_MACHINEFILE -np $MPI_START_NP"
     fi
  
     if test "x$MPI_MPIEXEC" != "x"; then

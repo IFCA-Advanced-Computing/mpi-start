@@ -22,7 +22,7 @@ shadow_mpi_start () {
 
     # add 2 additional processes for PACX
     debug_msg "add 2 additional processes"
-    I2G_MPI_NP=$(($I2G_MPI_NP+2))
+    MPI_START_NP=$(($MPI_START_NP+2))
 
     # create a new machinefile with the relay host
     # add host 2 times to reserve 2 slots 
@@ -32,7 +32,7 @@ shadow_mpi_start () {
     echo $I2G_MPI_RELAY >> $NEW_MACHINEFILE
     cat $MPI_START_MACHINEFILE >>  $NEW_MACHINEFILE
     MPI_START_MACHINEFILE=$NEW_MACHINEFILE
-    export I2G_MACHINEFILE_AND_NP="-machinefile $MPI_START_MACHINEFILE -np $I2G_MPI_NP"
+    export I2G_MACHINEFILE_AND_NP="-machinefile $MPI_START_MACHINEFILE -np $MPI_START_NP"
 
     # create PACX specific config file
     debug_msg "create .hostfile"

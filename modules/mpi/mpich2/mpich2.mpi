@@ -30,7 +30,7 @@ mpich2_with_mpd () {
     else
         MACHINES=$MPI_START_MACHINEFILE
     fi
-    export I2G_MACHINEFILE_AND_NP="-machinefile $MACHINES -np $I2G_MPI_NP"
+    export I2G_MACHINEFILE_AND_NP="-machinefile $MACHINES -np $MPI_START_NP"
     MPDBOOT_PARAMS="-n $MPI_START_NHOSTS -f $MPI_START_HOSTFILE"
 
     # take care that the ".mpd.conf" file is available

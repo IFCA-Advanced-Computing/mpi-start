@@ -31,7 +31,9 @@ fi
 if test "x$MPI_START_SSH_AGENT" != "x"; then
     # we are not using default start methods, setting specific ssh 
     debug_msg "setting specific ssh agent"
-    OPENMPI_PARAMS="-mca pls ^tm,gridengine -mca ras ^tm,gridengine -mca orte_rsh_agent $MPI_START_SSH_AGENT"
+    # plm_rsh_agent is deprecated in newer versions of Open MPI 
+    # need to check version and set the appropriate parameter
+    OPENMPI_PARAMS="-mca pls ^tm,gridengine -mca ras ^tm,gridengine -mca plm_rsh_agent $MPI_START_SSH_AGENT"
 fi
 
 #
@@ -42,12 +44,12 @@ mpi_exec () {
     mpi_start_search_mpiexec
 
     #handle Open MPI 1.2.2 + PBS bug
-    if test "x$MPI_START_SCHEDULER" = "xpbs" ; then
-        debug_msg "found openmpi and PBS, don't set machinefile"
-        export I2G_MACHINEFILE_AND_NP="-np $I2G_MPI_NP"
+    if test "x$MPI_START_SCHEDULER" = "xpbs" -a "x$MPI_START_SSH_AGENT" = "x" ; then
+        debug_msg "found openmpi and PBS (without ssh agent), don't set machinefile"
+        export I2G_MACHINEFILE_AND_NP="-np $MPI_START_NP"
     else
         debug_msg "found openmpi and a non-PBS batch system, set machinefile and np parameters"
-        export I2G_MACHINEFILE_AND_NP="-machinefile $MPI_START_MACHINEFILE -np $I2G_MPI_NP"
+        export I2G_MACHINEFILE_AND_NP="-machinefile $MPI_START_MACHINEFILE -np $MPI_START_NP"
     fi
 
     if test "x${I2G_MPI_PER_NODE}" != "x" ; then
