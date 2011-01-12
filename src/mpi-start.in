@@ -159,7 +159,6 @@ mpi_start_export_variable () {
 # $* command line to execute 
 #======================================================================
 mpi_start_execute_wrapper() {
-
     if test "x${MPI_START_DO_NOT_USE_WRAPPER}" = "x1" ; then
         if test "x${I2G_MPI_APPLICATION_STDIN}" = "x" ; then
             # no input
@@ -345,7 +344,6 @@ main() {
     check_options
     
     # check for scheduling system and set environment variables
-    # XXX Should have a fallback scheduler "No scheduler..."
     info_msg "search for scheduler"
     for i in $MPI_START_PREFIX/../etc/mpi-start/*.scheduler  ; do 
         # source the function definitions
