@@ -5,14 +5,6 @@
 #           (c) 2009-2010 Instituto de Fisica de Cantabria - CSIC. 
 #                         All rights reserved.
 
-#if test "x$MPI_START_MPI_PREFIX" = "x"  ; then    
-#    export MPI_START_MPI_PREFIX=/usr/lib64/openmpi/1.4-gcc
-#    debug_msg "use default mpi path: $MPI_START_MPI_PREFIX"
-#fi
-
-# activate MPI
-#mpi_start_activate_mpi $MPI_START_MPI_PREFIX "$MPI_START_MPI_MODULE"
-
 #
 # start an mpi job
 #
