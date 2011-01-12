@@ -28,7 +28,16 @@ mpich2_with_mpd () {
         done
         export MPI_START_CLEANUP_FILES="$MPI_START_CLEANUP_FILES $MACHINES" 
     else
-        MACHINES=$MPI_START_MACHINEFILE
+        if test $MPI_START_NP -gt $MPI_START_NSLOTS ; then
+            debug_msg "Creating machine file for starting more processes than available slots"
+            MACHINES=`mktemp`
+            while test `cat $MACHINES | wc -l` -lt $MPI_START_NP ; do
+                cat $MPI_START_MACHINEFILE >> $MACHINES
+            done
+            export MPI_START_CLEANUP_FILES="$MPI_START_CLEANUP_FILES $MACHINES" 
+        else
+            MACHINES=$MPI_START_MACHINEFILE
+        fi
     fi
     export I2G_MACHINEFILE_AND_NP="-machinefile $MACHINES -np $MPI_START_NP"
     MPDBOOT_PARAMS="-n $MPI_START_NHOSTS -f $MPI_START_HOSTFILE"
