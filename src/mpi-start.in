@@ -160,12 +160,52 @@ mpi_start_export_variable () {
 #======================================================================
 mpi_start_execute_wrapper() {
 
-    if test "x$MPI_START_DO_NOT_USE_WRAPPER" = "x1" ; then
-        if [ "x$I2G_MPI_APPLICATION_STDIN" != "x" -a "x$I2G_MPI_APPLICATION_STDOUT" != "x" ] ; then
-            debug_msg "redirecting stdin and stdout"
-            $* \> $I2G_MPI_APPLICATION_STDOUT < $I2G_MPI_APPLICATION_STDIN
+    if test "x${MPI_START_DO_NOT_USE_WRAPPER}" = "x1" ; then
+        if test "x${I2G_MPI_APPLICATION_STDIN}" = "x" ; then
+            # no input
+            if test "x${I2G_MPI_APPLICATION_STDOUT}" = "x" ; then
+                # no output
+                if test "x${I2G_MPI_APPLICATION_STDERR}" = "x" ; then
+                    # no error
+                    $*
+                else
+                    # only error
+                    $* 2> ${I2G_MPI_APPLICATION_STDERR}
+                fi
+            else
+                if test "x${I2G_MPI_APPLICATION_STDERR}" = "x" ; then
+                    # only output
+                    $* \> ${I2G_MPI_APPLICATION_STDOUT}
+                elif test ${I2G_MPI_APPLICATION_STDOUT} = ${I2G_MPI_APPLICATION_STDERR} ; then
+                    # same output and error
+                    $* \> ${I2G_MPI_APPLICATION_STDOUT} 2>&1
+                else
+                    # different output and error
+                    $* \> ${I2G_MPI_APPLICATION_STDOUT} 2> ${I2G_MPI_APPLICATION_STDERR} 
+                fi
+            fi
         else
-            $*
+            if test "x${I2G_MPI_APPLICATION_STDOUT}" = "x" ; then
+                # no output
+                if test "x${I2G_MPI_APPLICATION_STDERR}" = "x" ; then
+                    # no error
+                    $* < $I2G_MPI_APPLICATION_STDIN
+                else
+                    # only error
+                    $* 2> ${I2G_MPI_APPLICATION_STDERR} < $I2G_MPI_APPLICATION_STDIN
+                fi
+            else
+                if test "x${I2G_MPI_APPLICATION_STDERR}" = "x" ; then
+                    # only output
+                    $* \> ${I2G_MPI_APPLICATION_STDOUT} < $I2G_MPI_APPLICATION_STDIN
+                elif test ${I2G_MPI_APPLICATION_STDOUT} = ${I2G_MPI_APPLICATION_STDERR} ; then
+                    # same output and error
+                    $* \> ${I2G_MPI_APPLICATION_STDOUT} 2>&1 < $I2G_MPI_APPLICATION_STDIN
+                else
+                    # different output and error
+                    $* \> ${I2G_MPI_APPLICATION_STDOUT} 2> ${I2G_MPI_APPLICATION_STDERR} < $I2G_MPI_APPLICATION_STDIN
+                fi
+            fi
         fi
         return $?
     else
@@ -175,12 +215,23 @@ mpi_start_execute_wrapper() {
         CMD_WRAPPER=`mktemp`
         chmod +x $CMD_WRAPPER
         cat $MPI_START_MPI_WRAPPER > $CMD_WRAPPER
-        if [ "x$I2G_MPI_APPLICATION_STDIN" != "x" -a "x$I2G_MPI_APPLICATION_STDOUT" != "x" ] ; then
-            debug_msg "redirecting stdin and stdout"
-            echo "$* \> $I2G_MPI_APPLICATION_STDOUT < $I2G_MPI_APPLICATION_STDIN" >> $CMD_WRAPPER
-        else
-            echo "$*" >> $CMD_WRAPPER
+        local OUTPUT=""
+        local ERROR=""
+        local INPUT=""
+        if test "x${I2G_MPI_APPLICATION_STDOUT}" != "x" ; then
+            OUTPUT="> ${I2G_MPI_APPLICATION_STDOUT}"
         fi
+        if test "x${I2G_MPI_APPLICATION_STDERR}" != "x" ; then
+            if test "x${I2G_MPI_APPLICATION_STDOUT}" = "x${I2G_MPI_APPLICATION_STDERR}" ; then
+                ERROR="2>&1"
+            else
+                ERROR="2> ${I2G_MPI_APPLICATION_STDERR}"
+            fi
+        fi
+        if test "x${I2G_MPI_APPLICATION_STDIN}" != "x" ; then
+            INPUT="< ${I2G_MPI_APPLICATION_STDIN}"
+        fi 
+        echo "$* $OUTPUT $ERROR $INPUT" >> $CMD_WRAPPER
         echo "exit \$?" >> $CMD_WRAPPER
         $CMD_WRAPPER
         err=$?
