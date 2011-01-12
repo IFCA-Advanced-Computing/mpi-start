@@ -227,6 +227,12 @@ check_options() {
         done
     fi
 
+    # trace me
+    if test "x$I2G_MPI_START_TRACE" = "x1"  ; then
+        debug_msg "enable debugging"
+        set -x
+    fi
+
     if test -r "${I2G_MPI_CONFIG}" ; then 
         . ${I2G_MPI_CONFIG}
         if test $? -ne 0 ; then
@@ -265,16 +271,10 @@ check_options() {
     MPI_START_MPI_PREFIX=""
     MPI_START_CLEANUP_FILES=""
     MPI_START_SCHEDULER=""
-    MPI_START_NP=$I2G_MPI_NP
+    MPI_START_NP=1
 
     # default values
     MPI_START_DUMMY_SCHEDULER=${MPI_START_DUMMY_SCHEDULER:-1}
-
-    # trace me
-    if test "x$I2G_MPI_START_TRACE" = "x1"  ; then
-        debug_msg "enable debugging"
-        set -x
-    fi
 }
 
 #======================================================================
@@ -351,15 +351,15 @@ main() {
         debug_msg "=> $i"
     done
     if test "x${I2G_MPI_PER_NODE}" != "x" ; then
-        export I2G_MPI_NP=`expr $MPI_START_NHOSTS '*' $I2G_MPI_PER_NODE`
-        #export MPI_START_NP=`expr $MPI_START_NHOSTS '*' $I2G_MPI_PER_NODE`
+        export MPI_START_NP=`expr $MPI_START_NHOSTS '*' $I2G_MPI_PER_NODE`
+    elif test "x${I2G_MPI_NP}" != "x" ; then
+        export MPI_START_NP=$I2G_MPI_NP
     else
-        #export MPI_START_NP=$MPI_START_NSLOTS
-        export I2G_MPI_NP=$MPI_START_NSLOTS
+        export MPI_START_NP=$MPI_START_NSLOTS
     fi
 
     # setup the np count 
-    debug_msg "starting with $I2G_MPI_NP processes."
+    debug_msg "starting with $MPI_START_NP processes."
 
 
     debug_msg "check for site environment"
