@@ -1,0 +1,19 @@
+#!/bin/sh 
+#
+# Copyright (c) 2009-2010  Instituto de Fisica de Cantabria - CSIC. 
+#                          All rights reserved.
+
+#
+# hook for using OpenMP 
+# defines the OMP_NUM_THREADS variable
+#
+pre_run_hook () {
+    if test "x$I2G_USE_OMP" != "x1" ; then
+        debug_msg "OpenMP not enabled."
+        return 0
+    fi
+
+    # XXX what about non uniform slots allocations?
+    mpi_start_export_variable OMP_NUM_THREADS $MPI_START_NSLOTS_PER_HOST
+    return 0
+}

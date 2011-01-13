@@ -10,5 +10,6 @@ install:
 	install -m 0644 compiler.hook $(DESTDIR)/$(PREFIX)/etc/mpi-start/
 	install -m 0644 marmot.hook $(DESTDIR)/$(PREFIX)/etc/mpi-start/
 	install -m 0644 mpitrace.hook $(DESTDIR)/$(PREFIX)/etc/mpi-start/
+	install -m 0644 openmp.hook $(DESTDIR)/$(PREFIX)/etc/mpi-start/
 	$(MAKE) -C file-dist install
 
