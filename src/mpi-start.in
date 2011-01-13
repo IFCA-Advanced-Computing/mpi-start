@@ -124,7 +124,7 @@ mpi_start_activate_mpi () {
 # env variables
 #======================================================================
 mpi_start_create_wrapper() {
-    if test "x$MPI_START_MPI_WRAPPER" = "x" ; then
+    if test "x${MPI_START_MPI_WRAPPER}" = "x" ; then
         export MPI_START_MPI_WRAPPER=`mktemp`
         export MPI_START_CLEANUP_FILES="$MPI_START_CLEANUP_FILES $MPI_START_MPI_WRAPPER"
         cat > $MPI_START_MPI_WRAPPER << EOF
@@ -260,7 +260,7 @@ dummy_scheduler() {
 
 
 #======================================================================
-# Checks that mpi-start are corrent and coherent
+# Checks that mpi-start are correct and coherent
 #======================================================================
 check_options() {
     # debug me 
@@ -279,14 +279,14 @@ check_options() {
 
     # trace me
     if test "x$I2G_MPI_START_TRACE" = "x1"  ; then
-        debug_msg "enable debugging"
+        debug_msg "enable full trace debugging"
         set -x
     fi
 
     if test -r "${I2G_MPI_CONFIG}" ; then 
         . ${I2G_MPI_CONFIG}
         if test $? -ne 0 ; then
-            error_msg "Failed to load config file $I2G_MPI_CONFIG"
+            error_msg "Failed to load configuration file $I2G_MPI_CONFIG"
             dump_env
             exit 2
         fi
@@ -294,7 +294,7 @@ check_options() {
 
     if test "x${I2G_MPI_SINGLE_PROCESS}" = "x1" ; then
         if test "x${I2G_MPI_PER_NODE}" != "x" ; then
-            warn_msg "Process per node option ($I2G_MPI_PER_NODE) overriding single process option! "
+            warn_msg "Process per node option ($I2G_MPI_PER_NODE) overriding single process option!"
         else
             export I2G_MPI_PER_NODE=1
         fi
@@ -316,7 +316,6 @@ check_options() {
     MPI_START_NHOSTS=0
     MPI_START_NSLOTS=0
     MPI_START_NSLOTS_PER_HOST=0
-    MPI_START_MPI_WRAPPER=""
     MPI_START_READY=-1 
     MPI_START_MPI_PREFIX=""
     MPI_START_CLEANUP_FILES=""
@@ -517,8 +516,10 @@ main() {
 #  Print command line usage.
 #======================================================================
 print_usage () {
-    echo "mpi-start [-h] [-t mpi_type] [-v] [-vv] [-vvv] [-pre hook] [-post hook]" 1>&2
-    echo "    [-pcmd cmd] [-npnode n] [-pnode] [-np n] [--]" 1>&2
+    echo "mpi-start [-h] [-t mpi_type] [-v] [-vv] [-vvv]" 1>&2
+    echo "    [-pre hook] [-post hook] [-pcmd cmd]" 1>&2
+    echo "    [-npnode n] [-pnode] [-np n]" 1>&2
+    echo "    [-x VAR[=VALUE]] [-d VAR=VALUE] [--]" 1>&2
     echo "    application [...]" 1>&2
     echo  1>&2
     echo "Parallel job starter" 1>&2
@@ -537,11 +538,14 @@ print_usage () {
     echo "  -pnode         start only one process per node" 1>&2
     echo "  -np n          set total number of processes" 1>&2
     echo "  -c file        use file for sourcing mpi-start variables" 1>&2
+    echo "  -x VAR[=VALUE] export the environment variable VAR," 1>&2
+    echo "                   optionally define value" 1>&2
+    echo "  -d VAR=VALUE   define mpi-start variable VAR with specified VALUE" 1>&2
     echo "  --             separator for application and arguments" 1>&2
 }
 
 print_version () {
-    echo "mpi-start @VERSION@" 
+    echo "mpi-start v@VERSION@" 
 }
 
 #======================================================================
@@ -612,6 +616,20 @@ while [ "x$1" != "x" ] ; do
         -c)
             shift
             export I2G_MPI_CONFIG=$1
+            shift
+            ;;
+        -x)
+            shift
+            if [[ $1 == *=* ]] ; then
+                mpi_start_export_variable `echo $1 | cut -f1 -d"="` `echo $1 | cut -f2- -d"="`
+            else
+                mpi_start_export_variable $1 
+            fi
+            shift
+            ;;
+        -d)
+            shift
+            eval export $1
             shift
             ;;
         --)
