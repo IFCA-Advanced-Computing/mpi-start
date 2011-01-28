@@ -28,24 +28,6 @@ setUp () {
     unset MPI_START_SHARED_FS
 }
 
-testI2G_MPI_START_Unset () {
-    TEMP_MPI_START=$I2G_MPI_START 
-    export I2G_MPI_APPLICATION=/bin/true
-    unset I2G_MPI_START
-    $TEMP_MPI_START 
-    st=$?
-    assertEquals 0 $st
-}
-
-testNoScheduler () {
-    export MPI_START_DUMMY_SCHEDULER=0
-    export I2G_MPI_APPLICATION=/bin/true
-    $I2G_MPI_START 2>&1 | grep "ERROR.*cannot find scheduler" > /dev/null
-    st=$?
-    assertEquals 0 $st
-    unset MPI_START_DUMMY_SCHEDULER
-}
-
 count_app_np () {
     # disable the copy!
     export MPI_START_SHARED_FS=1
@@ -212,10 +194,5 @@ EOF
     assertEquals 0 $st
     rm -f $I2G_MPI_APPLICATION
 }
-
-# XXX slurm plugin uses some slurm tools not found in the test environment!
-#testSLURMscheduler () {
-#
-#}
 
 . $SHUNIT2
