@@ -89,7 +89,7 @@ build_lsb_mcpu_hosts () {
 # This function is called to setup 
 #
 scheduler_get_machinefile () {
-    if test "x$LSB_HOSTS" = "x" -o "x$LSB_MCPU_HOSTS" = "x" ; then
+    if test "x$LSB_HOSTS" = "x" -a "x$LSB_MCPU_HOSTS" = "x" ; then
         return 13
     fi
     if test "x$LSB_HOSTS" != "x" ; then
