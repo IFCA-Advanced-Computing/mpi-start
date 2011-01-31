@@ -1,3 +1,8 @@
+0.1.7 2011-01-27 Enol Fernandez <enolfc _AT_ ifca.unican.es>
+	* Changed default installation prefix (now it is /opt/mpi-start)
+	* Added and reviewed tests for basic functionality, schedulers and hooks. 
+
+
 0.1.6 2011-01-12 Enol Fernandez <enolfc _AT_ ifca.unican.es>
 	* Changed changelog format (now it includes version)
 	* Added -V option to get version

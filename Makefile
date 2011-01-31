@@ -1,8 +1,8 @@
 # Makefile for MPI_START
 VERSION=$(shell cat VERSION)
 DESTDIR=
-PREFIX=/opt/i2g
-NAME_PREFIX=i2g
+PREFIX=/opt/mpi-start
+NAME_PREFIX=emi
 
 all:
 	$(MAKE) -C src all 
