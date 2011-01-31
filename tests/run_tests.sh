@@ -9,7 +9,7 @@ DOWNLOAD_MY_SHUNIT=1
 if test "x${SHUNIT2}" = "x" ; then
     echo "SHUNIT2 environment variable not defined!"
     if test "x${DOWNLOAD_MY_SHUNIT}" = "x1"; then
-        wget http://devel.ifca.es/~enol/depot/shunit2 -O shunit2 -o /dev/null
+        wget -q http://devel.ifca.es/~enol/depot/shunit2 -O shunit2 
         st=$?
         if test $st -ne 0 ; then
             echo "Could not download shunit..."
