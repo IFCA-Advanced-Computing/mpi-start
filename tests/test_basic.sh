@@ -17,7 +17,6 @@ fi
 rm -f $TMPFILE    
 
 setUp () {
-    export I2G_MPI_START=../bin/mpi-start
     export I2G_MPI_TYPE="dummy"
     unset I2G_MPI_NP
     unset I2G_MPI_APPLICATION
@@ -35,6 +34,7 @@ testI2G_MPI_START_Unset () {
     $TEMP_MPI_START 
     st=$?
     assertEquals 0 $st
+    export I2G_MPI_START=$TEMP_MPI_START
 }
 
 testBadCommandLine () {
@@ -116,7 +116,7 @@ echo "\${I2G_MPI_PRE_RUN_HOOK};\${I2G_MPI_POST_RUN_HOOK};"
 EOF
     chmod +x $myapp
 
-    output=`$I2G_MPI_START -vvv -pre mypre -post mypost $myapp`
+    output=`$I2G_MPI_START -pre mypre -post mypost $myapp`
     st=$?
     assertEquals 0 $st
     prehook=`echo $output | cut -f1 -d";"`

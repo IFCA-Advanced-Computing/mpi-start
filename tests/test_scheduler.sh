@@ -17,7 +17,6 @@ fi
 rm -f $TMPFILE    
 
 setUp () {
-    export I2G_MPI_START=../bin/mpi-start
     export I2G_MPI_TYPE="dummy"
     unset I2G_MPI_NP
     unset I2G_MPI_APPLICATION

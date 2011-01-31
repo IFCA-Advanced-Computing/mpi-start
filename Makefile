@@ -9,6 +9,7 @@ all:
 	$(MAKE) -C modules all
 	$(MAKE) -C templates all
 	$(MAKE) -C docs all
+	$(MAKE) -C tests all 
 
 clean:
 	rm -f *.tar.gz
@@ -17,10 +18,11 @@ clean:
 	$(MAKE) -C modules clean
 	$(MAKE) -C templates clean
 	$(MAKE) -C docs clean
+	$(MAKE) -C tests clean
 
 distclean:clean
 
-install:
+install: all
 	mkdir -p $(DESTDIR)/$(PREFIX)/bin
 	mkdir -p $(DESTDIR)/$(PREFIX)/etc/mpi-start
 	mkdir -p $(DESTDIR)/etc
@@ -29,6 +31,7 @@ install:
 	$(MAKE) -C modules install
 	$(MAKE) -C templates install
 	$(MAKE) -C docs install
+	$(MAKE) -C tests install 
 	mkdir -p $(DESTDIR)/etc/profile.d
 	echo "export I2G_MPI_START=$(PREFIX)/bin/mpi-start" > $(DESTDIR)/etc/profile.d/mpi_start.sh
 	echo "setenv I2G_MPI_START $(PREFIX)/bin/mpi-start" > $(DESTDIR)/etc/profile.d/mpi_start.csh
@@ -47,7 +50,6 @@ dist:
 rpm: dist 
 	mkdir -p rpm/SOURCES rpm/SRPMS rpm/SPECS rpm/BUILD rpm/RPMS
 	rpmbuild --define "_topdir `pwd`/rpm" --define "mpi-start-prefix $(PREFIX)" -ta $(NAME_PREFIX)-mpi-start-$(VERSION).tar.gz
-
 
 export VERSION
 export PREFIX
