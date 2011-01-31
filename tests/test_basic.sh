@@ -25,7 +25,7 @@ setUp () {
     unset I2G_MPI_START_VERBOSE
     unset I2G_MPI_START_TRACE
     unset I2G_MPI_SINGLE_PROCESS
-    unset MPI_START_SHARED_FS
+    export MPI_START_SHARED_FS=1
 }
 
 testI2G_MPI_START_Unset () {
@@ -37,185 +37,93 @@ testI2G_MPI_START_Unset () {
     assertEquals 0 $st
 }
 
-testNoScheduler () {
-    export MPI_START_DUMMY_SCHEDULER=0
-    export I2G_MPI_APPLICATION=/bin/true
-    $I2G_MPI_START 2>&1 | grep "ERROR.*cannot find scheduler" > /dev/null
+testBadCommandLine () {
+    output=`$I2G_MPI_START -flu 2>&1`
+    st=$?
+    assertEquals 1 $st
+    echo $output | grep "Invalid option" > /dev/null
     st=$?
     assertEquals 0 $st
-    unset MPI_START_DUMMY_SCHEDULER
 }
 
-count_app_np () {
-    # disable the copy!
-    export MPI_START_SHARED_FS=1
-    export I2G_MPI_APPLICATION=`mktemp`
-    export I2G_MPI_NP=5
-    cat > $I2G_MPI_APPLICATION << EOF
+testCommandLineHelp () {
+    $I2G_MPI_START -h 2> /dev/null
+    st=$?
+    assertEquals 0 $st
+}
+
+testCommandLineVersion() {
+    version=`$I2G_MPI_START -V 2>&1`
+    st=$?
+    assertEquals 0 $st
+    echo $version | grep "mpi-start v[0-9]\.[0-9]\.[0-9]" > /dev/null
+    st=$?
+    assertEquals 0 $st
+}
+
+testCommandLineTypeAndApp() {
+    unset I2G_MPI_TYPE
+    myapp=`mktemp`
+    cat > $myapp << EOF
 #!/bin/sh
-echo "\${MPI_START_NSLOTS};\${MPI_START_NHOSTS};\${MPI_START_NSLOTS_PER_HOST};\${MPI_START_NP}"
-exit 0
+echo \${I2G_MPI_TYPE}
 EOF
-    chmod +x $I2G_MPI_APPLICATION
-    output=`$I2G_MPI_START`
+    chmod +x $myapp
+    output=`$I2G_MPI_START -t dummy -- $myapp`
     st=$?
-    slots=`echo $output | cut -f1 -d";"`
-    hosts=`echo $output | cut -f2 -d";"`
-    sperhosts=`echo $output | cut -f3 -d";"`
-    np=`echo $output | cut -f4 -d";"`
-    assertEquals 8 $slots
-    assertEquals 3 $hosts
-    assertEquals 2 $sperhosts
-    assertEquals 5 $np
+    assertEquals "dummy" "$output"
     assertEquals 0 $st
-    unset I2G_MPI_NP
-    rm -f $I2G_MPI_APPLICATION
+    rm -f $myapp
 }
 
-count_app_all_slots () {
-    # disable the copy!
-    export MPI_START_SHARED_FS=1
-    export I2G_MPI_APPLICATION=`mktemp`
-    cat > $I2G_MPI_APPLICATION << EOF
+testCommandLineVerbose() {
+    output=`$I2G_MPI_START -v /bin/true 2>&1`
+    st=$?
+    assertEquals 0 $st
+    echo $output | grep "INFO" > /dev/null
+    st=$?
+    assertEquals 0 $st
+}
+
+testCommandLineDebug() {
+    output=`$I2G_MPI_START -vv /bin/true 2>&1`
+    st=$?
+    assertEquals 0 $st
+    echo $output | grep "DEBUG" > /dev/null
+    st=$?
+    assertEquals 0 $st
+}
+
+testCommandLineTrace() {
+    myapp=`mktemp`
+    cat > $myapp << EOF
 #!/bin/sh
-echo "\${MPI_START_NSLOTS};\${MPI_START_NHOSTS};\${MPI_START_NSLOTS_PER_HOST};\${MPI_START_NP}"
-exit 0
+echo \${I2G_MPI_START_TRACE}
 EOF
-    chmod +x $I2G_MPI_APPLICATION
-    output=`$I2G_MPI_START`
+    chmod +x $myapp
+    output=`$I2G_MPI_START -vvv $myapp 2> /dev/null`
     st=$?
-    slots=`echo $output | cut -f1 -d";"`
-    hosts=`echo $output | cut -f2 -d";"`
-    sperhosts=`echo $output | cut -f3 -d";"`
-    np=`echo $output | cut -f4 -d";"`
-    assertEquals 8 $slots
-    assertEquals 3 $hosts
-    assertEquals 2 $sperhosts
-    assertEquals 8 $np
     assertEquals 0 $st
-    rm -f $I2G_MPI_APPLICATION
+    assertEquals 1 $output
+    rm -f $myapp
 }
 
-count_app_1slot_per_host () {
-    # disable the copy!
-    export MPI_START_SHARED_FS=1
-    export I2G_MPI_SINGLE_PROCESS=1
-    export I2G_MPI_APPLICATION=`mktemp`
-    cat > $I2G_MPI_APPLICATION << EOF
+testCommandLineHook() {
+    myapp=`mktemp`
+    cat > $myapp << EOF
 #!/bin/sh
-echo "\${MPI_START_NSLOTS};\${MPI_START_NHOSTS};\${MPI_START_NSLOTS_PER_HOST};\${MPI_START_NP}"
-exit 0
+echo "\${I2G_MPI_PRE_RUN_HOOK};\${I2G_MPI_POST_RUN_HOOK};"
 EOF
-    chmod +x $I2G_MPI_APPLICATION
-    output=`$I2G_MPI_START`
+    chmod +x $myapp
+
+    output=`$I2G_MPI_START -vvv -pre mypre -post mypost $myapp`
     st=$?
-    slots=`echo $output | cut -f1 -d";"`
-    hosts=`echo $output | cut -f2 -d";"`
-    sperhosts=`echo $output | cut -f3 -d";"`
-    np=`echo $output | cut -f4 -d";"`
-    assertEquals 8 $slots
-    assertEquals 3 $hosts
-    assertEquals 2 $sperhosts
-    assertEquals 3 $np
     assertEquals 0 $st
-    unset I2G_MPI_SINGLE_PROCESS
-    rm -f $I2G_MPI_APPLICATION
+    prehook=`echo $output | cut -f1 -d";"`
+    posthook=`echo $output | cut -f2 -d";"`
+    assertEquals "mypre" "$prehook"
+    assertEquals "mypost" "$posthook"
+    rm -f $myapp
 }
-
-count_app_3_per_host () {
-    # disable the copy!
-    export MPI_START_SHARED_FS=1
-    export I2G_MPI_PER_NODE=3
-    export I2G_MPI_APPLICATION=`mktemp`
-    cat > $I2G_MPI_APPLICATION << EOF
-#!/bin/sh
-echo "\${MPI_START_NSLOTS};\${MPI_START_NHOSTS};\${MPI_START_NSLOTS_PER_HOST};\${MPI_START_NP}"
-exit 0
-EOF
-    chmod +x $I2G_MPI_APPLICATION
-    output=`$I2G_MPI_START`
-    st=$?
-    slots=`echo $output | cut -f1 -d";"`
-    hosts=`echo $output | cut -f2 -d";"`
-    sperhosts=`echo $output | cut -f3 -d";"`
-    np=`echo $output | cut -f4 -d";"`
-    assertEquals 8 $slots
-    assertEquals 3 $hosts
-    assertEquals 2 $sperhosts
-    assertEquals 9 $np
-    assertEquals 0 $st
-    unset I2G_MPI_PER_NODE
-    rm -f $I2G_MPI_APPLICATION
-}
-
-testSGEScheduler() {
-    export PE_HOSTFILE=`mktemp`
-    cat > $PE_HOSTFILE << EOF
-host1 2
-host2 2
-host3 4
-EOF
-    count_app_np
-    count_app_all_slots
-    count_app_1slot_per_host
-    rm -f $PE_HOSTFILE
-    unset PE_HOSTFILE
-}
-
-testPBSScheduler () {
-    export PBS_NODEFILE=`mktemp`
-    cat > $PBS_NODEFILE << EOF
-host1
-host1
-host2
-host2
-host3
-host3
-host3
-host3
-EOF
-    count_app_np
-    count_app_all_slots
-    count_app_1slot_per_host
-    count_app_3_per_host
-    rm -f $PBS_NODEFILE
-    unset PBS_NODEFILE
-}
-
-testLSFScheduler () {
-    export LSB_HOSTS="host1 host1 host2 host2 host3 host3 host3 host3"
-    count_app_np
-    count_app_all_slots
-    count_app_1slot_per_host
-    unset LSB_HOSTS 
-}
-
-testDummyScheduler () {
-    # disable the copy!
-    export MPI_START_SHARED_FS=1
-    export I2G_MPI_APPLICATION=`mktemp`
-    cat > $I2G_MPI_APPLICATION << EOF
-#!/bin/sh
-echo "\${MPI_START_NSLOTS};\${MPI_START_NHOSTS};\${MPI_START_NSLOTS_PER_HOST};\${MPI_START_NP}"
-EOF
-   chmod +x $I2G_MPI_APPLICATION
-    output=`$I2G_MPI_START -npnode 3`
-    st=$?
-    slots=`echo $output | cut -f1 -d";"`
-    hosts=`echo $output | cut -f2 -d";"`
-    sperhosts=`echo $output | cut -f3 -d";"`
-    np=`echo $output | cut -f4 -d";"`
-    assertEquals 1 $slots
-    assertEquals 1 $hosts
-    assertEquals 1 $sperhosts
-    assertEquals 3 $np
-    assertEquals 0 $st
-    rm -f $I2G_MPI_APPLICATION
-}
-
-# XXX slurm plugin uses some slurm tools not found in the test environment!
-#testSLURMscheduler () {
-#
-#}
 
 . $SHUNIT2

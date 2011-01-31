@@ -25,12 +25,23 @@ setUp () {
     unset I2G_MPI_START_VERBOSE
     unset I2G_MPI_START_TRACE
     unset I2G_MPI_SINGLE_PROCESS
-    unset MPI_START_SHARED_FS
+    export MPI_START_SHARED_FS=1
 }
 
+testNoScheduler () {
+    export MPI_START_DUMMY_SCHEDULER=0
+    export I2G_MPI_APPLICATION=/bin/true
+    error=`$I2G_MPI_START 2>&1`
+    st=$?
+    assertNotEquals 0 $st
+    echo $error | grep "ERROR.*scheduler" > /dev/null
+    st=$?
+    assertEquals 0 $st
+    unset MPI_START_DUMMY_SCHEDULER
+}
+
+
 count_app_np () {
-    # disable the copy!
-    export MPI_START_SHARED_FS=1
     export I2G_MPI_APPLICATION=`mktemp`
     export I2G_MPI_NP=5
     cat > $I2G_MPI_APPLICATION << EOF
@@ -55,8 +66,6 @@ EOF
 }
 
 count_app_all_slots () {
-    # disable the copy!
-    export MPI_START_SHARED_FS=1
     export I2G_MPI_APPLICATION=`mktemp`
     cat > $I2G_MPI_APPLICATION << EOF
 #!/bin/sh
@@ -79,8 +88,6 @@ EOF
 }
 
 count_app_1slot_per_host () {
-    # disable the copy!
-    export MPI_START_SHARED_FS=1
     export I2G_MPI_SINGLE_PROCESS=1
     export I2G_MPI_APPLICATION=`mktemp`
     cat > $I2G_MPI_APPLICATION << EOF
@@ -105,8 +112,6 @@ EOF
 }
 
 count_app_3_per_host () {
-    # disable the copy!
-    export MPI_START_SHARED_FS=1
     export I2G_MPI_PER_NODE=3
     export I2G_MPI_APPLICATION=`mktemp`
     cat > $I2G_MPI_APPLICATION << EOF
@@ -173,14 +178,12 @@ testLSFScheduler () {
 }
 
 testDummyScheduler () {
-    # disable the copy!
-    export MPI_START_SHARED_FS=1
     export I2G_MPI_APPLICATION=`mktemp`
     cat > $I2G_MPI_APPLICATION << EOF
 #!/bin/sh
 echo "\${MPI_START_NSLOTS};\${MPI_START_NHOSTS};\${MPI_START_NSLOTS_PER_HOST};\${MPI_START_NP}"
 EOF
-   chmod +x $I2G_MPI_APPLICATION
+    chmod +x $I2G_MPI_APPLICATION
     output=`$I2G_MPI_START -npnode 3`
     st=$?
     slots=`echo $output | cut -f1 -d";"`
