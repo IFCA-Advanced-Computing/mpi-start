@@ -340,6 +340,8 @@ main() {
     info_msg "VERSION =  @VERSION@"  
     info_msg "************************************************************************"
 
+    debug_msg "Command line arguments: $*" 
+
     check_options
     
     # check for scheduling system and set environment variables
@@ -554,6 +556,7 @@ print_version () {
 if test "x${I2G_MPI_START}" = "x" ; then
     export I2G_MPI_START=$0
 fi
+arguments=$*
 while [ "x$1" != "x" ] ; do
     case $1 in 
         -h)
@@ -654,4 +657,4 @@ fi
 if test "x$*" != "x" ; then
     export I2G_MPI_APPLICATION_ARGS="$*"
 fi
-main
+main "$arguments"

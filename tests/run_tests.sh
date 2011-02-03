@@ -8,8 +8,9 @@ DOWNLOAD_MY_SHUNIT=1
 #
 if test "x${SHUNIT2}" = "x" ; then
     if test "x${DOWNLOAD_MY_SHUNIT}" = "x1"; then
-        wget -q http://devel.ifca.es/~enol/depot/shunit2 -O shunit2 
+        wget http://devel.ifca.es/~enol/depot/shunit2 -O shunit2 --no-check-certificate 
         st=$?
+        echo $st
         if test $st -ne 0 ; then
             echo "Could not download shunit, please set SHUNIT2 env variable to the correct location."
             exit 1

@@ -258,6 +258,15 @@ mpi_start_pre_run_hook_generic () {
 
     mpi_start_run_pre_hook $I2G_MPI_PRE_RUN_HOOK 1
 
+    # set the +x permission to executable, so it does not fail
+    for i in ${I2G_MPI_APPLICATION}; do
+        app=$i
+        break
+    done
+    if test ! -x $app ; then
+        chmod +x $app 2> /dev/null # do not care if it fails.
+    fi
+
     if  test "x$MPI_START_SHARED_FS" != "x1" -o "x$MPI_START_DISTRIBUTE_PROXY" = "x1" ; then 
         mpi_start_pre_run_hook_copy
     else

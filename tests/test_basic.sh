@@ -61,6 +61,20 @@ testCommandLineVersion() {
     assertEquals 0 $st
 }
 
+testChmodApp() {
+    unset I2G_MPI_TYPE
+    myapp=`mktemp`
+    cat > $myapp << EOF
+#!/bin/sh
+echo \${I2G_MPI_TYPE}
+EOF
+    output=`$I2G_MPI_START -t dummy -- $myapp`
+    st=$?
+    assertEquals "dummy" "$output"
+    assertEquals 0 $st
+    rm -f $myapp
+}
+
 testCommandLineTypeAndApp() {
     unset I2G_MPI_TYPE
     myapp=`mktemp`
