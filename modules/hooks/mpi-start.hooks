@@ -263,8 +263,10 @@ mpi_start_pre_run_hook_generic () {
         app=$i
         break
     done
-    if test ! -x $app ; then
-        chmod +x $app 2> /dev/null # do not care if it fails.
+    if test "x${app}" != "x" ; then
+        if test ! -x $app ; then
+            chmod +x $app 2> /dev/null # do not care if it fails.
+        fi
     fi
 
     if  test "x$MPI_START_SHARED_FS" != "x1" -o "x$MPI_START_DISTRIBUTE_PROXY" = "x1" ; then 
