@@ -25,6 +25,7 @@ setUp () {
     unset I2G_MPI_START_TRACE
     unset I2G_MPI_SINGLE_PROCESS
     export MPI_START_SHARED_FS=1
+    export MPI_START_DUMMY_SCHEDULER=0
 }
 
 testNoScheduler () {
@@ -148,6 +149,49 @@ EOF
     unset PE_HOSTFILE
 }
 
+testSlurmScheduler() {
+    TMPDIR=`mktemp -d`
+    export SLURM_JOB_NODELIST=$TMPDIR/nodes
+    cat > $SLURM_JOB_NODELIST << EOF
+host1
+host1
+host2
+host2
+host3
+host3
+host3
+host3
+EOF
+    # create fake commands
+    cat > $TMPDIR/sl_get_machine_list << EOF
+#!/bin/sh
+
+cat $SLURM_JOB_NODELIST
+EOF
+    cat > $TMPDIR/srun << EOF
+#!/bin/sh
+$*
+EOF
+    # export fake variables
+    export SLURM_NPROCS=8
+    export SLURM_NNODES=3
+    export SLURM_TASK_PER_NODE="2(2"
+    chmod +x $TMPDIR/sl_get_machine_list 
+    chmod +x $TMPDIR/srun
+    # add them to path
+    oldPATH="$PATH"
+    export PATH=$TMPDIR:$PATH
+    count_app_all_slots
+    rm -f $PE_HOSTFILE
+    unset SLURM_JOB_NODELIST
+    unset SLURM_NPROCS
+    unset SLURM_MNODES
+    unset SLURM_TASK_PER_NODE
+    export PATH="$oldPATH"
+    rm -rf $TMPDIR
+}
+
+
 testPBSScheduler () {
     export PBS_NODEFILE=`mktemp`
     cat > $PBS_NODEFILE << EOF
@@ -177,6 +221,7 @@ testLSFScheduler () {
 }
 
 testDummyScheduler () {
+    export MPI_START_DUMMY_SCHEDULER=1
     export I2G_MPI_APPLICATION=`mktemp`
     cat > $I2G_MPI_APPLICATION << EOF
 #!/bin/sh
