@@ -4,6 +4,13 @@
 #                    All rights reserved.
 #
 
+
+#
+# XXX
+# SLURM Support lacks the fine grained mapping options of the other
+# scheduler.
+#
+
 SCHEDULER_NAME="slurm"
 
 #
@@ -15,7 +22,7 @@ SCHEDULER_NAME="slurm"
 #  else  - NO support for this of scheduler is found. 
 #
 scheduler_available () {
-    debug_msg " checking for \$SLURM_NODELIST"
+    debug_msg " checking for \$SLURM_JOB_NODELIST"
 	if test "x$SLURM_JOB_NODELIST" = "x" ; then 
 		return 26;
 	else
@@ -49,6 +56,8 @@ scheduler_get_machinefile () {
              echo $host $slots >> $MPI_START_HOST_SLOTS_FILE
          done
 	export MPI_START_MACHINEFILE
+    export MPI_START_HOSTFILE
+    export MPI_START_HOST_SLOTS_FILE
     export MPI_START_NSLOTS=$SLURM_NPROCS
     export MPI_START_NHOSTS=$SLURM_NNODES
     export MPI_START_NSLOTS_PER_HOST=`echo $SLURM_TASK_PER_NODE | cut -f1 -d"("`
