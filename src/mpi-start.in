@@ -9,6 +9,10 @@
 # Return values of this script:
 # 0   - Success
 
+if test "x$I2G_MPI_START_FULL_TRACE" = "x1"  ; then
+    set -x
+fi
+
 #======================================================================
 # Cleans up temporary files upon finishing execution 
 #======================================================================
@@ -270,6 +274,7 @@ check_options() {
                    I2G_MPI_VERSION I2G_MPI_PRE_RUN_HOOK I2G_MPI_POST_RUN_HOOK \
                    I2G_MPI_PRECOMMAND I2G_MPI_FLAVOUR I2G_MPI_JOB_NUMBER \
                    I2G_MPI_STARTUP_INFO I2G_MPI_RELAY I2G_MPI_PER_NODE \
+                   I2G_MPI_APPLICATION_STDIN I2G_MPI_APPLICATION_STDOUT I2G_MPI_APPLICATION_STDERR \
                    I2G_MPI_NP I2G_MPI_SINGLE_PROCESS I2G_MPI_CONFIG; 
         do
             eval value="\${$var}"
@@ -372,7 +377,7 @@ main() {
             scheduler_get_machinefile
             result=$?
 
-            if test $? -ne 0 ; then
+            if test $result -ne 0 ; then
                 error_msg "cannot create machine file"
                 dump_env
                 exit 2
@@ -521,6 +526,7 @@ print_usage () {
     echo "mpi-start [-h] [-t mpi_type] [-v] [-vv] [-vvv]" 1>&2
     echo "    [-pre hook] [-post hook] [-pcmd cmd]" 1>&2
     echo "    [-npnode n] [-pnode] [-np n]" 1>&2
+    echo "    [-i file] [-o file] [-e file]" 1>&2
     echo "    [-x VAR[=VALUE]] [-d VAR=VALUE] [--]" 1>&2
     echo "    application [...]" 1>&2
     echo  1>&2
@@ -540,6 +546,9 @@ print_usage () {
     echo "  -pnode         start only one process per node" 1>&2
     echo "  -np n          set total number of processes" 1>&2
     echo "  -c file        use file for sourcing mpi-start variables" 1>&2
+    echo "  -i file        use file for standard input" 1>&2
+    echo "  -o file        use file for standard output" 1>&2
+    echo "  -e file        use file for standard error" 1>&2
     echo "  -x VAR[=VALUE] export the environment variable VAR," 1>&2
     echo "                   optionally define value" 1>&2
     echo "  -d VAR=VALUE   define mpi-start variable VAR with specified VALUE" 1>&2
@@ -619,6 +628,21 @@ while [ "x$1" != "x" ] ; do
         -c)
             shift
             export I2G_MPI_CONFIG=$1
+            shift
+            ;;
+        -i)
+            shift
+            export I2G_MPI_APPLICATION_STDIN=$1
+            shift
+            ;;
+        -o)
+            shift
+            export I2G_MPI_APPLICATION_STDOUT=$1
+            shift
+            ;;
+        -e)
+            shift
+            export I2G_MPI_APPLICATION_STDERR=$1
             shift
             ;;
         -x)
