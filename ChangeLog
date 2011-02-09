@@ -1,3 +1,7 @@
+1.0.0 2011-02-09 Enol Fernández <enolfc _AT_ ifca.unican.es>
+	* Brand new versioning: 1.0.0
+	* Ready for EMI-1 
+
 0.1.8 2011-02-03 Enol Fernández <enolfc _AT_ ifca.unican.es>
 	* Added the chmod +x to executable.
 
