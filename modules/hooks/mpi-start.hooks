@@ -219,7 +219,6 @@ mpi_start_run_pre_hook() {
             echo "-<STOP  PRE-RUN HOOK>---------------------------------------------------"; 
         fi
         if test $result -ne 0 ; then 
-            error_msg "pre-run hook returned : $i"
             error_msg "pre-run hook returned : $result"
             dump_env
             exit $result
@@ -307,7 +306,7 @@ mpi_start_run_post_hook() {
             echo "-<STOP  POST-RUN HOOK>--------------------------------------------------"; 
         fi
         if test $result -ne 0 ; then 
-            error_msg "post-run hook returned : $i"
+            error_msg "post-run hook returned : $result"
             dump_env
             exit $result
         fi
