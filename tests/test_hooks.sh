@@ -33,13 +33,13 @@ testPreHook () {
 #!/bin/sh
 
 pre_run_hook () {
-    echo "HOOK OK"
+    echo "PRE HOOK OK"
 }
 EOF
-    output=`$I2G_MPI_START -pre $myhook /bin/true 2>&1`
+    output=`$I2G_MPI_START -t dummy -pre $myhook /bin/true 2>&1`
     st=$?
     assertEquals 0 $st
-    assertEquals "HOOK OK" "$output"
+    assertEquals "PRE HOOK OK" "$output"
     rm -f $myhook
 }
 
@@ -49,14 +49,80 @@ testPostHook () {
 #!/bin/sh
 
 post_run_hook () {
-    echo "HOOK OK"
+    echo "POST HOOK OK"
 }
 EOF
-    output=`$I2G_MPI_START -post $myhook /bin/true 2>&1`
+    output=`$I2G_MPI_START -t dummy -post $myhook /bin/true 2>&1`
     st=$?
     assertEquals 0 $st
-    assertEquals "HOOK OK" "$output"
+    assertEquals "POST HOOK OK" "$output"
     rm -f $myhook
+}
+
+testFaultyPreHook () {
+    myhook=/dev/null
+    output=`$I2G_MPI_START -t dummy -pre $myhook /bin/true 2>&1`
+    st=$?
+    assertEquals 0 $st
+    assertEquals "" "$output"
+}
+
+testFaultyPostHook () {
+    myhook=/dev/null
+    output=`$I2G_MPI_START -t dummy -post $myhook /bin/true 2>&1`
+    st=$?
+    assertEquals 0 $st
+    assertEquals "" "$output"
+}
+
+testPreHookNon0 () {
+    myhook=`mktemp`
+    cat > $myhook << EOF
+#!/bin/sh
+
+pre_run_hook () {
+    echo "PRE HOOK BAD"
+    return 5
+}
+EOF
+    output=`$I2G_MPI_START -t dummy -pre $myhook /bin/true 2> /dev/null`
+    st=$?
+    assertEquals 5 $st
+    assertEquals "PRE HOOK BAD" "$output"
+    rm -f $myhook
+}
+
+testPreHookNon0 () {
+    myhook=`mktemp`
+    cat > $myhook << EOF
+#!/bin/sh
+
+post_run_hook () {
+    echo "POST HOOK BAD"
+    return 6
+}
+EOF
+    output=`$I2G_MPI_START -t dummy -post $myhook /bin/true 2> /dev/null`
+    st=$?
+    assertEquals 6 $st
+    assertEquals "POST HOOK BAD" "$output"
+    rm -f $myhook
+}
+
+testNonExistingPreHook () {
+    myhook=/a/b/c/d/nonexists
+    output=`$I2G_MPI_START -t dummy -pre $myhook /bin/true 2>&1`
+    st=$?
+    assertEquals 0 $st
+    assertEquals "" "$output"
+}
+
+testNonExistingPostHook () {
+    myhook=/a/b/c/d/nonexists
+    output=`$I2G_MPI_START -t dummy -post $myhook /bin/true 2>&1`
+    st=$?
+    assertEquals 0 $st
+    assertEquals "" "$output"
 }
 
 . $SHUNIT2
