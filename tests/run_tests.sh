@@ -17,7 +17,7 @@ if test "x${SHUNIT2}" = "x" ; then
             exit 1
         fi
         export SHUNIT2=$PWD/shunit2
-        REMOVE_MYSHUNIT=1
+        REMOVE_MY_SHUNIT=1
     else
         echo "SHUNIT2 environment variable not defined!"
         echo "Please set it to the location of shunit2 script"
