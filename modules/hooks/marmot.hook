@@ -9,7 +9,6 @@
 pre_run_hook () {
 
     if test "x$I2G_USE_MARMOT" != "x1" ; then
-        debug_msg "marmot not enabled."
         return 0
     fi
 
