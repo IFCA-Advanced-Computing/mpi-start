@@ -20,7 +20,7 @@ setUp () {
 
 testNoScheduler () {
     export MPI_START_DUMMY_SCHEDULER=0
-    export I2G_MPI_APPLICATION=/bin/true
+    export I2G_MPI_APPLICATION=true
     error=`$I2G_MPI_START 2>&1`
     st=$?
     assertNotEquals 0 $st
@@ -31,7 +31,7 @@ testNoScheduler () {
 }
 
 count_app_np_pnode () {
-    export I2G_MPI_APPLICATION=`mktemp`
+    export I2G_MPI_APPLICATION=`$MYMKTEMP`
     export I2G_MPI_NP=5
     export I2G_MPI_PER_NODE=3
     cat > $I2G_MPI_APPLICATION << EOF
@@ -58,7 +58,7 @@ EOF
 
 
 count_app_np () {
-    export I2G_MPI_APPLICATION=`mktemp`
+    export I2G_MPI_APPLICATION=`$MYMKTEMP`
     export I2G_MPI_NP=5
     cat > $I2G_MPI_APPLICATION << EOF
 #!/bin/sh
@@ -82,7 +82,7 @@ EOF
 }
 
 count_app_all_slots () {
-    export I2G_MPI_APPLICATION=`mktemp`
+    export I2G_MPI_APPLICATION=`$MYMKTEMP`
     cat > $I2G_MPI_APPLICATION << EOF
 #!/bin/sh
 echo "\${MPI_START_NSLOTS};\${MPI_START_NHOSTS};\${MPI_START_NSLOTS_PER_HOST};\${MPI_START_NP}"
@@ -105,7 +105,7 @@ EOF
 
 count_app_1slot_per_host () {
     export I2G_MPI_SINGLE_PROCESS=1
-    export I2G_MPI_APPLICATION=`mktemp`
+    export I2G_MPI_APPLICATION=`$MYMKTEMP`
     cat > $I2G_MPI_APPLICATION << EOF
 #!/bin/sh
 echo "\${MPI_START_NSLOTS};\${MPI_START_NHOSTS};\${MPI_START_NSLOTS_PER_HOST};\${MPI_START_NP}"
@@ -129,7 +129,7 @@ EOF
 
 count_app_3_per_host () {
     export I2G_MPI_PER_NODE=3
-    export I2G_MPI_APPLICATION=`mktemp`
+    export I2G_MPI_APPLICATION=`$MYMKTEMP`
     cat > $I2G_MPI_APPLICATION << EOF
 #!/bin/sh
 echo "\${MPI_START_NSLOTS};\${MPI_START_NHOSTS};\${MPI_START_NSLOTS_PER_HOST};\${MPI_START_NP}"
@@ -152,7 +152,7 @@ EOF
 }
 
 testSGEScheduler() {
-    export PE_HOSTFILE=`mktemp`
+    export PE_HOSTFILE=`$MYMKTEMP`
     cat > $PE_HOSTFILE << EOF
 host1 2
 host2 2
@@ -167,8 +167,8 @@ EOF
 }
 
 testSlurmScheduler() {
-    TMPDIR=`mktemp -d`
-    export SLURM_JOB_NODELIST=$TMPDIR/nodes
+    MYTMPDIR=`$MYMKTEMP -d`
+    export SLURM_JOB_NODELIST=$MYTMPDIR/nodes
     cat > $SLURM_JOB_NODELIST << EOF
 host1
 host1
@@ -180,12 +180,12 @@ host3
 host3
 EOF
     # create fake commands
-    cat > $TMPDIR/sl_get_machine_list << EOF
+    cat > $MYTMPDIR/sl_get_machine_list << EOF
 #!/bin/sh
 
 cat $SLURM_JOB_NODELIST
 EOF
-    cat > $TMPDIR/srun << EOF
+    cat > $MYTMPDIR/srun << EOF
 #!/bin/sh
 $*
 EOF
@@ -193,11 +193,11 @@ EOF
     export SLURM_NPROCS=8
     export SLURM_NNODES=3
     export SLURM_TASK_PER_NODE="2(2"
-    chmod +x $TMPDIR/sl_get_machine_list 
-    chmod +x $TMPDIR/srun
+    chmod +x $MYTMPDIR/sl_get_machine_list 
+    chmod +x $MYTMPDIR/srun
     # add them to path
     oldPATH="$PATH"
-    export PATH=$TMPDIR:$PATH
+    export PATH=$MYTMPDIR:$PATH
     count_app_all_slots
     rm -f $PE_HOSTFILE
     unset SLURM_JOB_NODELIST
@@ -205,12 +205,12 @@ EOF
     unset SLURM_MNODES
     unset SLURM_TASK_PER_NODE
     export PATH="$oldPATH"
-    rm -rf $TMPDIR
+    rm -rf $MYTMPDIR
 }
 
 
 testPBSScheduler () {
-    export PBS_NODEFILE=`mktemp`
+    export PBS_NODEFILE=`$MYMKTEMP`
     cat > $PBS_NODEFILE << EOF
 host1
 host1
@@ -241,7 +241,7 @@ testLSFScheduler () {
 
 testDummyScheduler () {
     export MPI_START_DUMMY_SCHEDULER=1
-    export I2G_MPI_APPLICATION=`mktemp`
+    export I2G_MPI_APPLICATION=`$MYMKTEMP`
     cat > $I2G_MPI_APPLICATION << EOF
 #!/bin/sh
 echo "\${MPI_START_NSLOTS};\${MPI_START_NHOSTS};\${MPI_START_NSLOTS_PER_HOST};\${MPI_START_NP}"

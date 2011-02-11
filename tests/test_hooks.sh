@@ -4,18 +4,6 @@
 # Tests for MPI-Start with dummy environment
 #
 
-# check mktemp
-TMPFILE=`mktemp 2> /dev/null`
-if test $? -ne 0 ; then
-    alias mktemp='mktemp -t MPI_START_TESTS'
-    TMPFILE=`mktemp 2> /dev/null`
-    if test $? -ne 0 ; then
-        echo "Unable to find good mktemp!?"
-        exit 0
-    fi
-fi
-rm -f $TMPFILE    
-
 setUp () {
     export I2G_MPI_TYPE="dummy"
     unset I2G_MPI_NP
@@ -24,11 +12,11 @@ setUp () {
     unset I2G_MPI_START_VERBOSE
     unset I2G_MPI_START_TRACE
     unset I2G_MPI_SINGLE_PROCESS
-    unset MPI_START_SHARED_FS
+    export MPI_START_SHARED_FS=1
 }
 
 testPreHook () {
-    myhook=`mktemp`
+    myhook=`$MYMKTEMP`
     cat > $myhook << EOF
 #!/bin/sh
 
@@ -36,7 +24,7 @@ pre_run_hook () {
     echo "PRE HOOK OK"
 }
 EOF
-    output=`$I2G_MPI_START -t dummy -pre $myhook /bin/true 2>&1`
+    output=`$I2G_MPI_START -t dummy -pre $myhook true 2>&1`
     st=$?
     assertEquals 0 $st
     assertEquals "PRE HOOK OK" "$output"
@@ -44,7 +32,7 @@ EOF
 }
 
 testPostHook () {
-    myhook=`mktemp`
+    myhook=`$MYMKTEMP`
     cat > $myhook << EOF
 #!/bin/sh
 
@@ -52,7 +40,7 @@ post_run_hook () {
     echo "POST HOOK OK"
 }
 EOF
-    output=`$I2G_MPI_START -t dummy -post $myhook /bin/true 2>&1`
+    output=`$I2G_MPI_START -t dummy -post $myhook true 2>&1`
     st=$?
     assertEquals 0 $st
     assertEquals "POST HOOK OK" "$output"
@@ -61,7 +49,7 @@ EOF
 
 testFaultyPreHook () {
     myhook=/dev/null
-    output=`$I2G_MPI_START -t dummy -pre $myhook /bin/true 2>&1`
+    output=`$I2G_MPI_START -t dummy -pre $myhook true 2>&1`
     st=$?
     assertEquals 0 $st
     assertEquals "" "$output"
@@ -69,14 +57,14 @@ testFaultyPreHook () {
 
 testFaultyPostHook () {
     myhook=/dev/null
-    output=`$I2G_MPI_START -t dummy -post $myhook /bin/true 2>&1`
+    output=`$I2G_MPI_START -t dummy -post $myhook true 2>&1`
     st=$?
     assertEquals 0 $st
     assertEquals "" "$output"
 }
 
 testPreHookNon0 () {
-    myhook=`mktemp`
+    myhook=`$MYMKTEMP`
     cat > $myhook << EOF
 #!/bin/sh
 
@@ -85,7 +73,7 @@ pre_run_hook () {
     return 5
 }
 EOF
-    output=`$I2G_MPI_START -t dummy -pre $myhook /bin/true 2> /dev/null`
+    output=`$I2G_MPI_START -t dummy -pre $myhook true 2> /dev/null`
     st=$?
     assertEquals 5 $st
     assertEquals "PRE HOOK BAD" "$output"
@@ -93,7 +81,7 @@ EOF
 }
 
 testPreHookNon0 () {
-    myhook=`mktemp`
+    myhook=`$MYMKTEMP`
     cat > $myhook << EOF
 #!/bin/sh
 
@@ -102,7 +90,7 @@ post_run_hook () {
     return 6
 }
 EOF
-    output=`$I2G_MPI_START -t dummy -post $myhook /bin/true 2> /dev/null`
+    output=`$I2G_MPI_START -t dummy -post $myhook true 2> /dev/null`
     st=$?
     assertEquals 6 $st
     assertEquals "POST HOOK BAD" "$output"
@@ -111,7 +99,7 @@ EOF
 
 testNonExistingPreHook () {
     myhook=/a/b/c/d/nonexists
-    output=`$I2G_MPI_START -t dummy -pre $myhook /bin/true 2>&1`
+    output=`$I2G_MPI_START -t dummy -pre $myhook true 2>&1`
     st=$?
     assertEquals 0 $st
     assertEquals "" "$output"
@@ -119,7 +107,7 @@ testNonExistingPreHook () {
 
 testNonExistingPostHook () {
     myhook=/a/b/c/d/nonexists
-    output=`$I2G_MPI_START -t dummy -post $myhook /bin/true 2>&1`
+    output=`$I2G_MPI_START -t dummy -post $myhook true 2>&1`
     st=$?
     assertEquals 0 $st
     assertEquals "" "$output"

@@ -5,7 +5,7 @@
 #
 
 oneTimeSetUp () {
-    OMP_SRC_CODE=`mktemp`
+    OMP_SRC_CODE=`$MYMKTEMP`
     cat > $OMP_SRC_CODE << EOF
 #include <omp.h>
 #include <stdio.h>
@@ -42,7 +42,7 @@ int main (int argc, char *argv[]) {
     return 0;
 }
 EOF
-    OMP_BIN=`mktemp`
+    OMP_BIN=`$MYMKTEMP`
     gcc -fopenmp -x c $OMP_SRC_CODE -o $OMP_BIN
 }
 
@@ -70,10 +70,10 @@ testPreCompiledOMP () {
 }
 
 testUnCompiledOMP () {
-    myhook=`mktemp`
+    myhook=`$MYMKTEMP`
     cat > $myhook << EOF
 pre_run_hook () {
-    export I2G_MPI_APPLICATION=`mktemp`
+    export I2G_MPI_APPLICATION=`$MYMKTEMP`
     gcc -fopenmp -x c $OMP_SRC_CODE -o \$I2G_MPI_APPLICATION
 }
 

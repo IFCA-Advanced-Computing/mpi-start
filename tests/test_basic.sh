@@ -17,7 +17,7 @@ setUp () {
 
 testI2G_MPI_START_Unset () {
     TEMP_MPI_START=$I2G_MPI_START 
-    export I2G_MPI_APPLICATION=/bin/true
+    export I2G_MPI_APPLICATION=true
     unset I2G_MPI_START
     $TEMP_MPI_START 
     st=$?
@@ -51,7 +51,7 @@ testCommandLineVersion() {
 
 testChmodApp() {
     unset I2G_MPI_TYPE
-    myapp=`mktemp`
+    myapp=`$MYMKTEMP`
     cat > $myapp << EOF
 #!/bin/sh
 echo \${I2G_MPI_TYPE}
@@ -65,7 +65,7 @@ EOF
 
 testCommandLineTypeAndApp() {
     unset I2G_MPI_TYPE
-    myapp=`mktemp`
+    myapp=`$MYMKTEMP`
     cat > $myapp << EOF
 #!/bin/sh
 echo \${I2G_MPI_TYPE}
@@ -79,7 +79,7 @@ EOF
 }
 
 testCommandLineVerbose() {
-    output=`$I2G_MPI_START -v /bin/true 2>&1`
+    output=`$I2G_MPI_START -v true 2>&1`
     st=$?
     assertEquals 0 $st
     echo $output | grep "INFO" > /dev/null
@@ -88,7 +88,7 @@ testCommandLineVerbose() {
 }
 
 testCommandLineDebug() {
-    output=`$I2G_MPI_START -vv /bin/true 2>&1`
+    output=`$I2G_MPI_START -vv true 2>&1`
     st=$?
     assertEquals 0 $st
     echo $output | grep "DEBUG" > /dev/null
@@ -97,7 +97,7 @@ testCommandLineDebug() {
 }
 
 testCommandLineTrace() {
-    myapp=`mktemp`
+    myapp=`$MYMKTEMP`
     cat > $myapp << EOF
 #!/bin/sh
 echo \${I2G_MPI_START_TRACE}
@@ -111,7 +111,7 @@ EOF
 }
 
 testCommandLineHook() {
-    myapp=`mktemp`
+    myapp=`$MYMKTEMP`
     cat > $myapp << EOF
 #!/bin/sh
 echo "\${I2G_MPI_PRE_RUN_HOOK};\${I2G_MPI_POST_RUN_HOOK};"

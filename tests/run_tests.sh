@@ -1,17 +1,18 @@
 #!/bin/sh
 
-
 # check mktemp
-TMPFILE=`mktemp 2> /dev/null`
+export MYMKTEMP="mktemp"
+TMPFILE=`$MYMKTEMP 2> /dev/null`
 if test $? -ne 0 ; then
-    alias mktemp='mktemp -t MPI_START_TESTS'
-    TMPFILE=`mktemp 2> /dev/null`
+    export MYMKTEMP="mktemp -t MPI_START_TESTS"
+    TMPFILE=`$MYMKTEMP 2> /dev/null`
     if test $? -ne 0 ; then
         echo "Unable to find good mktemp!?"
         exit 0
     fi
 fi
 rm -f $TMPFILE    
+
 
 
 DOWNLOAD_MY_SHUNIT=1
