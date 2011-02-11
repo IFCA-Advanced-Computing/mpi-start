@@ -4,18 +4,6 @@
 # Tests for MPI-Start with dummy environment
 #
 
-# check mktemp
-TMPFILE=`mktemp 2> /dev/null`
-if test $? -ne 0 ; then
-    alias mktemp='mktemp -t MPI_START_TESTS'
-    TMPFILE=`mktemp 2> /dev/null`
-    if test $? -ne 0 ; then
-        echo "Unable to find good mktemp!?"
-        exit 0
-    fi
-fi
-rm -f $TMPFILE    
-
 setUp () {
     export I2G_MPI_TYPE="dummy"
     unset I2G_MPI_NP
@@ -24,6 +12,8 @@ setUp () {
     unset I2G_MPI_START_VERBOSE
     unset I2G_MPI_START_TRACE
     unset I2G_MPI_SINGLE_PROCESS
+    unset I2G_MPI_NP
+    unset I2G_MPI_PER_NODE
     export MPI_START_SHARED_FS=1
     export MPI_START_DUMMY_SCHEDULER=0
 }
@@ -38,6 +28,32 @@ testNoScheduler () {
     st=$?
     assertEquals 0 $st
     unset MPI_START_DUMMY_SCHEDULER
+}
+
+count_app_np_pnode () {
+    export I2G_MPI_APPLICATION=`mktemp`
+    export I2G_MPI_NP=5
+    export I2G_MPI_PER_NODE=3
+    cat > $I2G_MPI_APPLICATION << EOF
+#!/bin/sh
+echo "\${MPI_START_NSLOTS};\${MPI_START_NHOSTS};\${MPI_START_NSLOTS_PER_HOST};\${MPI_START_NP}"
+exit 0
+EOF
+    chmod +x $I2G_MPI_APPLICATION
+    output=`$I2G_MPI_START`
+    st=$?
+    slots=`echo $output | cut -f1 -d";"`
+    hosts=`echo $output | cut -f2 -d";"`
+    sperhosts=`echo $output | cut -f3 -d";"`
+    np=`echo $output | cut -f4 -d";"`
+    assertEquals 8 $slots
+    assertEquals 3 $hosts
+    assertEquals 2 $sperhosts
+    assertEquals 9 $np
+    assertEquals 0 $st
+    unset I2G_MPI_NP
+    unset I2G_MPI_PER_NODE
+    rm -f $I2G_MPI_APPLICATION
 }
 
 
@@ -145,6 +161,7 @@ EOF
     count_app_np
     count_app_all_slots
     count_app_1slot_per_host
+    count_app_np_pnode
     rm -f $PE_HOSTFILE
     unset PE_HOSTFILE
 }
@@ -208,6 +225,7 @@ EOF
     count_app_all_slots
     count_app_1slot_per_host
     count_app_3_per_host
+    count_app_np_pnode
     rm -f $PBS_NODEFILE
     unset PBS_NODEFILE
 }
@@ -217,6 +235,7 @@ testLSFScheduler () {
     count_app_np
     count_app_all_slots
     count_app_1slot_per_host
+    count_app_np_pnode
     unset LSB_HOSTS 
 }
 
