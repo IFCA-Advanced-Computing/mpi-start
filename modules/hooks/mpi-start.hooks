@@ -155,7 +155,7 @@ mpi_start_pre_run_hook_copy () {
     then
     	for i in $MPI_START_PREFIX/../etc/mpi-start/*.filedist ; do
 	        unset check_distribution_method
-	        source $i
+	        . $i
 	        check_distribution_method
 	        returnPrior=$?
             #should we change the file distribution method?
@@ -178,7 +178,7 @@ mpi_start_pre_run_hook_copy () {
     fi
 
     unset copy
-    source $chosenDistrMethod &> /dev/null
+    . $chosenDistrMethod &> /dev/null
     if test $? -ne 0 ; then
         error_msg "Unable to load distribution method $chosenDistrMethod"
         dump_env
@@ -202,7 +202,7 @@ mpi_start_run_pre_hook() {
     if test -e $1 ; then 
         debug_msg "Try to run pre hooks at $1"
         unset pre_run_hook
-        source $1
+        . $1
         type pre_run_hook &> /dev/null
         result=$?
         if test $result -ne 0 ; then
@@ -289,7 +289,7 @@ mpi_start_run_post_hook() {
     if test -e $1 ; then 
         debug_msg "Try to run post hooks at $1"
         unset post_run_hook
-        source $1
+        . $1
         type post_run_hook &> /dev/null
         result=$?
         if test $result -ne 0 ; then
@@ -339,7 +339,7 @@ mpi_start_post_run_hook_generic () {
             # this may be unset if only running on localhost
             if test "x$chosenDistrMethod" != "x"; then
                 unset clean
-                source $chosenDistrMethod
+                . $chosenDistrMethod
                 clean
             fi
         fi
