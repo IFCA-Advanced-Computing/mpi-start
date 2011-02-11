@@ -252,12 +252,21 @@ dummy_scheduler() {
     export MPI_START_HOSTFILE=`mktemp`
     export MPI_START_HOST_SLOTS_FILE=`mktemp`
     myhost=`hostname`
-    echo $myhost > $MPI_START_MACHINEFILE
+    if test "x${MPI_DUMMY_SCH_SLOTS}" = "x" ; then
+        slots=1
+    else
+        slots=$MPI_DUMMY_SCH_SLOTS
+    fi
+    n=$slots
+    while [ $n -ne 0 ]; do
+        echo $myhost >> $MPI_START_MACHINEFILE
+        n=`expr $n - 1`
+    done
     echo $myhost > $MPI_START_HOSTFILE
-    echo "$myhost 1"> $MPI_START_HOST_SLOTS_FILE
-    export MPI_START_NSLOTS=1
+    echo "$myhost $slots"> $MPI_START_HOST_SLOTS_FILE
+    export MPI_START_NSLOTS=$slots
     export MPI_START_NHOSTS=1
-    export MPI_START_NSLOTS_PER_HOST=1
+    export MPI_START_NSLOTS_PER_HOST=$slots
     SCHEDULER_NAME="mpi-start-dummy"
     export MPI_START_SCHEDULER=$SCHEDULER_NAME
 }
