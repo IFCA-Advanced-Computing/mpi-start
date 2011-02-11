@@ -35,9 +35,9 @@ scheduler_available () {
 #
 scheduler_get_machinefile () {
     debug_msg " convert machine list into standard format"
-    MPI_START_MACHINEFILE=`mktemp`
-    MPI_START_HOSTFILE=`mktemp`
-    MPI_START_HOST_SLOTS_FILE=`mktemp`
+    MPI_START_MACHINEFILE=`mpi_start_mktemp`
+    MPI_START_HOSTFILE=`mpi_start_mktemp`
+    MPI_START_HOST_SLOTS_FILE=`mpi_start_mktemp`
 
     sl_get_machine_list > $MPI_START_MACHINEFILE 2> /dev/null
     if test $? != 0 ; then

@@ -84,11 +84,12 @@ dump_env () {
 # Find the correct parameter for the mktemp program.
 #======================================================================
 mpi_start_find_mktemp () {
-    tempfile=`mktemp 2> /dev/null`
+    MPI_START_MKTEMP=mktemp
+    tempfile=`$MPI_START_MKTEMP 2> /dev/null`
     if test $? -ne 0 ; then
         # BSD style mktemp
-        alias mktemp="mktemp -t MPI_START"
-        tempfile=`mktemp 2> /dev/null`
+        MPI_START_MKTEMP="mktemp -t MPI_START"
+        tempfile=`$MPI_START_MKTEMP 2> /dev/null`
         if test $? -ne 0 ; then
             error_msg "Could not find a proper mktemp utility"
             dump_env
@@ -96,6 +97,13 @@ mpi_start_find_mktemp () {
         fi
     fi
     rm -f $tempfile
+}
+
+#======================================================================
+# mpi-start mktemp 
+#======================================================================
+mpi_start_mktemp () {
+    $MPI_START_MKTEMP $*
 }
 
 #======================================================================
@@ -129,7 +137,7 @@ mpi_start_activate_mpi () {
 #======================================================================
 mpi_start_create_wrapper() {
     if test "x${MPI_START_MPI_WRAPPER}" = "x" ; then
-        export MPI_START_MPI_WRAPPER=`mktemp`
+        export MPI_START_MPI_WRAPPER=`mpi_start_mktemp`
         export MPI_START_CLEANUP_FILES="$MPI_START_CLEANUP_FILES $MPI_START_MPI_WRAPPER"
         cat > $MPI_START_MPI_WRAPPER << EOF
 #!/bin/sh
@@ -215,7 +223,7 @@ mpi_start_execute_wrapper() {
         mpi_start_create_wrapper
         # we create a new wrapper for each execution so we can have more than
         # one MPI execution in a single mpi-start call (not sure if it has any use)
-        CMD_WRAPPER=`mktemp`
+        CMD_WRAPPER=`mpi_start_mktemp`
         chmod +x $CMD_WRAPPER
         cat $MPI_START_MPI_WRAPPER > $CMD_WRAPPER
         local OUTPUT=""
@@ -248,9 +256,9 @@ mpi_start_execute_wrapper() {
 #======================================================================
 dummy_scheduler() {
     warn_msg "no scheduler found, using dummy environment with localhost"
-    export MPI_START_MACHINEFILE=`mktemp`
-    export MPI_START_HOSTFILE=`mktemp`
-    export MPI_START_HOST_SLOTS_FILE=`mktemp`
+    export MPI_START_MACHINEFILE=`mpi_start_mktemp`
+    export MPI_START_HOSTFILE=`mpi_start_mktemp`
+    export MPI_START_HOST_SLOTS_FILE=`mpi_start_mktemp`
     myhost=`hostname`
     if test "x${MPI_DUMMY_SCH_SLOTS}" = "x" ; then
         slots=1

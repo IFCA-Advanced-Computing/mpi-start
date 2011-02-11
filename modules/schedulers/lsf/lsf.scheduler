@@ -33,9 +33,9 @@ scheduler_available () {
 
 build_lsb_hosts () {
     debug_msg " build machinefile based on LSB_HOSTS"
-    export MPI_START_MACHINEFILE=`mktemp`
-    export MPI_START_HOSTFILE=`mktemp`
-    export MPI_START_HOST_SLOTS_FILE=`mktemp`
+    export MPI_START_MACHINEFILE=`mpi_start_mktemp`
+    export MPI_START_HOSTFILE=`mpi_start_mktemp`
+    export MPI_START_HOST_SLOTS_FILE=`mpi_start_mktemp`
     for host in $LSB_HOSTS; do
         echo $host >> $MPI_START_MACHINEFILE
     done
@@ -55,9 +55,9 @@ build_lsb_hosts () {
 
 build_lsb_mcpu_hosts () {
     debug_msg " build machinefile based on LSB_MCPU_HOSTS"
-    export MPI_START_MACHINEFILE=`mktemp`
-    export MPI_START_HOSTFILE=`mktemp`
-    export MPI_START_HOST_SLOTS_FILE=`mktemp`
+    export MPI_START_MACHINEFILE=`mpi_start_mktemp`
+    export MPI_START_HOSTFILE=`mpi_start_mktemp`
+    export MPI_START_HOST_SLOTS_FILE=`mpi_start_mktemp`
     is_host=1
     last_host=""
     total_slots=0

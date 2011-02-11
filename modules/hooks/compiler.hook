@@ -55,7 +55,7 @@ compiler_hook_set_compiler_flags() {
 compiler_hook_check_compiler_flags() {
     debug_msg " compiler_hook_check_compiler_flags"
 
-    wdir=`mktemp -d`
+    wdir=`mpi_start_mktemp -d`
     cat > $wdir/test.c << EOF
 #include <mpi.h>
 int main(int argc, char **argv) { MPI_Init(&argc, &argv); return 0; }
