@@ -1,15 +1,20 @@
-1.0.0 2011-02-09 Enol Fernández <enolfc _AT_ ifca.unican.es>
+2011-02-15 Enol Fernández <enolfc _AT_ ifca.unican.es> - 1.0.1
+	* Added OpenMP tests
+	* Review of hooks
+	* Added BSD mktemp compatiblity.	
+
+2011-02-09 Enol Fernández <enolfc _AT_ ifca.unican.es> - 1.0.0
 	* Brand new versioning: 1.0.0
 	* Ready for EMI-1 
 
-0.1.8 2011-02-03 Enol Fernández <enolfc _AT_ ifca.unican.es>
+2011-02-03 Enol Fernández <enolfc _AT_ ifca.unican.es> - 0.1.8
 	* Added the chmod +x to executable.
 
-0.1.7 2011-01-27 Enol Fernandez <enolfc _AT_ ifca.unican.es>
+2011-01-27 Enol Fernandez <enolfc _AT_ ifca.unican.es> - 0.1.7
 	* Changed default installation prefix (now it is /opt/mpi-start)
 	* Added and reviewed tests for basic functionality, schedulers and hooks. 
 
-0.1.6 2011-01-12 Enol Fernandez <enolfc _AT_ ifca.unican.es>
+2011-01-12 Enol Fernandez <enolfc _AT_ ifca.unican.es> - 0.1.6
 	* Changed changelog format (now it includes version)
 	* Added -V option to get version
 	* Changed the verbosity options.
