@@ -36,7 +36,7 @@ count_app_np_pnode () {
     export I2G_MPI_PER_NODE=3
     cat > $I2G_MPI_APPLICATION << EOF
 #!/bin/sh
-echo "\${MPI_START_NSLOTS};\${MPI_START_NHOSTS};\${MPI_START_NSLOTS_PER_HOST};\${MPI_START_NP}"
+echo "\${MPI_START_NSLOTS};\${MPI_START_NHOSTS};\${MPI_START_NSLOTS_PER_HOST};\${MPI_START_NP};\${MPI_START_SCHEDULER}"
 exit 0
 EOF
     chmod +x $I2G_MPI_APPLICATION
@@ -46,6 +46,8 @@ EOF
     hosts=`echo $output | cut -f2 -d";"`
     sperhosts=`echo $output | cut -f3 -d";"`
     np=`echo $output | cut -f4 -d";"`
+    sch=`echo $output | cut -f5 -d";"`
+    assertEquals "$1" $sch
     assertEquals 8 $slots
     assertEquals 3 $hosts
     assertEquals 2 $sperhosts
@@ -62,7 +64,7 @@ count_app_np () {
     export I2G_MPI_NP=5
     cat > $I2G_MPI_APPLICATION << EOF
 #!/bin/sh
-echo "\${MPI_START_NSLOTS};\${MPI_START_NHOSTS};\${MPI_START_NSLOTS_PER_HOST};\${MPI_START_NP}"
+echo "\${MPI_START_NSLOTS};\${MPI_START_NHOSTS};\${MPI_START_NSLOTS_PER_HOST};\${MPI_START_NP};\${MPI_START_SCHEDULER}"
 exit 0
 EOF
     chmod +x $I2G_MPI_APPLICATION
@@ -72,6 +74,8 @@ EOF
     hosts=`echo $output | cut -f2 -d";"`
     sperhosts=`echo $output | cut -f3 -d";"`
     np=`echo $output | cut -f4 -d";"`
+    sch=`echo $output | cut -f5 -d";"`
+    assertEquals "$1" $sch
     assertEquals 8 $slots
     assertEquals 3 $hosts
     assertEquals 2 $sperhosts
@@ -85,7 +89,7 @@ count_app_all_slots () {
     export I2G_MPI_APPLICATION=`$MYMKTEMP`
     cat > $I2G_MPI_APPLICATION << EOF
 #!/bin/sh
-echo "\${MPI_START_NSLOTS};\${MPI_START_NHOSTS};\${MPI_START_NSLOTS_PER_HOST};\${MPI_START_NP}"
+echo "\${MPI_START_NSLOTS};\${MPI_START_NHOSTS};\${MPI_START_NSLOTS_PER_HOST};\${MPI_START_NP};\${MPI_START_SCHEDULER}"
 exit 0
 EOF
     chmod +x $I2G_MPI_APPLICATION
@@ -95,6 +99,8 @@ EOF
     hosts=`echo $output | cut -f2 -d";"`
     sperhosts=`echo $output | cut -f3 -d";"`
     np=`echo $output | cut -f4 -d";"`
+    sch=`echo $output | cut -f5 -d";"`
+    assertEquals "$1" $sch
     assertEquals 8 $slots
     assertEquals 3 $hosts
     assertEquals 2 $sperhosts
@@ -108,7 +114,7 @@ count_app_1slot_per_host () {
     export I2G_MPI_APPLICATION=`$MYMKTEMP`
     cat > $I2G_MPI_APPLICATION << EOF
 #!/bin/sh
-echo "\${MPI_START_NSLOTS};\${MPI_START_NHOSTS};\${MPI_START_NSLOTS_PER_HOST};\${MPI_START_NP}"
+echo "\${MPI_START_NSLOTS};\${MPI_START_NHOSTS};\${MPI_START_NSLOTS_PER_HOST};\${MPI_START_NP};\${MPI_START_SCHEDULER}"
 exit 0
 EOF
     chmod +x $I2G_MPI_APPLICATION
@@ -118,6 +124,8 @@ EOF
     hosts=`echo $output | cut -f2 -d";"`
     sperhosts=`echo $output | cut -f3 -d";"`
     np=`echo $output | cut -f4 -d";"`
+    sch=`echo $output | cut -f5 -d";"`
+    assertEquals "$1" $sch
     assertEquals 8 $slots
     assertEquals 3 $hosts
     assertEquals 2 $sperhosts
@@ -132,7 +140,7 @@ count_app_3_per_host () {
     export I2G_MPI_APPLICATION=`$MYMKTEMP`
     cat > $I2G_MPI_APPLICATION << EOF
 #!/bin/sh
-echo "\${MPI_START_NSLOTS};\${MPI_START_NHOSTS};\${MPI_START_NSLOTS_PER_HOST};\${MPI_START_NP}"
+echo "\${MPI_START_NSLOTS};\${MPI_START_NHOSTS};\${MPI_START_NSLOTS_PER_HOST};\${MPI_START_NP};\${MPI_START_SCHEDULER}"
 exit 0
 EOF
     chmod +x $I2G_MPI_APPLICATION
@@ -142,6 +150,8 @@ EOF
     hosts=`echo $output | cut -f2 -d";"`
     sperhosts=`echo $output | cut -f3 -d";"`
     np=`echo $output | cut -f4 -d";"`
+    sch=`echo $output | cut -f5 -d";"`
+    assertEquals "$1" $sch
     assertEquals 8 $slots
     assertEquals 3 $hosts
     assertEquals 2 $sperhosts
@@ -158,10 +168,10 @@ host1 2
 host2 2
 host3 4
 EOF
-    count_app_np
-    count_app_all_slots
-    count_app_1slot_per_host
-    count_app_np_pnode
+    count_app_np "sge"
+    count_app_all_slots "sge"
+    count_app_1slot_per_host "sge"
+    count_app_np_pnode "sge"
     rm -f $PE_HOSTFILE
     unset PE_HOSTFILE
 }
@@ -198,7 +208,7 @@ EOF
     # add them to path
     oldPATH="$PATH"
     export PATH=$MYTMPDIR:$PATH
-    count_app_all_slots
+    count_app_all_slots "slurm"
     rm -f $PE_HOSTFILE
     unset SLURM_JOB_NODELIST
     unset SLURM_NPROCS
@@ -221,21 +231,21 @@ host3
 host3
 host3
 EOF
-    count_app_np
-    count_app_all_slots
-    count_app_1slot_per_host
-    count_app_3_per_host
-    count_app_np_pnode
+    count_app_np "pbs"
+    count_app_all_slots "pbs"
+    count_app_1slot_per_host "pbs"
+    count_app_3_per_host "pbs"
+    count_app_np_pnode "pbs"
     rm -f $PBS_NODEFILE
     unset PBS_NODEFILE
 }
 
 testLSFScheduler () {
     export LSB_HOSTS="host1 host1 host2 host2 host3 host3 host3 host3"
-    count_app_np
-    count_app_all_slots
-    count_app_1slot_per_host
-    count_app_np_pnode
+    count_app_np "lsf"
+    count_app_all_slots "lsf"
+    count_app_1slot_per_host "lsf"
+    count_app_np_pnode "lsf"
     unset LSB_HOSTS 
 }
 
@@ -244,7 +254,7 @@ testDummyScheduler () {
     export I2G_MPI_APPLICATION=`$MYMKTEMP`
     cat > $I2G_MPI_APPLICATION << EOF
 #!/bin/sh
-echo "\${MPI_START_NSLOTS};\${MPI_START_NHOSTS};\${MPI_START_NSLOTS_PER_HOST};\${MPI_START_NP}"
+echo "\${MPI_START_NSLOTS};\${MPI_START_NHOSTS};\${MPI_START_NSLOTS_PER_HOST};\${MPI_START_NP};\${MPI_START_SCHEDULER}"
 EOF
     chmod +x $I2G_MPI_APPLICATION
     output=`$I2G_MPI_START -npnode 3`
@@ -253,6 +263,8 @@ EOF
     hosts=`echo $output | cut -f2 -d";"`
     sperhosts=`echo $output | cut -f3 -d";"`
     np=`echo $output | cut -f4 -d";"`
+    sch=`echo $output | cut -f5 -d";"`
+    assertEquals "mpi-start-dummy" $sch
     assertEquals 1 $slots
     assertEquals 1 $hosts
     assertEquals 1 $sperhosts

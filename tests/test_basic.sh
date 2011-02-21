@@ -128,4 +128,89 @@ EOF
     rm -f $myapp
 }
 
+testInputFile() {
+    myapp=`$MYMKTEMP`
+    cat > $myapp << EOF
+#!/bin/sh
+while read line ; do
+    echo -n \$line
+done
+echo -n "ERROR" 1>&2
+EOF
+    chmod +x $myapp
+    myin=`$MYMKTEMP`
+    echo "OUTPUT" > $myin 
+    output=`$I2G_MPI_START -i $myin -- $myapp 2> /dev/null`
+    st=$?
+    assertEquals 0 $st
+    assertEquals "OUTPUT" "$output"
+    rm -f $myapp
+    rm -f $myin
+}
+
+testOutputFile() {
+    myapp=`$MYMKTEMP`
+    cat > $myapp << EOF
+#!/bin/sh
+echo -n "OUTPUT"
+echo -n "ERROR" 1>&2
+EOF
+    chmod +x $myapp
+    myout=`$MYMKTEMP`
+    output=`$I2G_MPI_START -o $myout -- $myapp 2> /dev/null`
+    st=$?
+    assertEquals 0 $st
+    out=`cat $myout`
+    assertEquals "OUTPUT" "$out"
+    rm -f $myapp
+    rm -rf $myout
+}
+
+testErrorFile() {
+    myapp=`$MYMKTEMP`
+    cat > $myapp << EOF
+#!/bin/sh
+echo -n "OUTPUT"
+echo -n "ERROR" 1>&2
+EOF
+    chmod +x $myapp
+    myerr=`$MYMKTEMP`
+    output=`$I2G_MPI_START -e $myerr -- $myapp`
+    st=$?
+    err=`cat $myerr`
+    assertEquals 0 $st
+    assertEquals "ERROR" "$err"
+    assertEquals "OUTPUT" "$output"
+    rm -f $myapp
+    rm -rf $myerr
+}
+
+
+testInOutputErrorFile() {
+    myapp=`$MYMKTEMP`
+    cat > $myapp << EOF
+#!/bin/sh
+while read line ; do
+    echo -n \$line
+done
+echo -n "ERROR" 1>&2
+EOF
+    chmod +x $myapp
+    myin=`$MYMKTEMP`
+    echo "OUTPUT" > $myin 
+    myerr=`$MYMKTEMP`
+    myout=`$MYMKTEMP`
+    `$I2G_MPI_START -i $myin -o $myout -e $myerr -- $myapp`
+    st=$?
+    assertEquals 0 $st
+    out=`cat $myout`
+    err=`cat $myerr`
+    assertEquals "OUTPUT" "$out"
+    assertEquals "ERROR" "$err"
+    rm -f $myapp
+    rm -f $myin
+    rm -f $myerr
+    rm -f $myout
+}
+
 . $SHUNIT2
