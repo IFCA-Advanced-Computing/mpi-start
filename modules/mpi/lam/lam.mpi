@@ -19,6 +19,21 @@ mpi_start_activate_mpi $MPI_START_MPI_PREFIX "$MPI_START_MPI_MODULE"
 mpi_exec () {
 	debug_msg "found LAM-MPI, set machinefile and np parameters"
 
+    . $MPI_START_PREFIX/../etc/mpi-start/common.sh
+    mpi_start_search_mpiexec
+
+    if test "x$MPI_MPIEXEC" != "x"; then
+        MPIEXEC=$MPI_MPIEXEC
+        MPI_SPECIFIC_PARAMS=$MPI_SPECIFIC_MPIEXEC_PARAMS
+    elif test "x$MPI_MPIRUN" != "x"; then
+        MPIEXEC=$MPI_MPIRUN
+        MPI_SPECIFIC_PARAMS=$MPI_SPECIFIC_MPIRUN_PARAMS
+    else
+        debug_msg "no mpiexec/mpirun found!"
+        dump_env
+        exit 1
+    fi
+
     if test "x$I2G_MPI_PER_NODE" = "x1"; then
 	    export I2G_MACHINEFILE_AND_NP="-machinefile $MPI_START_HOSTFILE -np $MPI_START_NP"
     else 
@@ -26,17 +41,7 @@ mpi_exec () {
     fi
 
     # check for user supplied mpiexec 
-    MPI_SPECIFIC_PARAMS=$LAM_PARAMS
-    MPIEXEC=`which mpiexec`
-    if test "x$MPI_LAM_MPIEXEC" != "x" ; then
-        MPIEXEC=$MPI_LAM_MPIEXEC
-        MPI_SPECIFIC_PARAMS="$MPI_SPECIFIC_PARAMS $MPI_LAM_MPIEXEC_PARAMS"
-        debug_msg "using user supplied startup : '$MPIEXEC'"
-    elif test "x$MPI_LAM_MPIRUN" != "x" ; then
-        MPIEXEC=$MPI_LAM_MPIRUN
-        MPI_SPECIFIC_PARAMS="$MPI_SPECIFIC_PARAMS $MPI_LAM_MPIRUN_PARAMS"
-        debug_msg "using user supplied startup : '$MPIEXEC'"
-    fi
+    MPI_SPECIFIC_PARAMS="$MPI_SPECIFIC_PARAMS $LAM_PARAMS"
 
     # With version 7.1.2 we don't need to start the daemons in advance.
     . $MPI_START_PREFIX/../etc/mpi-start/generic_mpiexec.sh
