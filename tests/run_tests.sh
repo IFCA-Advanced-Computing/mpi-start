@@ -59,6 +59,45 @@ if test "x${RUN_OMP_TESTS}" = "x1" ; then
     ./test_omp.sh || exitcode=1
 fi
 
+#RUN_MPICH2_TESTS=1
+#RUN_MPICH_TESTS=1
+#RUN_OPENMPI_TESTS=1
+#RUN_LAM_TESTS=1
+# test all the mpi implementations that we need to
+if test "x${RUN_MPICH2_TESTS}" = "x1" ; then
+    export MPICC=mpicc.mpich2
+    export MPICC_OPTS=
+    export I2G_MPI_TYPE=mpich2
+    echo "MPICH2 Tests"
+    ./test_mpi.sh || exitcode=1
+fi
+if test "x${RUN_MPICH_TESTS}" = "x1" ; then
+    export MPI_MPICH_PATH=/usr/lib/mpich
+    export MPI_MPICH_MPIRUN=mpirun
+    export MPICC=mpicc
+    export MPICC_OPTS=
+    export I2G_MPI_TYPE=mpich
+    echo "MPICH Tests"
+    ./test_mpi.sh || exitcode=1
+fi
+if test "x${RUN_OPENMPI_TESTS}" = "x1" ; then
+    export MPICC=mpicc.openmpi
+    export MPICC_OPTS=
+    export I2G_MPI_TYPE=openmpi
+    export MPI_OPENMPI_MPIEXEC=mpiexec.openmpi
+    echo "Open MP Tests"
+    ./test_mpi.sh || exitcode=1
+fi
+if test "x${RUN_LAM_TESTS}" = "x1" ; then
+    export MPICC=mpicc.lam
+    export MPICC_OPTS=
+    export I2G_MPI_TYPE=lam
+    export MPI_LAM_MPIRUN=mpirun.lam
+    echo "LAM Tests"
+    ./test_mpi.sh || exitcode=1
+fi
+
+
 if test $REMOVE_MY_SHUNIT -eq 1 ; then
     rm $SHUNIT2
 fi
