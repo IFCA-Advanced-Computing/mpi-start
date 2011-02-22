@@ -1,3 +1,7 @@
+2011-02-22 Enol Fernández <enolfc _AT_ ifca.unican.es> - 1.0.2
+	* Added MPI tests
+	* Fixed detection of MPI path.
+
 2011-02-15 Enol Fernández <enolfc _AT_ ifca.unican.es> - 1.0.1
 	* Added OpenMP tests
 	* Review of hooks
