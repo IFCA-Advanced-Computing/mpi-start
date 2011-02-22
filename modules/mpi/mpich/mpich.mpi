@@ -31,8 +31,13 @@ mpi_exec () {
         export I2G_MACHINEFILE_AND_NP="-machinefile $MPI_START_MACHINEFILE -np $MPI_START_NP"
     fi
  
-    if test "x$MPI_MPIEXEC" != "x"; then
+    # do prefer mpirun!
+    if test "x$MPI_MPIRUN" != "x"; then
+        MPIEXEC="$MPI_MPIRUN"
+        MPI_SPECIFIC_PARAMS="$MPI_SPECIFIC_MPIRUN_PARAMS"
+    elif test "x$MPI_MPIEXEC" != "x"; then
         MPIEXEC=$MPI_MPIEXEC
+        MPI_SPECIFIC_PARAMS="$MPI_SPECIFIC_MPIEXEC_PARAMS"
 
         # how to test if the mpiexec needs the -np and -machinefile args??
         $MPIEXEC 2>&1 | grep -e "-\<np\>" > /dev/null 2>&1
@@ -44,6 +49,10 @@ mpi_exec () {
                 MPI_SPECIFIC_PARAMS="$MPI_SPECIFIC_PARAMS -pernode"
             fi
         fi
+    else
+        debug_msg "no mpiexec/mpirun found!"
+        dump_env
+        exit 1
     fi
 
     if test "x$MPI_START_SSH_AGENT" != "x"; then
