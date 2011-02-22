@@ -20,11 +20,15 @@ REMOVE_MY_SHUNIT=0
 
 
 # tests to run
-#RUN_OMP_TESTS=1
-#RUN_MPICH2_TESTS=1
-#RUN_MPICH_TESTS=1
-#RUN_OPENMPI_TESTS=1
-#RUN_LAM_TESTS=1
+RUN_BASIC_TESTS=1
+RUN_HOOK_TESTS=1
+RUN_SCH_TESTS=1
+# if running these tests, ensure you have proper environment loaded!
+RUN_OMP_TESTS=0
+RUN_MPICH2_TESTS=0
+RUN_MPICH_TESTS=0
+RUN_OPENMPI_TESTS=0
+RUN_LAM_TESTS=0
 
 #
 # Check environment variables
@@ -56,25 +60,48 @@ fi
 # Run all the tests in the directory
 #
 exitcode=0
-echo "Basic Tests"
-./test_basic.sh || exitcode=1
-echo "Hook Tests"
-./test_hooks.sh || exitcode=1
-echo "Scheduler Tests"
-./test_scheduler.sh || exitcode=1
+if test "x${RUN_BASIC_TESTS}" = "x1" ; then
+    echo "*******************"
+    echo "    Basic Tests"
+    echo "*******************"
+    ./test_basic.sh || exitcode=1
+fi
+if test "x${RUN_HOOK_TESTS}" = "x1" ; then
+    echo
+    echo "*******************"
+    echo "    Hook Tests"
+    echo "*******************"
+    ./test_hooks.sh || exitcode=1
+fi
+if test "x${RUN_SCH_TESTS}" = "x1" ; then
+    echo
+    echo "*******************"
+    echo "  Scheduler Tests"
+    echo "*******************"
+    ./test_scheduler.sh || exitcode=1
+fi
 if test "x${RUN_OMP_TESTS}" = "x1" ; then
-    echo "Open MP Tests"
+    echo
+    echo "*******************"
+    echo "     OMP Tests"
+    echo "*******************"
     ./test_omp.sh || exitcode=1
 fi
 if test "x${RUN_MPICH2_TESTS}" = "x1" ; then
-    echo "MPICH2 Tests"
+    echo
+    echo "*******************"
+    echo "   MPICH2 Tests"
+    echo "*******************"
     export MPICC=mpicc.mpich2
     export MPICC_OPTS=
     export I2G_MPI_TYPE=mpich2
     ./test_mpi.sh || exitcode=1
 fi
 if test "x${RUN_MPICH_TESTS}" = "x1" ; then
-    echo "MPICH Tests"
+    echo
+    echo "*******************"
+    echo "     MPICH Tests"
+    echo "*******************"
     export MPI_MPICH_PATH=/usr/lib/mpich
     export MPICC=mpicc
     export MPICC_OPTS=
@@ -82,7 +109,10 @@ if test "x${RUN_MPICH_TESTS}" = "x1" ; then
     ./test_mpi.sh || exitcode=1
 fi
 if test "x${RUN_OPENMPI_TESTS}" = "x1" ; then
-    echo "Open MP Tests"
+    echo
+    echo "*******************"
+    echo "  Open MPI Tests"
+    echo "*******************"
     export MPICC=mpicc.openmpi
     export MPICC_OPTS=
     export I2G_MPI_TYPE=openmpi
@@ -90,7 +120,10 @@ if test "x${RUN_OPENMPI_TESTS}" = "x1" ; then
     ./test_mpi.sh || exitcode=1
 fi
 if test "x${RUN_LAM_TESTS}" = "x1" ; then
-    echo "LAM Tests"
+    echo
+    echo "*******************"
+    echo "     LAM Tests"
+    echo "*******************"
     export MPICC=mpicc.lam
     export MPICC_OPTS=
     export I2G_MPI_TYPE=lam
