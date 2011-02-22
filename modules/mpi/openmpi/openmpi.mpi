@@ -43,6 +43,20 @@ mpi_exec () {
     . $MPI_START_PREFIX/../etc/mpi-start/common.sh
     mpi_start_search_mpiexec
 
+    if test "x$MPI_MPIEXEC" != "x"; then
+        MPIEXEC=$MPI_MPIEXEC
+        MPI_SPECIFIC_PARAMS=$MPI_SPECIFIC_MPIEXEC_PARAMS
+        # TODO: What is I2G_MPI_MPIEXEC_PARAMS exactly???
+        MPI_SPECIFIC_PARAMS="$MPI_SPECIFIC_PARAMS $I2G_MPI_MPIEXEC_PARAMS"
+    elif test "x$MPI_MPIRUN" != "x"; then
+        MPIEXEC=$MPI_MPIRUN
+        MPI_SPECIFIC_PARAMS=$MPI_SPECIFIC_MPIRUN_PARAMS
+    else
+        error_msg "no mpiexec/mpirun found!"
+        dump_env
+        exit 1
+    fi
+
     #handle Open MPI 1.2.2 + PBS bug
     if test "x$MPI_START_SCHEDULER" = "xpbs" -a "x$MPI_START_SSH_AGENT" = "x" ; then
         debug_msg "found openmpi and PBS (without ssh agent), don't set machinefile"
@@ -70,17 +84,6 @@ mpi_exec () {
     fi
     MPI_SPECIFIC_PARAMS="$MPI_SPECIFIC_PARAMS --prefix $MPI_START_MPI_PREFIX $OPENMPI_PARAMS"
 
-    if test "x$MPI_MPIEXEC" != "x"; then
-        MPIEXEC=$MPI_MPIEXEC
-        # TODO: What is I2G_MPI_MPIEXEC_PARAMS exactly???
-        MPI_SPECIFIC_PARAMS="$MPI_SPECIFIC_PARAMS $I2G_MPI_MPIEXEC_PARAMS"
-    elif test "x$MPI_MPIRUN" != "x"; then
-        MPIEXEC=$MPI_MPIRUN
-    else
-        error_msg "no mpiexec/mpirun found!"
-        dump_env
-        exit 1
-    fi
 
     . $MPI_START_PREFIX/../etc/mpi-start/generic_mpiexec.sh
     generic_mpiexec
