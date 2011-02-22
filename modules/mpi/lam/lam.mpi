@@ -34,10 +34,23 @@ mpi_exec () {
         exit 1
     fi
 
+    # start lamd
+    LAM_OPT="-H"
+    if test "x${I2G_MPI_START_DEBUG}" = "x1" ; then
+        LAM_OPT="-v"
+    fi
+    lamboot $LAM_OPT $MPI_START_HOSTFILE
+    status=$?
+    if test $status -ne 0 ; then
+        error_msg "Unable to boot lam"
+        dump_env
+        exit 1
+    fi
+
     if test "x$I2G_MPI_PER_NODE" = "x1"; then
-	    export I2G_MACHINEFILE_AND_NP="-machinefile $MPI_START_HOSTFILE -np $MPI_START_NP"
+	    export I2G_MACHINEFILE_AND_NP="N"
     else 
-	    export I2G_MACHINEFILE_AND_NP="-machinefile $MPI_START_MACHINEFILE -np $MPI_START_NP"
+	    export I2G_MACHINEFILE_AND_NP="-np $MPI_START_NP"
     fi
 
     # check for user supplied mpiexec 
@@ -46,8 +59,12 @@ mpi_exec () {
     # With version 7.1.2 we don't need to start the daemons in advance.
     . $MPI_START_PREFIX/../etc/mpi-start/generic_mpiexec.sh
     generic_mpiexec
+    err=$?
 
-    return $?
+    # stop lam
+    lamhalt $LAM_OPT
+
+    return $err
 }
 
 mpi_start () {
