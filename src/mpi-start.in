@@ -17,6 +17,9 @@ fi
 # Cleans up temporary files upon finishing execution 
 #======================================================================
 clean_up () {
+    if test "xI2G_MPI_START_KEEP_FILES" != "x1"; then
+        exit
+    fi
     debug_msg "Cleaning up mpi-start temporary files."
     MPI_START_CLEANUP_FILES="$MPI_START_CLEANUP_FILES $MPI_START_HOSTFILE $MPI_START_HOST_SLOTS_FILE $MPI_START_MACHINEFILE"
     for file in $MPI_START_CLEANUP_FILES; do
@@ -492,7 +495,7 @@ main() {
     if test "x$I2G_PREFIX" = "x" ; then
         # first check the one with version included
         VALUE=`eval echo \\$${MPI_PREFIX}${MPI_TYPE}${US}${MPI_VERSION}${MPI_PATH_SUFFIX}`
-        if test "x$VALUE" = "x" ; then
+        if test "x$VALUE" != "x" ; then
             debug_msg " found MPI version: $MPI_VERSION"
             MPI_START_MPI_PREFIX=$VALUE
         else
