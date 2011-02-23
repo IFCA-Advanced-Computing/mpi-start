@@ -335,6 +335,11 @@ check_options() {
 
     # set global internal variables 
     MPI_START_PREFIX=`dirname $I2G_MPI_START`
+    if test $MPI_START_PREFIX = "/usr/bin"; then
+        MPI_START_ETC="/etc/mpi-start"
+    else
+        MPI_START_ETC="$MPI_START_PREFIX/../etc/mpi-start"
+    fi
     MPI_START_MACHINEFILE=""
     MPI_START_HOSTFILE=""
     MPI_START_HOST_SLOTS_FILE=""
@@ -371,7 +376,7 @@ main() {
     
     # check for scheduling system and set environment variables
     info_msg "search for scheduler"
-    for i in $MPI_START_PREFIX/../etc/mpi-start/*.scheduler  ; do 
+    for i in $MPI_START_ETC/*.scheduler  ; do 
         # source the function definitions
         unset scheduler
         unset scheduler_available
@@ -454,7 +459,7 @@ main() {
     fi 
 
     # load the mpi plugin
-    MPI_PLUGIN_FILE=$MPI_START_PREFIX/../etc/mpi-start/$I2G_MPI_TYPE.mpi
+    MPI_PLUGIN_FILE=$MPI_START_ETC/$I2G_MPI_TYPE.mpi
     if test ! -e $MPI_PLUGIN_FILE  ; then 
         error_msg "failed to find requested MPI type : $I2G_MPI_TYPE"
         dump_env 
@@ -582,9 +587,7 @@ print_version () {
 #======================================================================
 #  Parse the command line arguments and call the main function 
 #======================================================================
-if test "x${I2G_MPI_START}" = "x" ; then
-    export I2G_MPI_START=$0
-fi
+export I2G_MPI_START=$0
 arguments="$*"
 while [ "x$1" != "x" ] ; do
     case "$1" in 
