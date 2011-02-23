@@ -53,7 +53,7 @@ testChmodApp() {
     unset I2G_MPI_TYPE
     myapp=`$MYMKTEMP`
     cat > $myapp << EOF
-#!/bin/sh
+#!/bin/bash
 echo \${I2G_MPI_TYPE}
 EOF
     output=`$I2G_MPI_START -t dummy -- $myapp`
@@ -67,7 +67,7 @@ testCommandLineTypeAndApp() {
     unset I2G_MPI_TYPE
     myapp=`$MYMKTEMP`
     cat > $myapp << EOF
-#!/bin/sh
+#!/bin/bash
 echo \${I2G_MPI_TYPE}
 EOF
     chmod +x $myapp
@@ -99,7 +99,7 @@ testCommandLineDebug() {
 testCommandLineTrace() {
     myapp=`$MYMKTEMP`
     cat > $myapp << EOF
-#!/bin/sh
+#!/bin/bash
 echo \${I2G_MPI_START_TRACE}
 EOF
     chmod +x $myapp
@@ -113,7 +113,7 @@ EOF
 testCommandLineHook() {
     myapp=`$MYMKTEMP`
     cat > $myapp << EOF
-#!/bin/sh
+#!/bin/bash
 echo "\${I2G_MPI_PRE_RUN_HOOK};\${I2G_MPI_POST_RUN_HOOK};"
 EOF
     chmod +x $myapp
@@ -131,7 +131,7 @@ EOF
 testInputFile() {
     myapp=`$MYMKTEMP`
     cat > $myapp << EOF
-#!/bin/sh
+#!/bin/bash
 while read line ; do
     echo -n \$line
 done
@@ -151,7 +151,7 @@ EOF
 testOutputFile() {
     myapp=`$MYMKTEMP`
     cat > $myapp << EOF
-#!/bin/sh
+#!/bin/bash
 echo -n "OUTPUT"
 echo -n "ERROR" 1>&2
 EOF
@@ -169,7 +169,7 @@ EOF
 testErrorFile() {
     myapp=`$MYMKTEMP`
     cat > $myapp << EOF
-#!/bin/sh
+#!/bin/bash
 echo -n "OUTPUT"
 echo -n "ERROR" 1>&2
 EOF
@@ -189,7 +189,7 @@ EOF
 testInOutputErrorFile() {
     myapp=`$MYMKTEMP`
     cat > $myapp << EOF
-#!/bin/sh
+#!/bin/bash
 while read line ; do
     echo -n \$line
 done
