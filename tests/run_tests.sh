@@ -18,7 +18,6 @@ rm -f $TMPFILE
 DOWNLOAD_MY_SHUNIT=1
 REMOVE_MY_SHUNIT=0
 
-
 # tests to run
 RUN_BASIC_TESTS=1
 RUN_HOOK_TESTS=1
@@ -51,10 +50,19 @@ if test "x${SHUNIT2}" = "x" ; then
 fi
 
 if test "x${I2G_MPI_START}" = "x" ; then
-    echo "I2G_MPI_START environment variable not defined!"
-    echo "Please set it to the location of MPI-Start binary"
-    exit 1
+    type mpi-start &> /dev/null
+    if test $? -ne 0 ; then
+        echo "I2G_MPI_START environment variable not defined!"
+        echo "Please set it to the location of MPI-Start binary"
+        exit 1
+    else
+        export I2G_MPI_START=mpi-start
+    fi
 fi
+
+echo 
+echo "** Using $I2G_MPI_START for testing! **"
+echo 
 
 #
 # Run all the tests in the directory
