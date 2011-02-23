@@ -3,13 +3,16 @@ VERSION=$(shell cat VERSION)
 DESTDIR=
 PREFIX=
 NAME_PREFIX=emi
-BINPREFIX=$(PREFIX)/bin
-DOCPREFIX=$(PREFIX)/share/doc/mpi-start
-ETCPREFIX=$(PREFIX)/etc/mpi-start
-base=$(shell basename $(DESTDIR)/$(PREFIX))
-ifeq ("$(base)","/")
-	BINPREFIX=/usr/bin
+USRPREFIX=
+binDIR=bin
+docDIR=share/doc/mpi-start-$(VERSION)
+BINPREFIX=$(PREFIX)/$(binDIR)
+DOCPREFIX=$(PREFIX)/$(docDIR)
+ifeq ("$(PREFIX)","")
+	BINPREFIX=/usr/$(binDIR)
+	DOCPREFIX=/usr/$(docDIR)
 endif
+ETCPREFIX=$(PREFIX)/etc/mpi-start
 
 all:
 	$(MAKE) -C src all 
@@ -44,7 +47,7 @@ install: all
 	echo "setenv I2G_MPI_START $(DESTDIR)/$(BINPREFIX)/mpi-start" > $(DESTDIR)/etc/profile.d/mpi_start.csh
 
 tarball:all
-	$(MAKE) install PREFIX="" DESTDIR=`pwd` 
+	$(MAKE) install PREFIX="/" DESTDIR=`pwd` 
 	tar czvf mpi-start-$(VERSION).tar.gz bin/* etc/*
 
 dist:	
