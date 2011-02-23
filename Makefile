@@ -6,7 +6,8 @@ NAME_PREFIX=emi
 BINPREFIX=$(PREFIX)/bin
 DOCPREFIX=$(PREFIX)/share/doc/mpi-start
 ETCPREFIX=$(PREFIX)/etc/mpi-start
-ifeq ("$(DESTDIR)/$(PREFIX)","/")
+base=$(shell basename $(DESTDIR)/$(PREFIX))
+ifeq ("$(base)","/")
 	BINPREFIX=/usr/bin
 endif
 
