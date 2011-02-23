@@ -1,8 +1,14 @@
 # Makefile for MPI_START
 VERSION=$(shell cat VERSION)
 DESTDIR=
-PREFIX=/opt/mpi-start
+PREFIX=
 NAME_PREFIX=emi
+BINPREFIX=$(PREFIX)/bin
+DOCPREFIX=$(PREFIX)/share/doc/mpi-start
+ETCPREFIX=$(PREFIX)/etc/mpi-start
+ifeq ("$(DESTDIR)/$(PREFIX)","/")
+	BINPREFIX=/usr/bin
+endif
 
 all:
 	$(MAKE) -C src all 
@@ -23,18 +29,18 @@ clean:
 distclean:clean
 
 install: all
-	mkdir -p $(DESTDIR)/$(PREFIX)/bin
-	mkdir -p $(DESTDIR)/$(PREFIX)/etc/mpi-start
+	mkdir -p $(DESTDIR)/$(BINPREFIX)
+	mkdir -p $(DESTDIR)/$(ETCPREFIX)
 	mkdir -p $(DESTDIR)/etc
-	install COPYING $(DESTDIR)/$(PREFIX)/etc/mpi-start
+	install COPYING $(DESTDIR)/$(ETCPREFIX)
 	$(MAKE) -C src install
 	$(MAKE) -C modules install
 	$(MAKE) -C templates install
 	$(MAKE) -C docs install
 	$(MAKE) -C tests install 
 	mkdir -p $(DESTDIR)/etc/profile.d
-	echo "export I2G_MPI_START=$(PREFIX)/bin/mpi-start" > $(DESTDIR)/etc/profile.d/mpi_start.sh
-	echo "setenv I2G_MPI_START $(PREFIX)/bin/mpi-start" > $(DESTDIR)/etc/profile.d/mpi_start.csh
+	echo "export I2G_MPI_START=$(DESTDIR)/$(BINPREFIX)/mpi-start" > $(DESTDIR)/etc/profile.d/mpi_start.sh
+	echo "setenv I2G_MPI_START $(DESTDIR)/$(BINPREFIX)/mpi-start" > $(DESTDIR)/etc/profile.d/mpi_start.csh
 
 tarball:all
 	$(MAKE) install PREFIX="" DESTDIR=`pwd` 
@@ -54,3 +60,6 @@ rpm: dist
 export VERSION
 export PREFIX
 export DESTDIR
+export ETCPREFIX
+export BINPREFIX
+
