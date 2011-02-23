@@ -6,18 +6,17 @@
 
 
 check_distribution_method(){
-	#======================================================================
-	# setup the mpi-mt tool
-	#======================================================================
-	if test "x$I2G_MPI_MT" = "x"  ; then 
-		    export I2G_MPI_MT=$MPI_START_PREFIX/i2g-${I2G_MPI_TYPE}_mpi-mt
-	fi
-	result=255
-        if test -e $I2G_MPI_MT ; then 
-		result=0	
-	fi
-	return $result
-
+    #======================================================================
+    # setup the mpi-mt tool
+    #======================================================================
+    if test "x$I2G_MPI_MT" = "x"  ; then 
+        export I2G_MPI_MT=$MPI_START_PREFIX/i2g-${I2G_MPI_TYPE}_mpi-mt
+    fi
+    result=255
+    if test -e $I2G_MPI_MT ; then 
+        result=0	
+    fi
+    return $result
 }
 
 copy() {
@@ -28,12 +27,12 @@ copy() {
     old_i2g_mpi_precommand=$I2G_MPI_PRECOMMAND
     old_mpi_start_pernode=$MPI_START_PERNODE
     I2G_MPI_MPIEXEC_PARAMS=`printenv MPI_${MPI_TYPE}_MPIEXEC_PARAMS`
-	old_i2g_mpi_mpiexec_params=$I2G_MPI_MPIEXEC_PARAMS
+    old_i2g_mpi_mpiexec_params=$I2G_MPI_MPIEXEC_PARAMS
 
-	# set to tmp. values
-	I2G_MPI_APPLICATION=$I2G_MPI_MT
-	I2G_MPI_APPLICATION_ARGS="cp $TARBALL $PWD/$TARBALL_BASENAME"
-	I2G_MPI_PRECOMMAND=
+    # set to tmp. values
+    I2G_MPI_APPLICATION=$I2G_MPI_MT
+    I2G_MPI_APPLICATION_ARGS="cp $TARBALL $PWD/$TARBALL_BASENAME"
+    I2G_MPI_PRECOMMAND=
     MPI_START_PERNODE=1
     MPI_START_DO_NOT_USE_WRAPPER=1
 	

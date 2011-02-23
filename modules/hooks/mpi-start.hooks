@@ -153,7 +153,7 @@ mpi_start_pre_run_hook_copy () {
     #if it was not, try to pick the best method
     if test "x$I2G_MPI_FILE_DIST" = "x"
     then
-    	for i in $MPI_START_PREFIX/../etc/mpi-start/*.filedist ; do
+    	for i in $MPI_START_ETC/*.filedist ; do
 	        unset check_distribution_method
 	        . $i
 	        check_distribution_method
@@ -166,7 +166,7 @@ mpi_start_pre_run_hook_copy () {
 	        fi
     	done
     else
-        chosenDistrMethod="$MPI_START_PREFIX/../etc/mpi-start/$I2G_MPI_FILE_DIST.filedist"
+        chosenDistrMethod="$MPI_START_ETC/$I2G_MPI_FILE_DIST.filedist"
     fi
     debug_msg "I2G_MPI_FILE_DIST => $I2G_MPI_FILE_DIST"
 
@@ -245,14 +245,14 @@ mpi_start_pre_run_hook () {
 mpi_start_pre_run_hook_generic () {
     debug_msg "mpi_start_pre_run_hook_generic"
 
-    for hook in $MPI_START_PREFIX/../etc/mpi-start/*.hook; do
+    for hook in $MPI_START_ETC/*.hook; do
         mpi_start_run_pre_hook $hook
     done
 
     # determine local filesystem
     mpi_start_detect_shared_fs
 
-    MPI_START_HOOKS_LOCAL=$MPI_START_PREFIX/../etc/mpi-start/mpi-start.hooks.local
+    MPI_START_HOOKS_LOCAL=$MPI_START_ETC/mpi-start.hooks.local
     mpi_start_run_pre_hook $MPI_START_HOOKS_LOCAL 1
 
     mpi_start_run_pre_hook $I2G_MPI_PRE_RUN_HOOK 1
@@ -323,11 +323,11 @@ mpi_start_post_run_hook_generic () {
     # determine local filesystem
     mpi_start_detect_shared_fs
 
-    for hook in $MPI_START_PREFIX/../etc/mpi-start/*.hook; do
+    for hook in $MPI_START_ETC/*.hook; do
         mpi_start_run_post_hook $hook
     done
 
-    MPI_START_HOOKS_LOCAL=$MPI_START_PREFIX/../etc/mpi-start/mpi-start.hooks.local
+    MPI_START_HOOKS_LOCAL=$MPI_START_ETC/mpi-start.hooks.local
     mpi_start_run_post_hook $MPI_START_HOOKS_LOCAL 1
 
     mpi_start_run_post_hook $I2G_MPI_POST_RUN_HOOK 1

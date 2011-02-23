@@ -74,7 +74,7 @@ slurm_mpiexec() {
     MPI_SPECIFIC_PARAMS=""
     I2G_MACHINEFILE_AND_NP=""
 
-    . $MPI_START_PREFIX/../etc/mpi-start/generic_mpiexec.sh
+    . $MPI_START_ETC/generic_mpiexec.sh
     generic_mpiexec
     err=$?
     return $err

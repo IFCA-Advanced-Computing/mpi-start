@@ -6,14 +6,14 @@
 # start an mpi job
 #
 mpi_exec () {
-    . $MPI_START_PREFIX/../etc/mpi-start/generic_mpiexec.sh
+    . $MPI_START_ETC/generic_mpiexec.sh
     generic_mpiexec
     return $?
 }
 
 
 mpi_start () {
-    . $MPI_START_PREFIX/../etc/mpi-start/generic_mpi_start.sh
+    . $MPI_START_ETC/generic_mpi_start.sh
     generic_mpi_start
     return $?
 }

@@ -41,7 +41,7 @@ shadow_mpi_start () {
 
     # source local MPI config 
     info_msg "load support for local MPI implementation : $I2G_MPI_FLAVOUR"
-    source $MPI_START_PREFIX/../etc/mpi-start/$I2G_MPI_FLAVOUR.mpi
+    source $MPI_START_ETC/$I2G_MPI_FLAVOUR.mpi
 
     # start local mpi implementation
     info_msg "call local MPI implementation"
