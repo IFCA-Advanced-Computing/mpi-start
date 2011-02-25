@@ -7,8 +7,7 @@
 #
 
 if test "x$MPI_START_MPI_PREFIX" = "x"  ; then    
-    # TODO: find correct path for mpich in SL5
-    export MPI_START_MPI_PREFIX=/opt/mpich2-1.0.4p1
+    export MPI_START_MPI_PREFIX=/usr
     debug_msg "use default mpi path: $MPI_START_MPI_PREFIX"
 fi
 

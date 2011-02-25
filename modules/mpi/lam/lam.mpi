@@ -6,7 +6,7 @@
 #
 
 if test "x$MPI_START_MPI_PREFIX" = "x"  ; then    
-    export MPI_START_MPI_PREFIX=/opt/lam-7.1.2
+    export MPI_START_MPI_PREFIX=/usr/lib64/lam
     debug_msg "use default mpi path: $MPI_START_MPI_PREFIX"
 fi
 
