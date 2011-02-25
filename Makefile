@@ -43,8 +43,8 @@ install: all
 	$(MAKE) -C docs install
 	$(MAKE) -C tests install 
 	mkdir -p $(DESTDIR)/etc/profile.d
-	echo "export I2G_MPI_START=$(DESTDIR)/$(BINPREFIX)/mpi-start" > $(DESTDIR)/etc/profile.d/mpi_start.sh
-	echo "setenv I2G_MPI_START $(DESTDIR)/$(BINPREFIX)/mpi-start" > $(DESTDIR)/etc/profile.d/mpi_start.csh
+	echo "export I2G_MPI_START=$(BINPREFIX)/mpi-start" > $(DESTDIR)/etc/profile.d/mpi_start.sh
+	echo "setenv I2G_MPI_START $(BINPREFIX)/mpi-start" > $(DESTDIR)/etc/profile.d/mpi_start.csh
 
 tarball:all
 	$(MAKE) install PREFIX="/" DESTDIR=`pwd` 
