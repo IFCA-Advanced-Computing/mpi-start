@@ -473,21 +473,17 @@ main() {
     MPI_MODULE_SUFFIX="_MODULES"
     MPI_VERSION_SUFFIX="_VERSION"
 
+    MPI_VERSION=
     if test "x$I2G_MPI_VERSION" != "x" ; then
-        # TODO: check this sed expression
-        debug_msg " check for user requested MPI version : $I2G_MPI_VERSION"
-        MPI_VERSION=`echo $I2G_MPI_VERSION | sed -e s /\\\\./__/g`
-        VALUE=`eval echo \\$${MPI_PREFIX}${MPI_TYPE}${US}${MPI_VERSION}${MPI_PATH_SUFFIX}`
-        if test "x$VALUE" != "x"  ; then
-            debug_msg " found user requested version"
-            export MPI_START_MPI_PREFIX=$VALUE
-        else
-            error_msg " cannot find user request MPI version"
-            dump_env
-            exit 1
-        fi
+        debug_msg " user requested MPI version : $I2G_MPI_VERSION"
+        MPI_VERSION=$I2G_MPI_VERSION
     else
         MPI_VERSION=`eval echo \\$${MPI_PREFIX}${MPI_TYPE}${MPI_VERSION_SUFFIX}`
+    fi
+
+    if test "x{$MPI_VERSION}" != "x" ; then
+        debug_msg " will check for specific MPI version : $MPI_VERSION"
+        MPI_VERSION=`echo $MPI_VERSION | sed -e s/\\\\./__/g`
     fi
 
     # FIXME: why there is I2G_<flavour>_PREFIX and MPI_<flavour>_PATH ?
