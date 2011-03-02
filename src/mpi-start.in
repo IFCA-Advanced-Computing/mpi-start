@@ -512,7 +512,7 @@ main() {
         fi
     else
         debug_msg "use user provided prefix : $I2G_PREFIX"
-        $MPI_START_MPI_PREFIX=$I2G_PREFIX
+        MPI_START_MPI_PREFIX=$I2G_PREFIX
     fi
     export MPI_START_MPI_PREFIX
     
