@@ -49,20 +49,6 @@ testCommandLineVersion() {
     assertEquals 0 $st
 }
 
-testChmodApp() {
-    unset I2G_MPI_TYPE
-    myapp=`$MYMKTEMP`
-    cat > $myapp << EOF
-#!/bin/bash
-echo \${I2G_MPI_TYPE}
-EOF
-    output=`$I2G_MPI_START -t dummy -- $myapp`
-    st=$?
-    assertEquals "dummy" "$output"
-    assertEquals 0 $st
-    rm -f $myapp
-}
-
 testCommandLineTypeAndApp() {
     unset I2G_MPI_TYPE
     myapp=`$MYMKTEMP`
@@ -185,7 +171,6 @@ EOF
     rm -rf $myerr
 }
 
-
 testInOutputErrorFile() {
     myapp=`$MYMKTEMP`
     cat > $myapp << EOF
@@ -213,4 +198,17 @@ EOF
     rm -f $myout
 }
 
+testChmodApp() {
+    unset I2G_MPI_TYPE
+    myapp=`$MYMKTEMP`
+    cat > $myapp << EOF
+#!/bin/bash
+echo \${I2G_MPI_TYPE}
+EOF
+    output=`$I2G_MPI_START -t dummy -- $myapp`
+    st=$?
+    assertEquals "dummy" "$output"
+    assertEquals 0 $st
+    rm -f $myapp
+}
 . $SHUNIT2

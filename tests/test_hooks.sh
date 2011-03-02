@@ -15,7 +15,7 @@ setUp () {
     export MPI_START_SHARED_FS=1
 }
 
-testPreHook () {
+testPreHookOK () {
     myhook=`$MYMKTEMP`
     cat > $myhook << EOF
 #!/bin/sh
@@ -31,7 +31,7 @@ EOF
     rm -f $myhook
 }
 
-testPostHook () {
+testPostHookOK () {
     myhook=`$MYMKTEMP`
     cat > $myhook << EOF
 #!/bin/sh
