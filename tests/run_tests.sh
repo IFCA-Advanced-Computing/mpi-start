@@ -19,9 +19,10 @@ DOWNLOAD_MY_SHUNIT=1
 REMOVE_MY_SHUNIT=0
 
 # tests to run
+RUN_UNIT_TESTS=1
 RUN_BASIC_TESTS=0
 RUN_HOOK_TESTS=0
-RUN_SCH_TESTS=1
+RUN_SCH_TESTS=0
 # if running these tests, ensure you have proper environment loaded!
 RUN_OMP_TESTS=0
 RUN_MPICH2_TESTS=0
@@ -73,6 +74,12 @@ echo
 # Run all the tests in the directory
 #
 exitcode=0
+if test "x${RUN_UNIT_TESTS}" = "x1" ; then
+    echo "*******************"
+    echo "    Unit  Tests"
+    echo "*******************"
+    ./test_unit.sh || exitcode=1
+fi
 if test "x${RUN_BASIC_TESTS}" = "x1" ; then
     echo "*******************"
     echo "    Basic Tests"
