@@ -4,5 +4,5 @@ clean:
 
 install:
 	mkdir -p $(DESTDIR)/$(MODULEPREFIX)
-	install -m 0644 slurm.scheduler $(DESTDIR)/$(MODULEPREFIX)/
+	install -m 0755 slurm.scheduler $(DESTDIR)/$(MODULEPREFIX)/
 

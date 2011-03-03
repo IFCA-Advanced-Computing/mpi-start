@@ -336,11 +336,11 @@ check_options() {
     # set global internal variables 
     MPI_START_PREFIX=`dirname $I2G_MPI_START`
     # TODO! allow several configuration directories/files
-    MPI_START_ETC="$MPI_START_PREFIX/../share/mpi-start"
+    MPI_START_ETC="$MPI_START_PREFIX/../etc/mpi-start"
     if test ! -d "$MPI_START_ETC" ; then
-        MPI_START_ETC="$MPI_START_PREFIX/../etc/mpi-start"
+        MPI_START_ETC="/etc/mpi-start"
         if test ! -d "$MPI_START_ETC" ; then
-            MPI_START_ETC="/etc/mpi-start"
+            MPI_START_ETC="$MPI_START_PREFIX/../share/mpi-start"
             if test ! -d "$MPI_START_ETC" ; then
                 error_msg "unable to find mpi-start modules"
                 dump_env

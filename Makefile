@@ -9,13 +9,13 @@ docDIR=share/doc/mpi-start-$(VERSION)
 shareDIR=share/mpi-start/
 BINPREFIX=$(PREFIX)/$(binDIR)
 DOCPREFIX=$(PREFIX)/$(docDIR)
-MODULEPREFIX=$(PREFIX)/$(shareDIR)
+#MODULEPREFIX=$(PREFIX)/$(shareDIR)
 ifeq ("$(PREFIX)","")
 	BINPREFIX=/usr/$(binDIR)
 	DOCPREFIX=/usr/$(docDIR)
-	MODULEPREFIX=/usr/$(shareDIR)
+	#MODULEPREFIX=/usr/$(shareDIR)
 endif
-ETCPREFIX=$(PREFIX)/etc/mpi-start
+MODULEPREFIX=$(PREFIX)/etc/mpi-start
 
 all:
 	$(MAKE) -C src all 
@@ -50,6 +50,9 @@ install: all
 	mkdir -p $(DESTDIR)/etc/profile.d
 	echo "export I2G_MPI_START=$(BINPREFIX)/mpi-start" > $(DESTDIR)/etc/profile.d/mpi_start.sh
 	echo "setenv I2G_MPI_START $(BINPREFIX)/mpi-start" > $(DESTDIR)/etc/profile.d/mpi_start.csh
+	chmod +x $(DESTDIR)/etc/profile.d/mpi_start.sh
+	chmod +x $(DESTDIR)/etc/profile.d/mpi_start.csh
+
 
 tarball:all
 	$(MAKE) install PREFIX="/" DESTDIR=`pwd` 
