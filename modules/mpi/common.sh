@@ -1,3 +1,4 @@
+#!/bin/bash
 
 #======================================================================
 # Look for the appropriate mpirun/mpiexec  
