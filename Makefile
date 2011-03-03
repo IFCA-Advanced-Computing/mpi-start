@@ -6,11 +6,14 @@ NAME_PREFIX=emi
 USRPREFIX=
 binDIR=bin
 docDIR=share/doc/mpi-start-$(VERSION)
+shareDIR=share/mpi-start/
 BINPREFIX=$(PREFIX)/$(binDIR)
 DOCPREFIX=$(PREFIX)/$(docDIR)
+MODULEPREFIX=$(PREFIX)/$(shareDIR)
 ifeq ("$(PREFIX)","")
 	BINPREFIX=/usr/$(binDIR)
 	DOCPREFIX=/usr/$(docDIR)
+	MODULEPREFIX=/usr/$(shareDIR)
 endif
 ETCPREFIX=$(PREFIX)/etc/mpi-start
 
@@ -34,9 +37,11 @@ distclean:clean
 
 install: all
 	mkdir -p $(DESTDIR)/$(BINPREFIX)
-	mkdir -p $(DESTDIR)/$(ETCPREFIX)
+	#mkdir -p $(DESTDIR)/$(ETCPREFIX)
+	mkdir -p $(DESTDIR)/$(MODULEPREFIX)
+	mkdir -p $(DESTDIR)/$(DOCPREFIX)
 	mkdir -p $(DESTDIR)/etc
-	install COPYING $(DESTDIR)/$(ETCPREFIX)
+	install -m 0644 README $(DESTDIR)/$(DOCPREFIX)
 	$(MAKE) -C src install
 	$(MAKE) -C modules install
 	$(MAKE) -C templates install
@@ -66,4 +71,6 @@ export PREFIX
 export DESTDIR
 export ETCPREFIX
 export BINPREFIX
+export DOCPREFIX
+export MODULEPREFIX
 

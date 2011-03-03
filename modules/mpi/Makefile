@@ -17,10 +17,10 @@ clean:
 	$(MAKE) -C dummy clean
 
 install:
-	mkdir -p $(DESTDIR)/$(ETCPREFIX)
-	install -m 0644 generic_mpiexec.sh $(DESTDIR)/$(ETCPREFIX)/
-	install -m 0644 generic_mpi_start.sh $(DESTDIR)/$(ETCPREFIX)/
-	install -m 0644 common.sh $(DESTDIR)/$(ETCPREFIX)/
+	mkdir -p $(DESTDIR)/$(MODULEPREFIX)
+	install -m 0644 generic_mpiexec.sh $(DESTDIR)/$(MODULEPREFIX)/
+	install -m 0644 generic_mpi_start.sh $(DESTDIR)/$(MODULEPREFIX)/
+	install -m 0644 common.sh $(DESTDIR)/$(MODULEPREFIX)/
 	$(MAKE) -C openmpi install
 	$(MAKE) -C pacx install
 	$(MAKE) -C mpich2 install
