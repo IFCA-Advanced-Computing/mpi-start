@@ -1,4 +1,3 @@
-#!/bin/sh
 #
 # Copyright (c) 2006-2007 High Performance Computing Center Stuttgart, 
 #                         University of Stuttgart.  All rights reserved. 
