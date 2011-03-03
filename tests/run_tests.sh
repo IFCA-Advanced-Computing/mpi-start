@@ -25,10 +25,10 @@ RUN_HOOK_TESTS=1
 RUN_SCH_TESTS=1
 # if running these tests, ensure you have proper environment loaded!
 RUN_OMP_TESTS=1
-RUN_MPICH2_TESTS=1
-RUN_MPICH_TESTS=1
-RUN_OPENMPI_TESTS=1
-RUN_LAM_TESTS=1
+RUN_MPICH2_TESTS=0
+RUN_MPICH_TESTS=0
+RUN_OPENMPI_TESTS=0
+RUN_LAM_TESTS=0
 
 # Non SL5 installation of mpi (ubuntu)
 export MPI_MPICH_PATH=/usr/lib/mpich
