@@ -50,8 +50,6 @@ install: all
 	mkdir -p $(DESTDIR)/etc/profile.d
 	echo "export I2G_MPI_START=$(BINPREFIX)/mpi-start" > $(DESTDIR)/etc/profile.d/mpi_start.sh
 	echo "setenv I2G_MPI_START $(BINPREFIX)/mpi-start" > $(DESTDIR)/etc/profile.d/mpi_start.csh
-	chmod +x $(DESTDIR)/etc/profile.d/mpi_start.sh
-	chmod +x $(DESTDIR)/etc/profile.d/mpi_start.csh
 
 
 tarball:all
