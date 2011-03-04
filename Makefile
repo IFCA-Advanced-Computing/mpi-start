@@ -2,7 +2,7 @@
 VERSION=$(shell cat VERSION)
 DESTDIR=
 PREFIX=
-NAME_PREFIX=emi
+NAME_PREFIX=
 USRPREFIX=
 binDIR=bin
 docDIR=share/doc/mpi-start-$(VERSION)
@@ -42,30 +42,47 @@ install: all
 	mkdir -p $(DESTDIR)/$(DOCPREFIX)
 	mkdir -p $(DESTDIR)/etc
 	install -m 0644 README $(DESTDIR)/$(DOCPREFIX)
+	install -m 0644 ChangeLog $(DESTDIR)/$(DOCPREFIX)
 	$(MAKE) -C src install
 	$(MAKE) -C modules install
 	$(MAKE) -C templates install
 	$(MAKE) -C docs install
 	$(MAKE) -C tests install 
 	mkdir -p $(DESTDIR)/etc/profile.d
-	echo "export I2G_MPI_START=$(BINPREFIX)/mpi-start" > $(DESTDIR)/etc/profile.d/mpi_start.sh
-	echo "setenv I2G_MPI_START $(BINPREFIX)/mpi-start" > $(DESTDIR)/etc/profile.d/mpi_start.csh
-
+	echo "export I2G_MPI_START=$(BINPREFIX)/mpi-start" > \
+					$(DESTDIR)/etc/profile.d/mpi_start.sh
+	echo "setenv I2G_MPI_START $(BINPREFIX)/mpi-start" > \
+					$(DESTDIR)/etc/profile.d/mpi_start.csh
 
 tarball:all
 	$(MAKE) install PREFIX="/" DESTDIR=`pwd` 
 	tar czvf mpi-start-$(VERSION).tar.gz bin/* etc/*
 
+DISTFILES=src\
+		  modules\
+		  docs\
+		  templates \
+		  tests \
+          ChangeLog \
+          Makefile \
+		  README \
+		  VERSION
+
 dist:	
-	rm -rf $(NAME_PREFIX)-mpi-start-$(VERSION)
-	hg archive $(NAME_PREFIX)-mpi-start-$(VERSION)
-	sed -e "s/@NAME_PREFIX@/$(NAME_PREFIX)-/" -e "s/@VERSION@/$(VERSION)/" mpi-start.spec.in > $(NAME_PREFIX)-mpi-start-$(VERSION)/$(NAME_PREFIX)-mpi-start-$(VERSION).spec
-	tar cvzf $(NAME_PREFIX)-mpi-start-$(VERSION).tar.gz $(NAME_PREFIX)-mpi-start-$(VERSION)
-	rm -rf $(NAME_PREFIX)-mpi-start-$(VERSION)
+	rm -rf $(NAME_PREFIX)mpi-start-$(VERSION)
+	# what if hg is not here!
+	# hg archive $(NAME_PREFIX)mpi-start-$(VERSION)
+	mkdir $(NAME_PREFIX)mpi-start-$(VERSION)
+	cp -a $(DISTFILES) $(NAME_PREFIX)mpi-start-$(VERSION)
+	sed -e "s/@NAME_PREFIX@/$(NAME_PREFIX)/" \
+		-e "s/@VERSION@/$(VERSION)/" mpi-start.spec.in \
+		> $(NAME_PREFIX)mpi-start-$(VERSION)/$(NAME_PREFIX)mpi-start-$(VERSION).spec
+	tar cvzf $(NAME_PREFIX)mpi-start-$(VERSION).tar.gz $(NAME_PREFIX)mpi-start-$(VERSION)
+	rm -rf $(NAME_PREFIX)mpi-start-$(VERSION)
 
 rpm: dist 
 	mkdir -p rpm/SOURCES rpm/SRPMS rpm/SPECS rpm/BUILD rpm/RPMS
-	rpmbuild --define "_topdir `pwd`/rpm" --define "mpi-start-prefix $(PREFIX)" -ta $(NAME_PREFIX)-mpi-start-$(VERSION).tar.gz
+	rpmbuild --define "_topdir `pwd`/rpm" -ta $(NAME_PREFIX)mpi-start-$(VERSION).tar.gz
 
 export VERSION
 export PREFIX

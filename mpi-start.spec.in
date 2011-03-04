@@ -3,20 +3,17 @@
 #                         University of Stuttgart.  All rights reserved.
 #
 
-# set default values for I2G
-%{!?mpi_start_prefix: %define mpi_start_prefix /opt/i2g}
-
 Summary: A generic startup mechanism for different MPI installation in a cluster/grid.
 Name: @NAME_PREFIX@mpi-start
 Version: @VERSION@
 Release: 1
-License: other
-Group: Application
+License: GPLv2
+Group: System Environment/Libraries
 Source: @NAME_PREFIX@mpi-start-@VERSION@.tar.gz
 URL: http://devel.ifca.es/mpi-start/
 Packager: enolfc@ifca.unican.es
 BuildRoot: %{_tmppath}/%{name}-%{version}-root
-BuildArch:  noarch
+BuildArch: noarch
 
 %description
 A generic startup mechanism for different MPI installation in a cluster/grid.
@@ -26,16 +23,24 @@ A generic startup mechanism for different MPI installation in a cluster/grid.
 
 %build
 cd $RPM_BUILD_DIR/@NAME_PREFIX@mpi-start-@VERSION@
-%{__make} PREFIX=%{mpi_start_prefix}
+%{__make}
 
 %install
 cd $RPM_BUILD_DIR/@NAME_PREFIX@mpi-start-@VERSION@
-%{__make} DESTDIR=$RPM_BUILD_ROOT PREFIX=%{mpi_start_prefix} install
+%{__make} DESTDIR=$RPM_BUILD_ROOT install
 
 %clean
 rm -rf $RPM_BUILD_ROOT/*
 
 %files
 %defattr(-,root,root,-)
-%{mpi_start_prefix}/
-/etc/profile.d
+/usr/bin/mpi-start
+/etc/mpi-start/
+/usr/share/doc/mpi-start-%{version}/
+%config(noreplace) /etc/profile.d/mpi_start.sh
+%config(noreplace) /etc/profile.d/mpi_start.csh
+
+%changelog
+* Fri Mar 4 2011 <enolfc _AT_ ifca.unican.es> - %{version}-%{release}
+- Fedora guidelines compliant package.
+- See ChangeLog at doc directory.
