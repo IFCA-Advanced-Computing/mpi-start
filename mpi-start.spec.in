@@ -34,11 +34,11 @@ rm -rf $RPM_BUILD_ROOT/*
 
 %files
 %defattr(-,root,root,-)
-/usr/bin/mpi-start
-/etc/mpi-start/
-/usr/share/doc/mpi-start-%{version}/
-%config(noreplace) /etc/profile.d/mpi_start.sh
-%config(noreplace) /etc/profile.d/mpi_start.csh
+%{_bindir}/mpi-start
+%{_sysconfdir}/mpi-start/
+%{_datadir}/doc/mpi-start-%{version}/
+%config(noreplace) %{_sysconfdir}/profile.d/mpi_start.sh
+%config(noreplace) %{_sysconfdir}/profile.d/mpi_start.csh
 
 %changelog
 * Fri Mar 4 2011 <enolfc _AT_ ifca.unican.es> - @VERSION@-1
