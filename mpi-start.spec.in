@@ -3,7 +3,7 @@
 #                         University of Stuttgart.  All rights reserved.
 #
 
-Summary: A generic startup mechanism for different MPI installation in a cluster/grid.
+Summary: A generic startup mechanism for different MPI installation in a cluster/grid
 Name: @NAME_PREFIX@mpi-start
 Version: @VERSION@
 Release: 1
