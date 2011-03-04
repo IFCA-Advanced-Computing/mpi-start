@@ -59,14 +59,14 @@ tarball:all
 	tar czvf mpi-start-$(VERSION).tar.gz bin/* etc/*
 
 DISTFILES=src\
-		  modules\
-		  docs\
-		  templates \
-		  tests \
-          ChangeLog \
-          Makefile \
-		  README \
-		  VERSION
+modules\
+docs\
+templates \
+tests \
+ChangeLog \
+Makefile \
+README \
+VERSION
 
 dist:	
 	rm -rf $(NAME_PREFIX)mpi-start-$(VERSION)
@@ -76,7 +76,7 @@ dist:
 	cp -a $(DISTFILES) $(NAME_PREFIX)mpi-start-$(VERSION)
 	sed -e "s/@NAME_PREFIX@/$(NAME_PREFIX)/" \
 		-e "s/@VERSION@/$(VERSION)/" mpi-start.spec.in \
-		> $(NAME_PREFIX)mpi-start-$(VERSION)/$(NAME_PREFIX)mpi-start-$(VERSION).spec
+		> $(NAME_PREFIX)mpi-start-$(VERSION)/$(NAME_PREFIX)mpi-start.spec
 	tar cvzf $(NAME_PREFIX)mpi-start-$(VERSION).tar.gz $(NAME_PREFIX)mpi-start-$(VERSION)
 	rm -rf $(NAME_PREFIX)mpi-start-$(VERSION)
 
