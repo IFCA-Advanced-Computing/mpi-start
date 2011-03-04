@@ -1,0 +1,134 @@
+#!/bin/sh
+
+# Configure script for mpi-start.
+# not very fancy stuff
+name_prefix=""
+VERSION=`cat VERSION`
+
+PACKAGE='${name_prefix}mpi-start-${VERSION}'
+
+prefix=/usr/local
+exec_prefix='${prefix}'
+bindir='${exec_prefix}/bin'
+datadir='${prefix}/share'
+docdir='${datadir}/doc/${PACKAGE}'
+sysconfdir='${prefix}/etc'
+# modules are in $sysconfdir/mpi-start, should be moved to $datadir/mpi-start?
+moduledir='${sysconfdir}/${name_prefix}mpi-start'
+
+vars='VERSION
+PACKAGE
+name_prefix
+prefix
+exec_prefix
+bindir
+datadir
+docdir
+sysconfdir
+moduledir
+'
+
+# code taken from other configures...
+prev=
+dashdash=
+for option ;
+do
+    if test -n "$prev"; then
+        eval $prev=\$option
+        prev=
+        continue
+    fi
+    case $option in
+        *=*) optarg=`expr "X$option" : '[^=]*=\(.*\)'` ;;
+        *)   optarg=yes ;;
+    esac
+    case $option in
+        -h | -help | --help)
+            show_help ;;
+        -name_prefix | --name_prefix)
+            prev=name_prefix ;;
+        -name_prefix=* | --name_prefix=*)
+            name_prefix=$optarg ;;
+        -prefix | --prefix)
+            prev=prefix ;;
+        -prefix=* | --prefix=*)
+            prefix=$optarg ;;
+        -exec_prefix | --exec_prefix)
+            prev=exec_prefix ;;
+        -exec_prefix=* | --exec_prefix=*)
+            exec_prefix=$optarg ;;
+        -bindir | --bindir)
+            prev=bindir ;;
+        -bindir=*| --bindir=*)
+            bindir=$optarg ;;
+        -datadir | --datadir)
+            prev=datadir ;;
+        -datadir=* | --datadir=*)
+            datadir=$optarg ;;
+        -docdir | --docdir)
+            prev=docdir ;;
+        -docdir=* | --docdir=*)
+            docdir=$optarg ;;
+        -sysconfdir | --sysconfdir)
+            prev=sysconfdir ;;
+        -sysconfdir=* | --sysconfdir=*)
+            sysconfdir=$optarg ;;
+    esac
+done
+
+# Evaluation!
+#for v in $vars; do
+#    value=`eval echo \\$${v}`
+#    eval $v=$value
+#    echo "VALUE of $v: `eval echo \\$${v}`"
+#done
+
+files='Makefile
+/src/Makefile
+/docs/Makefile
+/templates/Makefile
+/tests/Makefile
+/modules/Makefile
+/modules/hooks/Makefile
+/modules/hooks/file-dist/Makefile
+/modules/mpi/Makefile
+/modules/mpi/dummy/Makefile
+/modules/mpi/generic/Makefile
+/modules/mpi/lam/Makefile
+/modules/mpi/mpich/Makefile
+/modules/mpi/mpich2/Makefile
+/modules/mpi/openmpi/ile
+/modules/mpi/pacx/Makefile
+/modules/schedulers/Makefile
+/modules/schedulers/condor/Makefile
+/modules/schedulers/lsf/Makefile
+/modules/schedulers/pbs/Makefile
+/modules/schedulers/sge/Makefile
+/modules/schedulers/slurm/Makefile'
+
+for f in $files ; do
+    cat > $f << EOF
+# Makefile automatically generated from Makefile.in by configure script
+#
+EOF
+    for v in $vars;  do
+        echo "$v=" >> $f
+    done
+    cat $f.in >> $f
+done
+        
+## Subsitution in makefile
+#sed -e "s/@name_prefix@/${name_prefix}/" \
+#    -e "s/@VERSION@/${VERSION}/" \
+#    -e "s#@prefix@#${prefix}#" \
+#    -e "s#@exec_prefix@#${exec_prefix}#" \
+#    -e "s#@bindir@#${bindir}#" \
+#    -e "s#@datadir@#${datadir}#" \
+#    -e "s#@docdir@#${docdir}#" \
+#    -e "s#@moduledir@#${moduledir}#" \
+#    -e "s#@sysconfdir@#${sysconfdir}#" \
+#    Makefile.in > Makefile
+
+
+
+
