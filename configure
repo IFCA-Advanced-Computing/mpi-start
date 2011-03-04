@@ -26,7 +26,22 @@ datadir
 docdir
 sysconfdir
 moduledir
+maintainerclean_files
 '
+
+show_help () {
+    echo "$0 [options]"
+    echo "options:"
+    echo "  --name_prefix=NAME_PREFIX"
+    echo "  --prefix=PREFIX"
+    echo "  --exec_prefix=PREFIX"
+    echo "  --bindir=BINDIR"
+    echo "  --docdir=DOCDIR"
+    echo "  --datadir=DATADIR"
+    echo "  --libdir=DATADIR"
+    echo "  --sysconfdir=DATADIR"
+    exit 0
+}
 
 # code taken from other configures...
 prev=
@@ -65,6 +80,10 @@ do
             prev=datadir ;;
         -datadir=* | --datadir=*)
             datadir=$optarg ;;
+        -libdir | --libdir)
+            prev=libdir ;;
+        -libdir=* | --libdir=*)
+            libdir=$optarg ;;
         -docdir | --docdir)
             prev=docdir ;;
         -docdir=* | --docdir=*)
@@ -76,59 +95,41 @@ do
     esac
 done
 
-# Evaluation!
-#for v in $vars; do
-#    value=`eval echo \\$${v}`
-#    eval $v=$value
-#    echo "VALUE of $v: `eval echo \\$${v}`"
-#done
-
 files='Makefile
-/src/Makefile
-/docs/Makefile
-/templates/Makefile
-/tests/Makefile
-/modules/Makefile
-/modules/hooks/Makefile
-/modules/hooks/file-dist/Makefile
-/modules/mpi/Makefile
-/modules/mpi/dummy/Makefile
-/modules/mpi/generic/Makefile
-/modules/mpi/lam/Makefile
-/modules/mpi/mpich/Makefile
-/modules/mpi/mpich2/Makefile
-/modules/mpi/openmpi/ile
-/modules/mpi/pacx/Makefile
-/modules/schedulers/Makefile
-/modules/schedulers/condor/Makefile
-/modules/schedulers/lsf/Makefile
-/modules/schedulers/pbs/Makefile
-/modules/schedulers/sge/Makefile
-/modules/schedulers/slurm/Makefile'
+src/Makefile
+docs/Makefile
+templates/Makefile
+tests/Makefile
+modules/Makefile
+modules/hooks/Makefile
+modules/hooks/file-dist/Makefile
+modules/mpi/Makefile
+modules/mpi/dummy/Makefile
+modules/mpi/generic/Makefile
+modules/mpi/lam/Makefile
+modules/mpi/mpich/Makefile
+modules/mpi/mpich2/Makefile
+modules/mpi/openmpi/Makefile
+modules/mpi/pacx/Makefile
+modules/schedulers/Makefile
+modules/schedulers/condor/Makefile
+modules/schedulers/lsf/Makefile
+modules/schedulers/pbs/Makefile
+modules/schedulers/sge/Makefile
+modules/schedulers/slurm/Makefile'
+
+maintainerclean_files="$files"
 
 for f in $files ; do
     cat > $f << EOF
+#
+# DO NOT EDIT!
 # Makefile automatically generated from Makefile.in by configure script
 #
+
 EOF
     for v in $vars;  do
-        echo "$v=" >> $f
+        echo "$v=`eval echo \\$${v}`" >> $f
     done
     cat $f.in >> $f
 done
-        
-## Subsitution in makefile
-#sed -e "s/@name_prefix@/${name_prefix}/" \
-#    -e "s/@VERSION@/${VERSION}/" \
-#    -e "s#@prefix@#${prefix}#" \
-#    -e "s#@exec_prefix@#${exec_prefix}#" \
-#    -e "s#@bindir@#${bindir}#" \
-#    -e "s#@datadir@#${datadir}#" \
-#    -e "s#@docdir@#${docdir}#" \
-#    -e "s#@moduledir@#${moduledir}#" \
-#    -e "s#@sysconfdir@#${sysconfdir}#" \
-#    Makefile.in > Makefile
-
-
-
-

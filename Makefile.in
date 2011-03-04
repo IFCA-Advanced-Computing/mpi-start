@@ -1,15 +1,5 @@
-# Makefile for MPI_START
-VERSION=@VERSION@
-destdir=
-prefix=@prefix@
-exec_prefix=@exec_prefix@
-bindir=@bindir@
-datadir=@datadir@
-docdir=@docdir@
-moduledir=@moduledir@
-sysconfdir=@sysconfdir@
-name_prefix=@name_prefix@
 
+# Main Makefile for MPI_START
 all:
 	$(MAKE) -C src all 
 	$(MAKE) -C modules all
@@ -58,8 +48,9 @@ modules\
 docs\
 templates \
 tests \
+configure \
 ChangeLog \
-Makefile \
+Makefile.in \
 README \
 VERSION
 
@@ -69,7 +60,7 @@ dist:
 	# hg archive $(name_prefix)mpi-start-$(VERSION)
 	mkdir $(name_prefix)mpi-start-$(VERSION)
 	cp -a $(DISTFILES) $(name_prefix)mpi-start-$(VERSION)
-	sed -e "s/@name_prefix@/$(name_prefix)/" \
+	sed -e "s/@NAME_PREFIX@/$(name_prefix)/" \
 		-e "s/@VERSION@/$(VERSION)/" mpi-start.spec.in \
 		> $(name_prefix)mpi-start-$(VERSION)/$(name_prefix)mpi-start.spec
 	tar cvzf $(name_prefix)mpi-start-$(VERSION).tar.gz $(name_prefix)mpi-start-$(VERSION)
@@ -78,6 +69,10 @@ dist:
 rpm: dist 
 	mkdir -p rpm/SOURCES rpm/SRPMS rpm/SPECS rpm/BUILD rpm/RPMS
 	rpmbuild --define "_topdir `pwd`/rpm" -ta $(name_prefix)mpi-start-$(VERSION).tar.gz
+
+maintainer-clean: clean
+	rm -rf rpm
+	rm -f $(maintainerclean_files)
 
 export VERSION
 export prefix

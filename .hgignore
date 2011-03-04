@@ -2,3 +2,4 @@ build/*
 src/mpi-start
 bin/*
 etc/*
+Makefile
