@@ -1,3 +1,6 @@
+2011-03-04 Enol Fernández <enolfc _AT_ ifca.unican.es> - 1.0.4
+	* New build procedure.
+
 2011-02-23 Enol Fernández <enolfc _AT_ ifca.unican.es> - 1.0.4
 	* Fixed bug #29. 
 	* Added unit testing for mpi-start main source code. 
