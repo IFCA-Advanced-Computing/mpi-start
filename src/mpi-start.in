@@ -17,7 +17,7 @@ fi
 # Cleans up temporary files upon finishing execution 
 #======================================================================
 clean_up () {
-    if test "xI2G_MPI_START_KEEP_FILES" != "x1"; then
+    if test "xI2G_MPI_START_KEEP_FILES" = "x1"; then
         exit
     fi
     debug_msg "Cleaning up mpi-start temporary files."
