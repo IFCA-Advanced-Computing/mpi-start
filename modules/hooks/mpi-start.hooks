@@ -66,6 +66,8 @@ mpi_start_detect_shared_fs() {
                 SYM_LINK=`stat -c "%N" $CUR_DIR`
                 debug_msg "found symbolic link : $SYM_LINK "
                 CUR_DIR=`stat $CUR_DIR | grep File | awk '{ print $4 }' | tr -d \\\047 | tr -d \\\140 `
+                # Remove possible trailing slash, that may lead to not find the proper mount point
+                CUR_DIR=${CUR_DIR%"/"}
             fi
 
             MOUNT_POINT_INDEX=1
