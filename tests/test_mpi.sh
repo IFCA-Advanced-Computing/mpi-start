@@ -5,6 +5,12 @@
 #
 
 oneTimeSetUp () {
+    TYPE=`echo $I2G_MPI_TYPE | tr '[:lower:]' '[:upper:]'`
+    eval cc="\${MPI_${TYPE}_MPICC}"
+    if test "x$cc" != "x" ; then
+        export MPICC=$cc
+    fi
+    echo "Using $MPICC as compiler!"
     export MPI_TEST_DIR=`$MYMKTEMP -d`
     export MPI_SRC_CODE=$MPI_TEST_DIR/test.c
     cat > $MPI_SRC_CODE << EOF
