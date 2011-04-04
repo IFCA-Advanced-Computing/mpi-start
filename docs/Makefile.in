@@ -1,9 +1,11 @@
 
-all: mpi-start.tex
+all: mpi-start.pdf
+
+mpi-start.pdf: mpi-start.tex
 	pdflatex mpi-start
 	pdflatex mpi-start
 
-mpi-start.tex:
+mpi-start.tex: mpi-start.tex.in
 	sed -e "s/@VERSION@/$(VERSION)/" mpi-start.tex.in \
 		> mpi-start.tex
 
