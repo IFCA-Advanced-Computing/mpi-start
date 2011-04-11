@@ -1,5 +1,4 @@
 # Makefile for MPI_START
-
 all:
 	sed -e s/@VERSION@/$(VERSION)/  < mpi-start.in > mpi-start 
 	chmod 0755 mpi-start 
@@ -8,6 +7,8 @@ clean:
 	rm -f mpi-start
 
 install:
-	install -m 0755 mpi-start $(DESTDIR)/$(BINPREFIX)
-#	install -m 0755 mpi-sh $(DESTDIR)/$(BINPREFIX)
+	echo $(prefix)
+	echo $(exec_prefix)
+	install -m 0755 mpi-start $(destdir)/$(bindir)/
+#	install -m 0755 mpi-sh $(destdir)/$(bindir)
 

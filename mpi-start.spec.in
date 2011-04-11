@@ -11,7 +11,6 @@ License: GPLv2
 Group: System Environment/Libraries
 Source: @NAME_PREFIX@mpi-start-@VERSION@.tar.gz
 URL: http://devel.ifca.es/mpi-start/
-Packager: enolfc@ifca.unican.es
 BuildRoot: %{_tmppath}/%{name}-%{version}-root
 BuildArch: noarch
 
@@ -23,24 +22,26 @@ A generic startup mechanism for different MPI installation in a cluster/grid.
 
 %build
 cd $RPM_BUILD_DIR/@NAME_PREFIX@mpi-start-@VERSION@
+./configure --prefix=%{_prefix} --sysconfdir=%{_sysconfdir} --datadir=%{_datadir} --libdir=%{_libdir}
 %{__make}
 
 %install
+rm -rf $RPM_BUILD_ROOT/*
 cd $RPM_BUILD_DIR/@NAME_PREFIX@mpi-start-@VERSION@
-%{__make} DESTDIR=$RPM_BUILD_ROOT install
+%{__make} destdir=$RPM_BUILD_ROOT install
 
 %clean
 rm -rf $RPM_BUILD_ROOT/*
 
 %files
 %defattr(-,root,root,-)
-/usr/bin/mpi-start
-/etc/mpi-start/
-/usr/share/doc/mpi-start-%{version}/
-%config(noreplace) /etc/profile.d/mpi_start.sh
-%config(noreplace) /etc/profile.d/mpi_start.csh
+%{_bindir}/mpi-start
+%{_sysconfdir}/mpi-start/
+%{_datadir}/doc/mpi-start-%{version}/
+%config(noreplace) %{_sysconfdir}/profile.d/mpi_start.sh
+%config(noreplace) %{_sysconfdir}/profile.d/mpi_start.csh
 
 %changelog
-* Fri Mar 4 2011 <enolfc _AT_ ifca.unican.es> - %{version}-%{release}
+* Fri Mar 4 2011 <enolfc _AT_ ifca.unican.es> - @VERSION@-1
 - Fedora guidelines compliant package.
 - See ChangeLog at doc directory.
