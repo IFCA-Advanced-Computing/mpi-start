@@ -15,7 +15,7 @@ rm -f $TMPFILE
 
 
 
-DOWNLOAD_MY_SHUNIT=1
+DOWNLOAD_MY_SHUNIT=0
 REMOVE_MY_SHUNIT=0
 
 # tests to run
@@ -38,6 +38,7 @@ export MPI_LAM_MPIRUN=mpirun.lam
 #
 # Check environment variables
 #
+export SHUNIT2=$PWD/shunit2
 if test "x${SHUNIT2}" = "x" ; then
     if test "x${DOWNLOAD_MY_SHUNIT}" = "x1"; then
         wget -q http://devel.ifca.es/~enol/depot/shunit2 -O shunit2 --no-check-certificate 
