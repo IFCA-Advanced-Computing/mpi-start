@@ -3,13 +3,10 @@
 \usepackage{tabularx}
 
 \title{MPI-Start}
-\Subtitle{v @VERSION@}
-\author{Enol Fernández}
-%\DocIdentifier{}
-\DocVersion{@VERSION@}
+\author{E. Fernández}
+\DocVersion{1.0}
+\EMICompVersion{@VERSION@}
 \Date{\today}
-\DocStatus{DRAFT}
-\DocumentLink{http://devel.ifca.es/mpi-start}
 
 \Abstract{
 MPI-Start is a set of scripts to close the gap between the workload management
@@ -19,6 +16,8 @@ applications on heterogeneous Grid sites.
 }
 
 \begin{document}
+
+\input{copyright}
 
 %% Uncomment to insert and modify the suggested sections in your document. 
 \tableofcontents
