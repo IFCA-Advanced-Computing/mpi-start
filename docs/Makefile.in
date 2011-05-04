@@ -1,5 +1,8 @@
 
-all: mpi-start.pdf
+# all: mpi-start.pdf
+all: 
+
+docs: mpi-start.pdf
 
 mpi-start.pdf: mpi-start.tex
 	pdflatex mpi-start
