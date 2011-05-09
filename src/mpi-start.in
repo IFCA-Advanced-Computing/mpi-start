@@ -369,15 +369,29 @@ check_options() {
 linux_core_detector() {
     MPI_START_CPUSOCKETS=`cat /proc/cpuinfo | grep "physical id" | sort -u | wc -l`
     if test $? -ne 0 ; then
-        warn_msg "Unable to detect number of cpus, assuming only 1"
+        warn_msg "Unable to detect number of cpus, assuming 1"
         MPI_START_CPUSOCKETS=1
     fi
     MPI_START_CORESOCKET=`cat /proc/cpuinfo | grep "cpu cores" | sort -u | cut -f2 -d":"`
     if test $? -ne 0 ; then
-        warn_msg "Unable to detect number of cores per cpu, assuming only 1"
+        warn_msg "Unable to detect number of cores per cpu, assuming 1"
         MPI_START_CORESOCKET=1
     fi
-    info_msg "Detected $MPI_START_CPUSOCKETS CPU sockets and $MPI_START_CORESOCKET cores per CPU"
+}
+
+darwin_core_detector() {
+    MPI_START_CORESOCKET=`sysctl -n machdep.cpu.cores_per_package`
+    if echo $MPI_START_CORESOCKET | grep "^machdep:" > /dev/null ; then
+        warn_msg "Unable to detect number of cores per cpu, assuming 1"
+        MPI_START_CORESOCKET=1
+    fi
+    TOTALCPUS=`sysctl -n hw.ncpu`
+    if test $? -ne 0 ; then
+        warn_msg "Unable to detect total number of cpus, assuming 1"
+        MPI_START_CPUSOCKETS=1
+    else
+        MPI_START_CPUSOCKETS=`expr $TOTALCPUS / $MPI_START_CORESOCKET`
+    fi  
 }
 
 core_detector() {
@@ -387,9 +401,12 @@ core_detector() {
     MPI_START_CORESOCKET=1
     if test "x${MPI_START_UNAME}" = "xlinux" ; then
         linux_core_detector
+    elif test "x${MPI_START_UNAME}" = "xdarwin" ; then
+        darwin_core_detector
     else
         info_msg "Physical layout of CPU not implemented for your OS ($MPI_START_UNAME)"
     fi
+    info_msg "Detected $MPI_START_CPUSOCKETS CPU socket(s) and $MPI_START_CORESOCKET core(s) per CPU"
 }
 
 #======================================================================
