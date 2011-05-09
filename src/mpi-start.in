@@ -308,6 +308,8 @@ check_options() {
         set -x
     fi
 
+    MPI_START_UNAME=`uname -s | tr "[:upper:]" "[:lower:]"`
+
     if test -r "${I2G_MPI_CONFIG}" ; then 
         . ${I2G_MPI_CONFIG}
         if test $? -ne 0 ; then
@@ -362,6 +364,32 @@ check_options() {
 
     # default values
     MPI_START_DUMMY_SCHEDULER=${MPI_START_DUMMY_SCHEDULER:-1}
+}
+
+linux_core_detector() {
+    MPI_START_CPUSOCKETS=`cat /proc/cpuinfo | grep "physical id" | sort -u | wc -l`
+    if test $? -ne 0 ; then
+        warn_msg "Unable to detect number of cpus, assuming only 1"
+        MPI_START_CPUSOCKETS=1
+    fi
+    MPI_START_CORESOCKET=`cat /proc/cpuinfo | grep "cpu cores" | sort -u | cut -f2 -d":"`
+    if test $? -ne 0 ; then
+        warn_msg "Unable to detect number of cores per cpu, assuming only 1"
+        MPI_START_CORESOCKET=1
+    fi
+    info_msg "Detected $MPI_START_CPUSOCKETS CPU sockets and $MPI_START_CORESOCKET cores per CPU"
+}
+
+core_detector() {
+    debug_msg "Detection of core/cpu topology."
+
+    MPI_START_CPUSOCKETS=1
+    MPI_START_CORESOCKET=1
+    if test "x${MPI_START_UNAME}" = "xlinux" ; then
+        linux_core_detector
+    else
+        info_msg "Physical layout of CPU not implemented for your OS ($MPI_START_UNAME)"
+    fi
 }
 
 #======================================================================
@@ -449,6 +477,8 @@ main() {
     # setup the np count 
     debug_msg "starting with $MPI_START_NP processes."
 
+    # core/cpu detection
+    core_detector
 
     debug_msg "check for site environment"
 
