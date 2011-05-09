@@ -1,6 +1,19 @@
-all:
+
+# all: mpi-start.pdf
+all: 
+
+docs: mpi-start.pdf
+
+mpi-start.pdf: mpi-start.tex
+	pdflatex mpi-start
+	pdflatex mpi-start
+
+mpi-start.tex: mpi-start.tex.in
+	sed -e "s/@VERSION@/$(VERSION)/" mpi-start.tex.in \
+		> mpi-start.tex
 
 clean:
+	rm -rf mpi-start.tex mpi-start.pdf mpi-start.aux mpi-start.log mpi-start.toc mpi-start.out
 
 install:
 	install -m 0644 COPYING $(destdir)/$(docdir)

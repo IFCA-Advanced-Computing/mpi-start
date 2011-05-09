@@ -2,4 +2,10 @@ build/*
 src/mpi-start
 bin/*
 etc/*
+docs/mpi-start.aux
+docs/mpi-start.log
+docs/mpi-start.out
+docs/mpi-start.pdf
+docs/mpi-start.tex
+docs/mpi-start.toc
 Makefile
