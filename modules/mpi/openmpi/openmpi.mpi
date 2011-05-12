@@ -79,12 +79,11 @@ mpi_exec () {
     # set the parameters to be always used with Open MPI:
     MPI_SPECIFIC_PARAMS="$MPI_SPECIFIC_PARAMS -wdir $PWD "
     if test "x$MPI_START_DO_NOT_USE_WRAPPER" = "x1" ; then
-        for vars in $MPI_START_ENV_VARIABLES; do
+        for var in $MPI_START_ENV_VARIABLES; do
             MPI_SPECIFIC_PARAMS="$MPI_SPECIFIC_PARAMS -x $var"
         done
     fi
     MPI_SPECIFIC_PARAMS="$MPI_SPECIFIC_PARAMS --prefix $MPI_START_MPI_PREFIX $OPENMPI_PARAMS"
-
 
     . $MPI_START_ETC/generic_mpiexec.sh
     generic_mpiexec
