@@ -87,7 +87,7 @@ dump_env () {
 #======================================================================
 mpi_start_find_mktemp () {
     MPI_START_MKTEMP=mktemp
-    tempfile=`$MPI_START_MKTEMP 2> /dev/null`
+    local tempfile=`$MPI_START_MKTEMP 2> /dev/null`
     if test $? -ne 0 ; then
         # BSD style mktemp
         MPI_START_MKTEMP="mktemp -t MPI_START"
@@ -158,7 +158,7 @@ EOF
 #======================================================================
 mpi_start_export_variable () {
     mpi_start_create_wrapper
-    var_name=$1
+    local var_name=$1
     shift
     if test "x$*" != "x"; then  
         echo "export $var_name=\"$*\"" >> $MPI_START_MPI_WRAPPER
@@ -226,7 +226,7 @@ mpi_start_execute_wrapper() {
         mpi_start_create_wrapper
         # we create a new wrapper for each execution so we can have more than
         # one MPI execution in a single mpi-start call (not sure if it has any use)
-        CMD_WRAPPER=`mpi_start_mktemp`
+        local CMD_WRAPPER=`mpi_start_mktemp`
         chmod +x $CMD_WRAPPER
         cat $MPI_START_MPI_WRAPPER > $CMD_WRAPPER
         local OUTPUT=""
@@ -262,13 +262,12 @@ dummy_scheduler() {
     export MPI_START_MACHINEFILE=`mpi_start_mktemp`
     export MPI_START_HOSTFILE=`mpi_start_mktemp`
     export MPI_START_HOST_SLOTS_FILE=`mpi_start_mktemp`
-    myhost=`hostname`
-    if test "x${MPI_DUMMY_SCH_SLOTS}" = "x" ; then
-        slots=1
-    else
+    local myhost=`hostname`
+    local slots=1
+    if test "x${MPI_DUMMY_SCH_SLOTS}" != "x" ; then
         slots=$MPI_DUMMY_SCH_SLOTS
     fi
-    n=$slots
+    local n=$slots
     while [ $n -ne 0 ]; do
         echo $myhost >> $MPI_START_MACHINEFILE
         n=`expr $n - 1`
@@ -320,7 +319,6 @@ check_options() {
         fi
     fi
     
-
     if test "x${I2G_MPI_SINGLE_PROCESS}" = "x1" ; then
         if test "x${I2G_MPI_PER_NODE}" != "x" ; then
             warn_msg "Process per node option ($I2G_MPI_PER_NODE) overriding single process option!"
@@ -342,7 +340,7 @@ check_options() {
 
     if test "x${I2G_MPI_PER_NODE}${I2G_MPI_PER_SOCKET}${I2G_MPI_PER_CORE}" != "x" \
             -a "x${I2G_MPI_NP}" != "x" ; then
-    warn_msg "Total number of processes (np) option overriden by node/socket/core option!"
+        warn_msg "Total number of processes (np) option overriden by node/socket/core option!"
         unset I2G_MPI_NP
     fi
 
@@ -394,7 +392,7 @@ mpi_start_scheduler_detector() {
             warn_msg "failed to source : $i"
         fi
 
-        scheduler=`basename $i .scheduler`
+        local scheduler=`basename $i .scheduler`
 
         # check if support for this kind of schedulers is supported
         debug_msg "checking for scheduler support : $scheduler"
@@ -453,7 +451,7 @@ mpi_start_darwin_core_detector() {
         warn_msg "Unable to detect number of cores per cpu, assuming 1"
         MPI_START_COREPERSOCKET=1
     fi
-    TOTALCPUS=`sysctl -n hw.ncpu`
+    local TOTALCPUS=`sysctl -n hw.ncpu`
     if test $? -ne 0 ; then
         warn_msg "Unable to detect total number of cpus, assuming 1"
         MPI_START_SOCKETS=1
@@ -552,11 +550,11 @@ main() {
     fi
 
     MPI_TYPE=`echo $I2G_MPI_TYPE | tr "[:lower:]" "[:upper:]" | tr "-" "_"`
-    US=_
-    MPI_PREFIX="MPI_"
-    MPI_PATH_SUFFIX="_PATH"
-    MPI_MODULE_SUFFIX="_MODULES"
-    MPI_VERSION_SUFFIX="_VERSION"
+    local US=_
+    local MPI_PREFIX="MPI_"
+    local MPI_PATH_SUFFIX="_PATH"
+    local MPI_MODULE_SUFFIX="_MODULES"
+    local MPI_VERSION_SUFFIX="_VERSION"
 
     MPI_VERSION=
     if test "x$I2G_MPI_VERSION" != "x" ; then
@@ -799,3 +797,5 @@ if test "$I2G_MPI_START_ENABLE_TESTING" != "TEST" ; then
     fi
     main "$arguments"
 fi
+
+
