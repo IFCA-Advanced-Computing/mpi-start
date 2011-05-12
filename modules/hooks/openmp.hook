@@ -14,7 +14,21 @@ pre_run_hook () {
     fi
     debug_msg "Defining OMP_NUM_THREADS for OpenMP."
 
+    if test "x${I2G_MPI_PER_NODE}" != "x" ; then
+        local max_threads=`expr $MPI_START_SOCKETS '*' $MPI_START_COREPERSOCKET`
+        local thrs=`expr $max_threads / $I2G_MPI_PER_NODE`
+        if test $thrs -eq 0 ; then
+            thrs=1
+        fi
+        mpi_start_export_variable OMP_NUM_THREADS $thrs
+    elif test "x${I2G_MPI_PER_SOCKET}" != "x" ; then
+        mpi_start_export_variable OMP_NUM_THREADS  $MPI_START_COREPERSOCKET
+    elif test "x${I2G_MPI_PER_CORE}" != "x" ; then
+        mpi_start_export_variable OMP_NUM_THREADS 1 
+    else
+        mpi_start_export_variable OMP_NUM_THREADS $MPI_START_NSLOTS_PER_HOST
+    fi
+
     # XXX what about non uniform slots allocations?
-    mpi_start_export_variable OMP_NUM_THREADS $MPI_START_NSLOTS_PER_HOST
     return 0
 }
