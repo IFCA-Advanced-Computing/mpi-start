@@ -123,7 +123,6 @@ mpi_start_pre_run_hook_copy () {
     fi
     TARBALL_BASENAME=`basename $TARBALL`
     # add tarball to files that must be cleaned
-    export MPI_START_CLEANUP_FILES="$MPI_START_CLEANUP_FILES $TARBALL"
    
     # try and get the whole job directory
     if [ "x$EDG_WL_RB_BROKERINFO" = "x" ]; then
