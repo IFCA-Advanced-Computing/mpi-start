@@ -108,8 +108,11 @@ testActivateMPI () {
 
 testMktempFile () {
     mpi_start_find_mktemp
-    file=`mpi_start_mktemp`
+    mpi_start_mktemp
     st=$?
+    file=$MPI_START_TEMP_FILE
+    assertEquals 0 $st
+    echo $MPI_START_CLEANUP_FILES | grep $file > /dev/null
     assertEquals 0 $st
     assertTrue "[ -f $file ]"
     rm -f $file
@@ -117,8 +120,11 @@ testMktempFile () {
 
 testMktempDir () {
     mpi_start_find_mktemp
-    dir=`mpi_start_mktemp -d`
+    mpi_start_mktemp -d
     st=$?
+    dir=$MPI_START_TEMP_FILE
+    assertEquals 0 $st
+    echo $MPI_START_CLEANUP_FILES | grep $dir > /dev/null
     assertEquals 0 $st
     assertTrue "[ -d $dir ]"
     rm -rf $dir
