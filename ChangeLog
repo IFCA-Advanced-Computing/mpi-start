@@ -1,3 +1,8 @@
+2011-05-13 Enol Fernández <enolfc _AT_ ifca.unican.es> - 1.0.5
+	* Detection of hardware layout (linux and darwin currently)
+	* Added preliminary support for processor affinity (openmpi currently).
+	* Review of the mktemp mechanism
+
 2011-03-04 Enol Fernández <enolfc _AT_ ifca.unican.es> - 1.0.4
 	* New build procedure.
 
