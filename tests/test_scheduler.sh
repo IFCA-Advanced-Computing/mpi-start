@@ -14,7 +14,7 @@ echo "\${MPI_START_NSLOTS};\${MPI_START_NHOSTS};\${MPI_START_NSLOTS_PER_HOST};\$
 exit 0
 EOF
     chmod +x $I2G_MPI_APPLICATION
-    output=`$I2G_MPI_START`
+    output=`$I2G_MPI_START 2> /dev/null`
     st=$?
     slots=`echo $output | cut -f1 -d";"`
     hosts=`echo $output | cut -f2 -d";"`
@@ -41,7 +41,7 @@ echo "\${MPI_START_NSLOTS};\${MPI_START_NHOSTS};\${MPI_START_NSLOTS_PER_HOST};\$
 exit 0
 EOF
     chmod +x $I2G_MPI_APPLICATION
-    output=`$I2G_MPI_START`
+    output=`$I2G_MPI_START 2> /dev/null`
     st=$?
     slots=`echo $output | cut -f1 -d";"`
     hosts=`echo $output | cut -f2 -d";"`
@@ -66,7 +66,7 @@ echo "\${MPI_START_NSLOTS};\${MPI_START_NHOSTS};\${MPI_START_NSLOTS_PER_HOST};\$
 exit 0
 EOF
     chmod +x $I2G_MPI_APPLICATION
-    output=`$I2G_MPI_START`
+    output=`$I2G_MPI_START 2> /dev/null`
     st=$?
     slots=`echo $output | cut -f1 -d";"`
     hosts=`echo $output | cut -f2 -d";"`
@@ -91,7 +91,7 @@ echo "\${MPI_START_NSLOTS};\${MPI_START_NHOSTS};\${MPI_START_NSLOTS_PER_HOST};\$
 exit 0
 EOF
     chmod +x $I2G_MPI_APPLICATION
-    output=`$I2G_MPI_START`
+    output=`$I2G_MPI_START 2> /dev/null`
     st=$?
     slots=`echo $output | cut -f1 -d";"`
     hosts=`echo $output | cut -f2 -d";"`
@@ -117,7 +117,7 @@ echo "\${MPI_START_NSLOTS};\${MPI_START_NHOSTS};\${MPI_START_NSLOTS_PER_HOST};\$
 exit 0
 EOF
     chmod +x $I2G_MPI_APPLICATION
-    output=`$I2G_MPI_START`
+    output=`$I2G_MPI_START 2> /dev/null`
     st=$?
     slots=`echo $output | cut -f1 -d";"`
     hosts=`echo $output | cut -f2 -d";"`

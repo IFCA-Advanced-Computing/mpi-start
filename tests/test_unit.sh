@@ -18,7 +18,7 @@ setUp () {
 testWarningDisabled () {
     export I2G_MPI_START_VERBOSE=0
     output=`warn_msg "test" 2>&1`
-    output=`echo $output | cut -f2 -d':'`
+    output=`echo $output | cut -f2 -d':' | tr -d " "`  
     st=$?
     assertEquals 0 $st
     assertEquals "test" "$output"
@@ -27,10 +27,10 @@ testWarningDisabled () {
 testWarningEnabled () {
     export I2G_MPI_START_VERBOSE=1
     output=`warn_msg "test" 2>&1`
-    output=`echo $output | cut -f2 -d':'`
+    output=`echo $output | cut -f2 -d':' | tr -d " "`
     st=$?
     assertEquals 0 $st
-    assertEquals "test" $output
+    assertEquals "test" "$output"
 }
 
 testDebugDisabled () {
@@ -128,7 +128,6 @@ testCreateWrapper () {
     unset MPI_START_MPI_WRAPPER
     mpi_start_create_wrapper
     assertNotNull "$MPI_START_MPI_WRAPPER"
-    echo $MPI_START_CLEANUP_FILES | grep "$MPI_START_MPI_WRAPPER" > /dev/null
     st=$?
     assertEquals 0 $st
     assertTrue "[ -f $MPI_START_MPI_WRAPPER ]"

@@ -115,7 +115,8 @@ mpi_start_pre_run_hook_copy () {
     fi
 
     # create tarball
-    TARBALL=`mpi_start_mktemp`
+    mpi_start_mktemp
+    export TARBALL=$MPI_START_TEMP_FILE
     status=$?
     if [ $status -ne 0 -o "x$TARBALL" = "x" ]; then
         error_msg "Failed to create tarball for file distribution"

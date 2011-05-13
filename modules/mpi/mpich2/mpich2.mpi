@@ -20,7 +20,8 @@ mpich2_with_mpd () {
     debug_msg "assume it is safe to set the machinefile and number of processes"
     if test "x${I2G_MPI_PER_NODE}" != "x" ; then
         debug_msg "Creating machine file for per node option"
-        MACHINES=`mpi_start_mktemp`
+        mpi_start_mktemp
+        MACHINES=$MPI_START_TEMP_FILE
         for host in `cat $MPI_START_HOSTFILE` ; do 
             for ((i=0; i < I2G_MPI_PER_NODE; i++)) ; do
                 echo $host >> $MACHINES
@@ -29,7 +30,8 @@ mpich2_with_mpd () {
     else
         if test $MPI_START_NP -gt $MPI_START_NSLOTS ; then
             debug_msg "Creating machine file for starting more processes than available slots"
-            MACHINES=`mpi_start_mktemp`
+            mpi_start_mktemp
+            MACHINES=$MPI_START_TEMP_FILE
             while test `cat $MACHINES | wc -l` -lt $MPI_START_NP ; do
                 cat $MPI_START_MACHINEFILE >> $MACHINES
             done

@@ -15,7 +15,8 @@ pre_run_hook () {
 
     if test "x${I2G_MPI_TYPE}" = "xopenmpi" ; then
         # create a rank file
-        local rankfile=`mpi_start_mktemp`
+        mpi_start_mktemp
+        local rankfile=$MPI_START_TEMP_FILE
         local rank=0
         for host in `cat ${MPI_START_MACHINEFILE}`; do
             if test "x${I2G_MPI_PER_NODE}" != "x" ; then

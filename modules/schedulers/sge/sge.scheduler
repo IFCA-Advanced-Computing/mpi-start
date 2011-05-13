@@ -32,9 +32,12 @@ scheduler_available () {
 scheduler_get_machinefile () {
     debug_msg " convert PE_HOSTFILE into standard format"
     [ ! -f "$PE_HOSTFILE" ] && return 13
-    export MPI_START_MACHINEFILE=`mpi_start_mktemp`
-    export MPI_START_HOSTFILE=`mpi_start_mktemp`
-    export MPI_START_HOST_SLOTS_FILE=`mpi_start_mktemp`
+    mpi_start_mktemp
+    export MPI_START_MACHINEFILE=$MPI_START_TEMP_FILE
+    mpi_start_mktemp
+    export MPI_START_HOSTFILE=$MPI_START_TEMP_FILE
+    mpi_start_mktemp
+    export MPI_START_HOST_SLOTS_FILE=$MPI_START_TEMP_FILE
     while read line; do
         [ -z "$line" ] && break
         host=`echo $line | cut -f1 -d" "`

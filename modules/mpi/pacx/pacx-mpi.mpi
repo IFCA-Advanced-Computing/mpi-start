@@ -27,7 +27,8 @@ shadow_mpi_start () {
 
     # create a new machinefile with the relay host
     # add host 2 times to reserve 2 slots 
-    NEW_MACHINEFILE=`mpi_start_mktemp`
+    mpi_start_mktemp
+    NEW_MACHINEFILE=$MPI_START_TEMP_FILE
     debug_msg "create new machinefile :" $NEW_MACHINEFILE
     echo $I2G_MPI_RELAY > $NEW_MACHINEFILE
     echo $I2G_MPI_RELAY >> $NEW_MACHINEFILE

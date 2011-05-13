@@ -48,9 +48,12 @@ scheduler_get_machinefile () {
     CONDOR_CONTACT_FILE=$_CONDOR_SCRATCH_DIR/contact
     [ ! -f "$CONDOR_CONTACT_FILE" ] && return 13
     cat $CONDOR_CONTACT_FILE
-    export MPI_START_MACHINEFILE=`mpi_start_mktemp`
-    export MPI_START_HOSTFILE=`mpi_start_mktemp`
-    export MPI_START_HOST_SLOTS_FILE=`mpi_start_mktemp`
+    mpi_start_mktemp
+    export MPI_START_MACHINEFILE=$MPI_START_TEMP_FILE
+    mpi_start_mktemp
+    export MPI_START_HOSTFILE=$MPI_START_TEMP_FILE
+    mpi_start_mktemp
+    export MPI_START_HOST_SLOTS_FILE=$MPI_START_TEMP_FILE
     sort -n < $CONDOR_CONTACT_FILE | awk '{print $2}' > $MPI_START_MACHINEFILE
     # assume CONDOR allocation of machines is "sane"
     cat $MPI_START_MACHINEFILE | sort | uniq -c | tr -s " " |

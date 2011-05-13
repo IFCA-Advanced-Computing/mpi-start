@@ -89,7 +89,7 @@ testCommandLineTrace() {
 echo \${I2G_MPI_START_TRACE}
 EOF
     chmod +x $myapp
-    output=`$I2G_MPI_START -vvv $myapp 2> /dev/null`
+    output=`$I2G_MPI_START -vvv $myapp 2> /dev/null | grep -v "^=\[START\]" | grep -v "^=\[FINISHED\]"`
     st=$?
     assertEquals 0 $st
     assertEquals 1 $output
