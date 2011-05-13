@@ -18,9 +18,10 @@ setUp () {
 testWarningDisabled () {
     export I2G_MPI_START_VERBOSE=0
     output=`warn_msg "test" 2>&1`
+    output=`echo $output | cut -f2 -d':'`
     st=$?
     assertEquals 0 $st
-    assertNull "$output"
+    assertEquals "test" "$output"
 }
 
 testWarningEnabled () {
