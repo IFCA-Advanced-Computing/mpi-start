@@ -14,6 +14,26 @@ pre_run_hook () {
     debug_msg "Setting processor affinity."
 
     if test "x${I2G_MPI_TYPE}" = "xopenmpi" ; then
+
+        # check ompi version
+        local version=`ompi_info --parseable | grep "ompi:version:full" | cut -d":" -f4-`
+        local major=`echo $version | cut -f1 -d"."`
+        local minor=`echo $version | cut -f2 -d"."`
+        if test ${major} -ne 1 -o ${minor} -eq 1 ; then
+            warn_msg "Processor affinity is only supported for Open MPI versions 1.x.x!"
+            return 0
+        fi
+        if test ${minor} -eq 2 ; then
+            if test "x${I2G_MPI_PER_CORE}" != "x" ; then
+                export OPENMPI_PARAMS="$OPENMPI_PARAMS --mca mpi_paffinity_alone 1"
+            else
+                warn_msg "Processor affinity only supported if per core options used in Open MPI 1.2.x"
+            fi
+            return 0
+        fi
+
+        # this should work with all Open MPI 1.3/4/5.x versions
+
         # create a rank file
         mpi_start_mktemp
         local rankfile=$MPI_START_TEMP_FILE
