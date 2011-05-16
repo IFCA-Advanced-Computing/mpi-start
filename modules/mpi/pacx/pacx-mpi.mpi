@@ -34,7 +34,6 @@ shadow_mpi_start () {
     echo $I2G_MPI_RELAY >> $NEW_MACHINEFILE
     cat $MPI_START_MACHINEFILE >>  $NEW_MACHINEFILE
     MPI_START_MACHINEFILE=$NEW_MACHINEFILE
-    export I2G_MACHINEFILE_AND_NP="-machinefile $MPI_START_MACHINEFILE -np $MPI_START_NP"
 
     # create PACX specific config file
     debug_msg "create .hostfile"
@@ -52,7 +51,6 @@ shadow_mpi_start () {
 
     # remove temp file
     debug_msg "cleanup temp. files"
-    rm -f $MPI_START_MACHINEFILE
     rm -f $PACX_HOSTFILE
 
     exit $result

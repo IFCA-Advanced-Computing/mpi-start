@@ -39,7 +39,7 @@ mpich2_with_mpd () {
             MACHINES=$MPI_START_MACHINEFILE
         fi
     fi
-    export I2G_MACHINEFILE_AND_NP="-machinefile $MACHINES -np $MPI_START_NP"
+    local machines_params="-machinefile $MACHINES -np $MPI_START_NP"
     MPDBOOT_PARAMS="-n $MPI_START_NHOSTS -f $MPI_START_HOSTFILE"
 
     # take care that the ".mpd.conf" file is available
@@ -58,7 +58,22 @@ mpich2_with_mpd () {
 
     # Start MPICH2 daemon.
     mpdboot $MPDBOOT_PARAMS 
-    MPI_SPECIFIC_PARAMS=$MPICH2_PARAMS
+    MPI_GLOBAL_PARAMS="$MPICH2_PARAMS $machines_params"
+
+    # set the environment variables
+    if test "x${MPI_START_ENV_VARIABLES}" != "x" ; then
+        local envparam=""
+        local first=1
+        for var in ${MPI_START_ENV_VARIABLES}; do
+            if test $first -eq 0 ; then
+                envparam="${envparam},${var}"
+            else
+                envparam="-envlist $var"
+                first=0
+            fi
+        done
+        MPI_LOCAL_PARAMS="${MPI_LOCAL_PARAMS} ${envparam}"
+    fi
     . $MPI_START_ETC/generic_mpiexec.sh
     generic_mpiexec
     err=$?
@@ -82,7 +97,7 @@ mpi_exec () {
 
     if test "x$MPI_MPIEXEC" != "x"; then
         MPIEXEC=$MPI_MPIEXEC
-        MPI_SPECIFIC_PARAMS=$MPI_SPECIFIC_MPIEXEC_PARAMS
+        MPI_GLOBAL_PARAMS=$MPI_SPECIFIC_MPIEXEC_PARAMS
 
         # how to test if the mpiexec needs the -np and -machinefile args??
         $MPIEXEC 2>&1 | grep -e "-\<np\>" > /dev/null 2>&1
@@ -90,11 +105,11 @@ mpi_exec () {
         if test $status -ne 0 ; then
             # OSC mpiexec! 
             # if a comm method has already been requested don't set
-            if `echo $MPI_SPECIFIC_PARAMS | grep -vq "comm=" 2> /dev/null`; then
-                MPI_SPECIFIC_PARAMS="$MPI_SPECIFIC_PARAMS --comm=pmi"
+            if `echo $MPI_GLOBAL_PARAMS | grep -vq "comm=" 2> /dev/null`; then
+                MPI_GLOBAL_PARAMS="$MPI_GLOBAL_PARAMS --comm=pmi"
             fi
             if test "x$I2G_MPI_PER_NODE" = "x1" ; then
-                MPI_SPECIFIC_PARAMS="$MPI_SPECIFIC_PARAMS -pernode"
+                MPI_GLOBAL_PARAMS="$MPI_GLOBAL_PARAMS -pernode"
             elif test "x${I2G_MPI_PER_NODE}" != "x" ; then
                 warn_msg "Per node option ignored when using OSC mpiexec"
             fi
@@ -108,7 +123,7 @@ mpi_exec () {
         fi
     elif test "x$MPI_MPIRUN" != "x"; then
         MPIEXEC=$MPI_MPIRUN
-        MPI_SPECIFIC_PARAMS=$MPI_SPECIFIC_MPIRUN_PARAMS
+        MPI_GLOBAL_PARAMS=$MPI_SPECIFIC_MPIRUN_PARAMS
         mpich2_with_mpd
         err=$?
     else

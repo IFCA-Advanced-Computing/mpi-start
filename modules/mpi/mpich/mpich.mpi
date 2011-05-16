@@ -26,19 +26,20 @@ mpi_exec () {
     . $MPI_START_ETC/common.sh
     mpi_start_search_mpiexec
 
+    local machines_params=""
     if test "x$I2G_MPI_PER_NODE" = "x1" ; then
-        export I2G_MACHINEFILE_AND_NP="-machinefile $MPI_START_HOSTFILE -np $MPI_START_NP"
+        export machines_params="-machinefile $MPI_START_HOSTFILE -np $MPI_START_NP"
     else
-        export I2G_MACHINEFILE_AND_NP="-machinefile $MPI_START_MACHINEFILE -np $MPI_START_NP"
+        export machines_params="-machinefile $MPI_START_MACHINEFILE -np $MPI_START_NP"
     fi
  
     # do prefer mpirun!
     if test "x$MPI_MPIRUN" != "x"; then
         MPIEXEC="$MPI_MPIRUN"
-        MPI_SPECIFIC_PARAMS="$MPI_SPECIFIC_MPIRUN_PARAMS"
+        MPI_GLOBAL_PARAMS="$MPI_SPECIFIC_MPIRUN_PARAMS"
     elif test "x$MPI_MPIEXEC" != "x"; then
         MPIEXEC=$MPI_MPIEXEC
-        MPI_SPECIFIC_PARAMS="$MPI_SPECIFIC_MPIEXEC_PARAMS"
+        MPI_GLOBAL_PARAMS="$MPI_SPECIFIC_MPIEXEC_PARAMS"
 
         # how to test if the mpiexec needs the -np and -machinefile args??
         $MPIEXEC 2>&1 | grep -e "-\<np\>" > /dev/null 2>&1
@@ -47,7 +48,7 @@ mpi_exec () {
             # OSC mpiexec! 
             debug_msg "Found OSC MPIEXEC, do not set machinefile!"
             if test "x$I2G_MPI_PER_NODE" = "x1" ; then
-                MPI_SPECIFIC_PARAMS="$MPI_SPECIFIC_PARAMS -pernode"
+                MPI_GLOBAL_PARAMS="$MPI_GLOBAL_PARAMS -pernode"
             fi
         fi
     else
@@ -61,6 +62,8 @@ mpi_exec () {
         debug_msg "setting specific ssh agent"
         export P4_RSHCOMMAND=$MPI_START_SSH_AGENT
     fi
+
+    MPI_GLOBAL_PARAMS="$MPI_GLOBAL_PARAMS $machines_params"
 
     . $MPI_START_ETC/generic_mpiexec.sh
     generic_mpiexec

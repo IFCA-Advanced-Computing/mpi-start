@@ -46,42 +46,43 @@ mpi_exec () {
 
     if test "x$MPI_MPIEXEC" != "x"; then
         MPIEXEC=$MPI_MPIEXEC
-        MPI_SPECIFIC_PARAMS=$MPI_SPECIFIC_MPIEXEC_PARAMS
+        MPI_GLOBAL_PARAMS=$MPI_SPECIFIC_MPIEXEC_PARAMS
         # TODO: What is I2G_MPI_MPIEXEC_PARAMS exactly???
-        MPI_SPECIFIC_PARAMS="$MPI_SPECIFIC_PARAMS $I2G_MPI_MPIEXEC_PARAMS"
+        MPI_GLOBAL_PARAMS="$MPI_GLOBAL_PARAMS $I2G_MPI_MPIEXEC_PARAMS"
     elif test "x$MPI_MPIRUN" != "x"; then
         MPIEXEC=$MPI_MPIRUN
-        MPI_SPECIFIC_PARAMS=$MPI_SPECIFIC_MPIRUN_PARAMS
+        MPI_GLOBAL_PARAMS=$MPI_SPECIFIC_MPIRUN_PARAMS
     else
         error_msg "no mpiexec/mpirun found!"
         dump_env
         exit 1
     fi
 
+    local machines_params=""
     #handle Open MPI 1.2.2 + PBS bug
     if test "x$MPI_START_SCHEDULER" = "xpbs" -a "x$MPI_START_SSH_AGENT" = "x" ; then
         debug_msg "found openmpi and PBS (without ssh agent), don't set machinefile"
-        export I2G_MACHINEFILE_AND_NP="-np $MPI_START_NP"
+        export machines_params="-np $MPI_START_NP"
     else
         debug_msg "found openmpi and a non-PBS batch system, set machinefile and np parameters"
-        export I2G_MACHINEFILE_AND_NP="-machinefile $MPI_START_MACHINEFILE -np $MPI_START_NP"
+        export machines_params="-machinefile $MPI_START_MACHINEFILE -np $MPI_START_NP"
     fi
 
     if test "x${I2G_MPI_PER_NODE}" != "x" ; then
         # Open MPI does not like to have npernode if it oversubscribes nodes in version 1.2.8 
         if test ${I2G_MPI_PER_NODE} -le ${MPI_START_NSLOTS_PER_HOST} ; then
-            I2G_MACHINEFILE_AND_NP="$I2G_MACHINEFILE_AND_NP -npernode $I2G_MPI_PER_NODE"
+            machines_params="$machines_params -npernode $I2G_MPI_PER_NODE"
         else
             warn_msg "Per node count option will not be used in order to avoid node oversubscription!"
         fi
     fi
 
     # set the parameters to be always used with Open MPI:
-    MPI_SPECIFIC_PARAMS="$MPI_SPECIFIC_PARAMS -wdir $PWD "
+    MPI_GLOBAL_PARAMS="$MPI_GLOBAL_PARAMS -wdir $PWD "
     for var in $MPI_START_ENV_VARIABLES; do
-        MPI_SPECIFIC_PARAMS="$MPI_SPECIFIC_PARAMS -x $var"
+        MPI_GLOBAL_PARAMS="$MPI_GLOBAL_PARAMS -x $var"
     done
-    MPI_SPECIFIC_PARAMS="$MPI_SPECIFIC_PARAMS --prefix $MPI_START_MPI_PREFIX $OPENMPI_PARAMS"
+    MPI_GLOBAL_PARAMS="$MPI_GLOBAL_PARAMS --prefix $MPI_START_MPI_PREFIX $OPENMPI_PARAMS $machines_params"
 
     . $MPI_START_ETC/generic_mpiexec.sh
     generic_mpiexec

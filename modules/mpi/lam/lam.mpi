@@ -25,10 +25,10 @@ mpi_exec () {
 
     if test "x$MPI_MPIEXEC" != "x"; then
         MPIEXEC=$MPI_MPIEXEC
-        MPI_SPECIFIC_PARAMS=$MPI_SPECIFIC_MPIEXEC_PARAMS
+        MPI_GLOBAL_PARAMS=$MPI_SPECIFIC_MPIEXEC_PARAMS
     elif test "x$MPI_MPIRUN" != "x"; then
         MPIEXEC=$MPI_MPIRUN
-        MPI_SPECIFIC_PARAMS=$MPI_SPECIFIC_MPIRUN_PARAMS
+        MPI_GLOBAL_PARAMS=$MPI_SPECIFIC_MPIRUN_PARAMS
     else
         debug_msg "no mpiexec/mpirun found!"
         dump_env
@@ -48,14 +48,15 @@ mpi_exec () {
         exit 1
     fi
 
+    local machines_params=""
     if test "x$I2G_MPI_PER_NODE" = "x1"; then
-	    export I2G_MACHINEFILE_AND_NP="N"
+	    export machines_params="N"
     else 
-	    export I2G_MACHINEFILE_AND_NP="-np $MPI_START_NP"
+	    export machines_params="-np $MPI_START_NP"
     fi
 
     # check for user supplied mpiexec 
-    MPI_SPECIFIC_PARAMS="$MPI_SPECIFIC_PARAMS $LAM_PARAMS"
+    MPI_GLOBAL_PARAMS="$MPI_GLOBAL_PARAMS $LAM_PARAMS $machines_params"
 
     # With version 7.1.2 we don't need to start the daemons in advance.
     . $MPI_START_ETC/generic_mpiexec.sh
