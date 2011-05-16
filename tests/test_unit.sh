@@ -137,23 +137,21 @@ testCreateWrapper () {
     st=$?
     assertEquals 0 $st
     assertTrue "[ -f $MPI_START_MPI_WRAPPER ]"
-    oldWrapper=$MPI_START_MPI_WRAPPER
-    mpi_start_create_wrapper
-    assertEquals "$MPI_START_MPI_WRAPPER" "$oldWrapper"
 }
 
 testExportVariable() {
     export MYVAR=23
     mpi_start_export_variable MYVAR
-    echo $MPI_START_ENV_VARIABLES | grep MYVAR > /dev/null
     st=$?
     assertEquals 0 $st
+    mpi_start_create_wrapper
     cat $MPI_START_MPI_WRAPPER | grep "^export MYVAR$" > /dev/null
     st=$?
     assertEquals 0 $st
     mpi_start_export_variable OTHERVAR "VALUE"
     st=$?
     assertEquals 0 $st
+    mpi_start_create_wrapper
     cat $MPI_START_MPI_WRAPPER | grep "^export OTHERVAR=\"VALUE\"$" > /dev/null
     st=$?
     assertEquals 0 $st
