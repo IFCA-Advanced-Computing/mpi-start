@@ -38,7 +38,7 @@ pre_run_hook () {
         mpi_start_mktemp
         local rankfile=$MPI_START_TEMP_FILE
         local rank=0
-        for host in `cat ${MPI_START_MACHINEFILE}`; do
+        for host in `cat ${MPI_START_HOSTFILE}`; do
             if test "x${I2G_MPI_PER_NODE}" != "x" ; then
                 # XXX lets assume now that we want just one process per node, later on we could drill into 
                 # more complex scenarios
