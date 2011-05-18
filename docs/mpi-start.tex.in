@@ -4,7 +4,7 @@
 
 \title{MPI-Start}
 \author{E. Fernández}
-\DocVersion{1.0}
+\DocVersion{1.0.1}
 \EMICompVersion{@VERSION@}
 \Date{\today}
 
@@ -391,6 +391,12 @@ yum install mpi-start
 Debian based:
 \begin{verbatim}
 apt-get install mpi-start
+\end{verbatim}
+
+If you are running a gLite site, you may prefer to install the glite-mpi
+meta-package that includes the yaim plugin for configuraton:
+\begin{verbatim}
+yum install glite-mpi
 \end{verbatim}
 
 \subsubsection{From source}
