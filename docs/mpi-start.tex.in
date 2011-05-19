@@ -399,6 +399,15 @@ meta-package that includes the yaim plugin for configuraton:
 yum install glite-mpi
 \end{verbatim}
 
+The nodes where the user applications will be executed (Worker Nodes) also
+require a working MPI implementation, Open MPI and MPICH are recommended.
+The devel packages should also be installed in order to allow user to compile their
+applications. Refer to your OS repositories for the exact packages.
+In the case of SL5, Open MPI (including devel packages) can be installed with the following command line:
+\begin{verbatim}
+yum install openmpi openmpi-devel
+\end{verbatim}
+
 \subsubsection{From source}
 
 Source can be retrieved from the mercurial repository.
@@ -418,8 +427,8 @@ $ export I2G_MPI_START=/opt/mpi-start/bin/mpi-start
 \subsection{MPI-Start configuration}
 
 \subsubsection{yaim configuration}
-There is a yaim plugin available for configuring gLite sites, check the
-documentation at the MPI-Start trac. 
+
+There is a yaim plugin available for configuring gLite sites, check the documentation at the MPI-Start trac. 
 
 \subsubsection{Manual configuration}
 
