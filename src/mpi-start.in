@@ -36,7 +36,7 @@ MPI_START_DUMMY_SCHEDULER=${MPI_START_DUMMY_SCHEDULER:-1}
 # Cleans up temporary files upon finishing execution 
 #======================================================================
 clean_up () {
-    if test "x$I2G_MPI_START_KEEP_FILES" != "x1"; then
+    if test "x$I2G_MPI_START_KEEP_FILES" == "x1"; then
         exit
     fi
     debug_msg "Cleaning up mpi-start temporary files."
@@ -107,11 +107,11 @@ dump_env () {
 mpi_start_find_mktemp () {
     MPI_START_MKTEMP=mktemp
     local tempfile=`$MPI_START_MKTEMP 2> /dev/null`
-    if test $? -ne 0 ; then
+    if test $? -ne 0 -o -z "$tempfile"  ; then
         # BSD style mktemp
         MPI_START_MKTEMP="mktemp -t MPI_START"
         tempfile=`$MPI_START_MKTEMP 2> /dev/null`
-        if test $? -ne 0 ; then
+        if test $? -ne 0 -o -z "$tempfile" ; then
             error_msg "Could not find a proper mktemp utility"
             dump_env
             exit 1
