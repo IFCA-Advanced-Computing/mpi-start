@@ -10,10 +10,10 @@
 compiler_hook_is64bit () {
     debug_msg " finding out if compiler is 64 bit."
 
-    if test "x$I2G_MPI_TYPE"="xopenmpi" ; then
+    if test "x$I2G_MPI_TYPE" = "xopenmpi" ; then
         $MPI_OPENMPI_INFO --parseable --arch | grep "x86_64" &> /dev/null
         return $?
-    elif test "x$I2G_MPI_TYPE"="xmpich" -o  "x$I2G_MPI_TYPE"="xmpich2" ; then 
+    elif test "x$I2G_MPI_TYPE" = "xmpich" -o "x$I2G_MPI_TYPE" = "xmpich2" ; then 
         machine=`mpicc -dumpmachine`
         if test $? -eq 0 ; then
             echo $machine | grep "x86_64" &> /dev/null
@@ -30,7 +30,8 @@ compiler_hook_is64bit () {
 #
 compiler_hook_set_compiler_flags() {
 
-    is64bit=compiler_hook_is64bit
+    compiler_hook_is64bit
+    is64bit=$?
     if test $is64bit ; then
         change='s/-m32/-m64/g'
     else
