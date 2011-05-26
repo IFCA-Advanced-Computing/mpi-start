@@ -11,13 +11,7 @@ compiler_hook_is64bit () {
     debug_msg " finding out if compiler is 64 bit."
 
     if test "x$I2G_MPI_TYPE"="xopenmpi" ; then
-        command="opal_info"
-        which $command >& /dev/null
-        status=$?
-        if test $? -eq 1 ; then
-            command="ompi_info"
-        fi
-        $command --parseable --arch | grep "x86_64" &> /dev/null
+        $MPI_OPENMPI_INFO --parseable --arch | grep "x86_64" &> /dev/null
         return $?
     elif test "x$I2G_MPI_TYPE"="xmpich" -o  "x$I2G_MPI_TYPE"="xmpich2" ; then 
         machine=`mpicc -dumpmachine`

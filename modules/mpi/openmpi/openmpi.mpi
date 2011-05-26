@@ -6,9 +6,22 @@
 #           (c) 2009-2010 Instituto de Fisica de Cantabria - CSIC. 
 #                         All rights reserved.
 
+search_openmpi_info_command() {
+    MPI_OPENMPI_INFO="ompi_info"
+    which $MPI_OPENMPI_INFO>& /dev/null
+    if test $? -eq 1 ; then
+        MPI_OPENMPI_INFO="opal_info"
+        which $MPI_OPENMPI_INFO >& /dev/null
+        return $?
+    fi
+    export MPI_OPENMPI_INFO
+    return 0
+}
+
 if test "x$MPI_START_MPI_PREFIX" = "x"  ; then    
     # assume ompi_info knows the correct prefix,
-    ompi_path=`ompi_info --path prefix --parseable 2> /dev/null`
+    search_openmpi_info_command
+    ompi_path=`$MPI_OPENMPI_INFO --path prefix --parseable 2> /dev/null`
     if test $? -ne 0 ; then
         # if fails, set default in SLC5
         export MPI_START_MPI_PREFIX=/usr/lib64/openmpi/1.4-gcc
@@ -21,6 +34,7 @@ fi
 
 # activate MPI
 mpi_start_activate_mpi $MPI_START_MPI_PREFIX "$MPI_START_MPI_MODULE"
+search_openmpi_info_command
 
 if test "x$MPI_START_DISABLE_LRMS_INTEGRATION" == "xyes"; then
     # we are not the primary MPI 
@@ -35,6 +49,7 @@ if test "x$MPI_START_SSH_AGENT" != "x"; then
     # plm_rsh_agent is deprecated in newer versions of Open MPI 
     # need to check version and set the appropriate parameter
     OPENMPI_PARAMS="-mca pls ^tm,gridengine -mca ras ^tm,gridengine -mca plm_rsh_agent $MPI_START_SSH_AGENT"
+    export MPI_START_DISABLE_LRMS_INTEGRATION="yes"
 fi
 
 #
@@ -44,14 +59,14 @@ mpi_exec () {
     . $MPI_START_ETC/common.sh
     mpi_start_search_mpiexec
 
-    if test "x$MPI_MPIEXEC" != "x"; then
-        MPIEXEC=$MPI_MPIEXEC
-        MPI_GLOBAL_PARAMS=$MPI_SPECIFIC_MPIEXEC_PARAMS
+    if test "x${MPI_MPIEXEC}" != "x"; then
+        MPIEXEC="$MPI_MPIEXEC"
+        MPI_GLOBAL_PARAMS="$MPI_SPECIFIC_MPIEXEC_PARAMS"
         # TODO: What is I2G_MPI_MPIEXEC_PARAMS exactly???
         MPI_GLOBAL_PARAMS="$MPI_GLOBAL_PARAMS $I2G_MPI_MPIEXEC_PARAMS"
     elif test "x$MPI_MPIRUN" != "x"; then
-        MPIEXEC=$MPI_MPIRUN
-        MPI_GLOBAL_PARAMS=$MPI_SPECIFIC_MPIRUN_PARAMS
+        MPIEXEC="$MPI_MPIRUN"
+        MPI_GLOBAL_PARAMS="$MPI_SPECIFIC_MPIRUN_PARAMS"
     else
         error_msg "no mpiexec/mpirun found!"
         dump_env
@@ -59,12 +74,16 @@ mpi_exec () {
     fi
 
     local machines_params=""
-    #handle Open MPI 1.2.2 + PBS bug
-    if test "x$MPI_START_SCHEDULER" = "xpbs" -a "x$MPI_START_SSH_AGENT" = "x" ; then
-        debug_msg "found openmpi and PBS (without ssh agent), don't set machinefile"
-        export machines_params="-np $MPI_START_NP"
+    if test "x${MPI_START_SCHEDULER}" = "xpbs" -a "x${MPI_START_DISABLE_LRMS_INTEGRATION}" != "xyes" ; then
+        $MPI_OPENMPI_INFO --parseable | grep "pls:tm" &> /dev/null
+        if test $? -eq 0 ; then
+            debug_msg "found openmpi and PBS (with pbs support enabled), don't set machinefile"
+            export machines_params="-np $MPI_START_NP"
+        else
+            export machines_params="-machinefile $MPI_START_MACHINEFILE -np $MPI_START_NP"
+        fi 
     else
-        debug_msg "found openmpi and a non-PBS batch system, set machinefile and np parameters"
+        # non pbs, set machine file and np
         export machines_params="-machinefile $MPI_START_MACHINEFILE -np $MPI_START_NP"
     fi
 
