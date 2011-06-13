@@ -1,0 +1,44 @@
+.\" mpi-start man page
+.TH mpi-start 1 "June 2011" "" "mpi-start"
+.SH NAME
+mpi-start \- start mpi applications
+.SH SYNOPSIS
+mpi-start [\fIOPTIONS\fR] [\fIAPPLICATION [\fIAPPLICATIONARGS\fR]\fR]
+.SH DESCRIPTION
+.PP
+A generic startup mechanism for different MPI installation in a cluster/grid. mpi-start options may be also specified as environment variables 
+.TP
+\fB\-h\fR
+show online help
+.TP
+\fB\-V\fR
+show mpi-start version
+.TP
+\fB\-t\fr type
+use the mpi type (sets I2G_MPI_TYPE)
+.TP
+\fB\-v\fr
+Run with verbose information
+.\" -v             verbose
+.\" -vv            debug
+.\" -vvv           full trace
+.\" -pre hook      use specified pre run hook script
+.\" -post hook     use specified post run hook script
+.\" -pcmd cmd      use specified pre command
+.\" -npnode n      set number of processes per node
+.\" -pcore         start only one process per core
+.\" -psocket       start only one process per cpu socket
+.\" -pnode         start only one process per node
+.\" -np n          set total number of processes
+.\" -c file        use file for sourcing mpi-start variables
+.\" -i file        use file for standard input
+.\" -o file        use file for standard output
+.\" -e file        use file for standard error
+.\" -x VAR[=VALUE] export the environment variable VAR,
+                .\" optionally define value
+.\" -d VAR=VALUE   define mpi-start variable VAR with specified VALUE
+.\" --             separator for application and arguments
+
+.SH AUTHOR
+MPI-Start team \- <http://devel.ifca.es/mpi-start>
+
