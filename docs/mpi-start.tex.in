@@ -74,7 +74,7 @@ MPI-Start only requires bash compatible shell for working.
 
 \subsection{Source Code}
 
-Source code is available at MPI-Start teac with tag
+Source code is available at MPI-Start trac with tag
 \texttt{mpi-start\_R\_1\_0\_4 }
 
 \subsection{Known Issues}
@@ -99,9 +99,11 @@ a tarball installation that can be transfered in the input sandbox of the job.
 
 In order to create a tarball installation, get the source code and do the following:
 
+\begin{small}
 \begin{verbatim}
 $ make tarball
 \end{verbatim}
+\end{small}
 
 This will create a mpi-start-X.Y.Z.tar.gz (with X.Y.Z being the version of
 MPI-Start) that contains all that is needed for the execution of jobs. In your
@@ -115,9 +117,11 @@ switches, most configuration dependent paramenters are automatically detected
 by MPI-Start and do not need to be specified by the user. The following
 command line will be enough to run the application with the site defaults:
 
+\begin{small}
 \begin{verbatim}
 $ mpi-start application [application arguments ...]
 \end{verbatim}
+\end{small}
 
 \subsection{Command Line Options}
 \begin{description}
@@ -142,9 +146,12 @@ $ mpi-start application [application arguments ...]
 \end{description}
 
 For example, the following command line would start /bin/hostname 3 times for available node using Open MPI:
+\begin{small}
 \begin{verbatim}
 $ mpi-start -t openmpi -npnode 3 -- /bin/hostname
 \end{verbatim}
+\end{small}
+
 
 \subsection{Environment Variables}
 
@@ -221,8 +228,6 @@ environment and the execution environment can be selected with the
 \end{tabularx} 
 \end{center}
 
-
-
 \section{Hooks}
 The MPI-Start Hooks Framework allow the extension of MPI-Start features without changing the core functionality.
 
@@ -231,7 +236,7 @@ dealing with file distribution and some MPI extensions. Site admins can check
 the local hooks description while users probably are interested in developing
 their own hooks for compilation.
 
-\subsection{File distribution hooks}
+\subsection{File Distribution Hooks}
 
 File distribution hooks are responsible for providing a common set of files prior to the execution of the application in all the hosts involved in that execution. Two steps are taken for file distribution:
 \begin{itemize}
@@ -248,7 +253,6 @@ of the available distribution methods. Distribution methods are plugins that
 are detected at runtime by checking all the files with \texttt{.filedist}
 extension in the MPI-Start \texttt{etc} directory.
 \end{itemize}
-
 
 The file distribution method can be fixed by using the \texttt{I2G\_MPI\_FILE\_DIST} variable.
 
@@ -274,7 +278,7 @@ These distribution methods are included in MPI-Start:
 \item[mpi\_mt] uses the mpi\_mt for copying the files. Needs mpi\_mt available in all machines.
 \end{description}
 
-\subsection{Extensions hooks}
+\subsection{Extensions Hooks}
 
 Extension hooks are local site hooks that come in the default MPI-Start
 distribution. These 3 hooks are available:
@@ -290,7 +294,7 @@ These hooks can be completely removed by deleting the openmp.hook,
 mpitrace.hook, marmot.hook, or compiler.hook in the mpi-start configuration
 directory.
 
-\subsection{Local site hooks}
+\subsection{Local Site Hooks}
 
 Site admins can define their own hooks by creating \texttt{.hook} files in the configuration directory of MPI-Start (by default /etc/mpi-start). The file must contain one of the following functions:
 \begin{itemize}
@@ -313,6 +317,7 @@ Both pre and post hooks can be in the same file. In the next sections there are 
 \subsubsection{Compilation}
 Pre-run hook can be used for generating the binaries of the application that will be run by MPI-Start. The following sample shows a hook that compiles an application using \texttt{mpicc}. It assumes that the source code is called like the application binary, but with a \texttt{.c} extension. Use of complex compilation commands like configure, make, etc is also possible. This code is only executed in the first host. The results of the compilation will be available to all hosts thanks to the file distribution mechanisms.
 
+\begin{small}
 \begin{verbatim}
 #!/bin/sh
 
@@ -330,10 +335,12 @@ pre_run_hook () {
   return 0
 }
 \end{verbatim}
+\end{small}
 
 \subsubsection{Input Preprocessing}
 Some applications require some input preprocessing before the application gets executed. For example, gromacs has a \texttt{grompp} tool that prepares the input for the actual \texttt{mdrun} application. In the following example the \texttt{grompp} tool prepares the input for gromacs:
 
+\begin{small}
 \begin{verbatim}
 #!/bin/sh
 
@@ -348,6 +355,7 @@ pre_run_hook()
    return 0
 }
 \end{verbatim}
+\end{small}
 
 \subsubsection{Output Gathering}
 Applications that write output files in each of the hosts involved in the
@@ -358,6 +366,7 @@ once the execution is finished. The following example copies all the
 first argument for each of the hosts passing the name of the host as
 parameter. 
 
+\begin{small}
 \begin{verbatim}
 # the first paramter is the name of a host in the
 my_copy () {
@@ -374,63 +383,71 @@ post_run_hook () {
     return 0
 }
 \end{verbatim}
+\end{small}
 
 \section{System Administrator Guide}
 
 \subsection{Installation}
 
-\subsubsection{From binary packages}
+\subsubsection{Binary Packages}
 
 Binary packages for MPI-Start are generated in EMI using ETICS. Check their repositories for the correct package for your distribution. Once you have the repositories configured you only need to install the package using your favorite package manager:
 
 For RedHat based distributions:
+\begin{small}
 \begin{verbatim}
 yum install mpi-start
 \end{verbatim}
+\end{small}
 
 Debian based:
+\begin{small}
 \begin{verbatim}
 apt-get install mpi-start
 \end{verbatim}
+\end{small}
 
 If you are running a gLite site, you may prefer to install the glite-mpi
 meta-package that includes the yaim plugin for configuraton:
+\begin{small}
 \begin{verbatim}
 yum install glite-mpi
 \end{verbatim}
+\end{small}
 
 The nodes where the user applications will be executed (Worker Nodes) also
 require a working MPI implementation, Open MPI and MPICH are recommended.
 The devel packages should also be installed in order to allow user to compile their
 applications. Refer to your OS repositories for the exact packages.
 In the case of SL5, Open MPI (including devel packages) can be installed with the following command line:
+\begin{small}
 \begin{verbatim}
 yum install openmpi openmpi-devel
 \end{verbatim}
+\end{small}
 
-\subsubsection{From source}
+\subsubsection{Source Distribution}
 
 Source can be retrieved from the mercurial repository.
 
 Installation is as easy as "make install". The default installation prefix is "/usr", by default it also creates files in /etc/profile.d. If a non default installation wants to be done, use the PREFIX variable in make install
 
+\begin{small}
 \begin{verbatim}
 $ make install  PREFIX=/opt/mpi-start
 \end{verbatim}
+\end{small}
 
 In this case, is recommendable setting the installation the environment
 variable I2G\_MPI\_START to point to mpi-start script (although it is not mandatory anymore). 
+\begin{small}
 \begin{verbatim}
 $ export I2G_MPI_START=/opt/mpi-start/bin/mpi-start
 \end{verbatim}
+\end{small}
 
-\subsection{MPI-Start configuration}
 
-\subsubsection{yaim configuration}
-
-There is a yaim plugin available for configuring gLite sites, check the documentation at the MPI-Start trac. 
-
-\subsubsection{Manual configuration}
+\subsection{MPI-Start Manual Configuration}
 
 MPI-Start is designed to auto detect most of the site configurations without any administrator intervention. The default installation will automatically detect:
 \begin{itemize}
@@ -480,12 +497,179 @@ Site admins can tune the file distribution method with the following variables:
 \end{tabularx} 
 \end{center}
 
+\subsection{MPI-Start Yaim Configuration}
+
+A yaim plugin for site configuration is available for MPI-Start. This plugin
+(glite-yaim-mpi) allows the configuration of CEs and WN. The MPI-Utils web
+
+\subsubsection{Configure MPI in site-info.def}
+
+Individual "flavours" of MPI are enabled by setting the associated variable
+\texttt{MPI\_<FLAVOUR>\_ENABLE} to "yes". For example, to enable Open MPI, add the following:
+
+\begin{small}
+\begin{verbatim}
+MPI_OPENMPI_ENABLE="yes"
+\end{verbatim}
+\end{small}
+
+The version of the MPI implementation must also be specified for the CE configuration with the variable \texttt{MPI\_<FLAVOUR>\_VERSION}, for Open MPI version 1.3:
+\begin{small}
+\begin{verbatim}
+MPI_OPENMPI_VERSION="1.3"
+\end{verbatim}
+\end{small}
+
+You may also set the path to non default locations for a flavour of MPI with the variable \texttt{MPI\_<FLAVOUR>\_PATH}, but should not be used unless necessary:
+\begin{small}
+\begin{verbatim}
+MPI_OPENMPI_PATH="/opt/openmpi-1.3/"
+\end{verbatim}
+\end{small}
+
+Possible flavours are:
+\begin{description}
+\item[OPENMPI] for Open MPI
+\item[MPICH] for MPICH-1
+\item[MPICH2] for MPICH-2
+\item[LAM] for LAM-MPI
+\end{description}
+
+The next table shows all the variables that the yaim plugin uses:
+
+\begin{center}
+\begin{tabularx}{\textwidth}{|l|c|X|}
+\hline
+\textbf{Variable}     & \textbf{Mandatory} & \textbf{Description}        \\ \hline
+\texttt{MPI\_<FLAVOUR>\_ENABLE}      & YES & set to "yes" if you want to enable the <flavour> \\ \hline
+\texttt{MPI\_<FLAVOUR>\_VERSION}     & YES & set to the supported version of the <flavour> \\ \hline
+\texttt{MPI\_<FLAVOUR>\_PATH}        & NO  & set to the path of supported version of the <flavour>, usually is automatically detected by the yaim WN plugin \\ \hline
+\texttt{MPI\_SHARED\_HOME}           & NO  & set this to "yes" if you have a shared home area between WNs. \\ \hline
+\texttt{MPI\_SSH\_HOST\_BASED\_AUTH} & NO  & set it to "yes" if you have SSH based authentication between WNs \\ \hline
+\texttt{MPI\_<FLAVOUR>\_MPIEXEC}     & NO  & If you are using OSC mpiexec (only in PBS/Torque sites), set this to the location of the mpiexec program, e.g. "/usr/bin/mpiexec" \\ \hline
+\texttt{MPI\_MPI\_START}             & NO  & Location of mpi-start if not installed in standard location (/usr/bin/mpi-start) \\ \hline
+\texttt{MPI\_DEFAULT\_FLAVOUR}       & NO  & Set it to the default flavour for your site, if undefined, the first defined flavour will be used \\ \hline
+\texttt{MPI\_SUBMIT\_FILTER}         & NO  & Set this to "yes" to configure the submit filter for torque batch system that enables the submission of parallel jobs \\ \hline
+\end{tabularx}
+\end{center}
+
+Here is an example configuration:
+
+\begin{small}
+\begin{verbatim}
+#----------------------------------
+# MPI-related configuration:
+#----------------------------------
+# Several MPI implementations (or "flavours") are available.
+# If you do NOT want a flavour to be installed/configured, set its variable
+# to "no". Else, set it to "yes" (default). If you want to use an
+# already installed version of an implementation, set its "_PATH" and
+# "_VERSION" variables to match your setup (examples below).
+#
+# NOTE 1: the CE_RUNTIMEENV will be automatically updated in the file
+# functions/config_mpi, so that the CE advertises the MPI implementations
+# you choose here - you do NOT have to change it manually in this file.
+# It will become something like this:
+#
+#   CE_RUNTIMEENV="$CE_RUNTIMEENV
+#              MPI_MPICH
+#              MPI_MPICH2
+#              MPI_OPENMPI
+#              MPI_LAM"
+#
+# NOTE 2: it is currently NOT possible to configure multiple concurrent
+# versions of the same implementations (e.g. MPICH-1.2.3 and MPICH-1.2.7)
+# using YAIM. Customize "/opt/glite/yaim/functions/config_mpi" file
+# to do so.
+
+MPI_MPICH_ENABLE="yes"
+MPI_MPICH_VERSION="1.2.7p1"
+
+MPI_MPICH2_ENABLE="yes"
+MPI_MPICH2_VERSION="1.0.4"
+
+MPI_OPENMPI_ENABLE="yes"
+MPI_OPENMPI_VERSION="1.1"
+
+MPI_LAM_ENABLE="yes"
+MPI_LAM_VERSION="7.1.2"
+
+# set Open MPI as default flavour
+MPI_DEFAULT_FLAVOUR=OPENMPI
+
+# Enable the configuration of parallel jobs in torque
+MPI_SUBMIT_FILTER="yes"
+
+#---
+# Example for using an already installed version of MPI.
+# Setting "_PATH" and "_VERSION" variables will prevent YAIM
+# from downloading and installing the gLite-provided packages.
+# Just fill in the path to its current installation (e.g. "/usr")
+# and which version it is (e.g. "6.5.9").
+# DO NOT USE UNLESS A NON DEFAULT LOCATION IS USED
+#---
+# MPI_MPICH_PATH="/opt/mpich-1.2.7p1/"
+# MPI_MPICH2_PATH="/opt/mpich2-1.0.4/"
+
+# If you do NOT provide a shared home, set $MPI_SHARED_HOME to "no" (default).
+#
+MPI_SHARED_HOME="yes"
+
+#
+# If you do NOT have SSH Hostbased Authentication between your WNs, set the below
+# variable to "no" (default). Else, set it to "yes".
+#
+MPI_SSH_HOST_BASED_AUTH="no"
+
+
+# If you use Torque as batch system, you may want to let the yaim plugin
+# configure a submit filter for you. Uncomment the following line to do so
+# MPI_SUBMIT_FILTER="yes"
+
+#
+# If you provide an 'mpiexec' for MPICH or MPICH2, please state the full path to
+# that file here (http://www.osc.edu/~pw/mpiexec/index.php). Else, leave empty.
+#
+#MPI_MPICH_MPIEXEC="/usr/bin/mpiexec"
+MPI_MPICH_MPIEXEC="/usr/bin/mpiexec"
+\end{verbatim}
+\end{small}
+
+\subsubsection{Configure CE}
+
+The profile for configuring the CE is \texttt{MPI\_CE}. 
+\begin{small}
+\begin{verbatim}
+/opt/glite/yaim/bin/yaim -c -s site-info.def  -n MPI_CE -n <other_ce_profiles>
+\end{verbatim}
+\end{small}
+
+\textbf{Batch system and MPI}: The batch system may need extra configuration for the submission of MPI jobs.
+In PBS, you may use the automatic creation of the submit filter with the
+\texttt{MPI\_SUBMIT\_FILTER} variable. In the case of SGE you need to configure a parallel environment.
+Check the documentation of your batch system for any further details.
+
+\textbf{MPI\_CE and other yaim profiles}: The \texttt{MPI\_CE} profile should
+be the first in the yaim configuration, otherwise the Glue variables will not
+be properly defined. This restriction may be removed in future versions.
+
+\subsubsection{Configure WN}
+For a worker node, use the \texttt{MPI\_WN} profile: 
+\begin{small}
+\begin{verbatim}
+/opt/glite/yaim/bin/yaim -c -s site-info.def  -n MPI_WN -n <other_WN_profiles>
+\end{verbatim}
+\end{small}
+
+
+
 \section{Examples}
 
 \subsection{Simple Job}
 
 Simple job using environment variables:
 
+\begin{small}
 \begin{verbatim}
 #!/bin/sh
 # IMPORTANT : This example script execute a
@@ -496,13 +680,17 @@ export I2G_MPI_TYPE=openmpi
 
 $I2G_MPI_START
 \end{verbatim}
+\end{small}
 
 Same example using command line parameters:
+\begin{small}
 \begin{verbatim}
 mpi-start -t openmpi /bin/hostname
 \end{verbatim}
+\end{small}
 
-\subsection{Job with user specified hooks}
+\subsection{Job with User Hooks}
+\begin{small}
 \begin{verbatim}
 #!/bin/sh
 #
@@ -564,6 +752,7 @@ $I2G_MPI_START
 # instead of the variable definition, the following command line could be used:
 # mpi-start -t openmpi -pre ./pre_run_hook.sh -post ./post_run_hook.sh mpi_sleep 0
 \end{verbatim}
+\end{small}
 
 \subsection{Using MPI-Start with gLite}
 
@@ -578,6 +767,7 @@ Jobs are described with the JDL language. Most relevant attributes for parallel 
 
 The following example shows a job that will use 6 processes and it is executed with Open MPI. The \texttt{requirements} attribute makes the WMS to select sites that publish that they support MPI-Start and Open MPI.
 
+\begin{small}
 \begin{verbatim}
 JobType       = "Normal";
 CPUNumber     = 6;
@@ -590,6 +780,8 @@ StdError      = "std.err";
 Requirements  = member("MPI-START", other.GlueHostApplicationSoftwareRunTimeEnvironment)
                 && member("OPENMPI", other.GlueHostApplicationSoftwareRunTimeEnvironment);
 \end{verbatim}
+\end{small}
+
 The \texttt{Executable} attribute is a script that will invoke MPI-Start with the correct options for the execution of the user's application. We propose a generic wrapper that can be used for any application and MPI flavour that gets in the \texttt{Arguments} attribute:
 
 \begin{itemize}
@@ -600,6 +792,7 @@ The \texttt{Executable} attribute is a script that will invoke MPI-Start with th
 
 This is the content of the wrapper:
 
+\begin{small}
 \begin{verbatim}
 #!/bin/bash
 # Pull in the arguments.
@@ -621,8 +814,11 @@ chmod +x $I2G_MPI_APPLICATION
 # Invoke mpi-start.
 $I2G_MPI_START
 \end{verbatim}
+\end{small}
+
 User needs to include this wrapper in the \texttt{InputSandbox} of the JDL (\texttt{starter.sh}) and set it as the \texttt{Executable} of the job. Submission is performed as any other gLite job:
 
+\begin{small}
 \begin{verbatim}
 $ glite-wms-job-submit -a hello-mpi.sh
 
@@ -638,9 +834,11 @@ https://gridwms01.ifca.es:9000/8jG3MUNRm-ol7BqhFP5Crg
 
 ==========================================================================
 \end{verbatim}
+\end{small}
 
 Once the job is finished, the output can be retrieved:
 
+\begin{small}
 \begin{verbatim}
 $ glite-wms-job-output https://gridwms01.ifca.es:9000/8jG3MUNRm-ol7BqhFP5Crg
 
@@ -666,14 +864,16 @@ Hello world from gcsic054wn. Process 0 of 6
 Hello world from gcsic055wn. Process 4 of 6
 Hello world from gcsic055wn. Process 5 of 6
 \end{verbatim}
+\end{small}
 
-\subsubsection{Modifying MPI-Start behavior}
+\subsubsection{Modifying MPI-Start Behavior}
 MPI-Start behavior can be customized by setting different environment
 variables. If using the generic wrapper, one easy way of customizing MPI-Start
 execution is using the \texttt{Environment} attribute of the JDL. The following JDL adds debugging to
 the previous example by setting the \texttt{I2G\_MPI\_START\_VERBOSE} and
 \texttt{I2G\_MPI\_START\_DEBUG} variables to 1:
 
+\begin{small}
 \begin{verbatim}
 JobType       = "Normal";
 CPUNumber     = 6;
@@ -684,15 +884,17 @@ OutputSandbox = {"std.out", "std.err"};
 StdOutput     = "std.out";
 StdError      = "std.err";
 Requirements  = member("MPI-START", other.GlueHostApplicationSoftwareRunTimeEnvironment)
-                && member("OPENMPI", other.GlueHostApplicationSoftwareRunTimeEnvironment);
+             && member("OPENMPI", other.GlueHostApplicationSoftwareRunTimeEnvironment);
 Environment   = {"I2G_MPI_START_VERBOSE=1", "I2G_MPI_START_DEBUG=1"};
 \end{verbatim}
+\end{small}
 
 Use of hooks is also possible using this mechanism. If the user has a file
 with the MPI-Start hooks called \texttt{hooks.sh}, the following JDL would add
 it to the execution (notice that the file is also added in the
 \texttt{InputSandbox}):
 
+\begin{small}
 \begin{verbatim}
 JobType       = "Normal";
 CPUNumber     = 6;
@@ -703,8 +905,9 @@ OutputSandbox = {"std.out", "std.err"};
 StdOutput     = "std.out";
 StdError      = "std.err";
 Requirements  = member("MPI-START", other.GlueHostApplicationSoftwareRunTimeEnvironment)
-                && member("OPENMPI", other.GlueHostApplicationSoftwareRunTimeEnvironment);
+             && member("OPENMPI", other.GlueHostApplicationSoftwareRunTimeEnvironment);
 Environment   = {"I2G_MPI_PRE_RUN_HOOK=hooks.sh", "I2G_MPI_POST_RUN_HOOK=hooks.sh"};
 \end{verbatim}
+\end{small}
 
 \end{document}
