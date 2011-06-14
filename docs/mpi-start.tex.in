@@ -1,8 +1,9 @@
 \documentclass{emi}
 
 \usepackage{tabularx}
+\usepackage{url}
 
-\title{MPI-Start}
+\title{MPI-Start and MPI-Utils}
 \author{E. Fernández}
 \DocVersion{1.0.1}
 \EMICompVersion{@VERSION@}
@@ -35,7 +36,7 @@ the execution of MPI applications with the CrossBroker metascheduler and then
 extended its use as the official way of starting MPI jobs within EGEE.
 Currently, it is part of the EMI project. 
 
-There is a trac page at http://devel.ifca.es/mpi-start with information about
+There is a trac page at \url{http://devel.ifca.es/mpi-start} with information about
 the development of MPI-Start.
 
 \section{Release Notes}
@@ -47,6 +48,7 @@ Most of MPI-Start 1.0.3 release notes are applicable to MPI-Start 1.0.4, check
 them at the MPI-Start trac for more information.
 
 \subsection{Changes}
+\subsubsection{MPI-Start}
 Major Changes for MPI-Start 1.0.x versions until 1.0.4 are:
 \begin{itemize}
 \item New hook plugin architecture: now hooks can be installed in the configuration directory as independent files with .hook extension.
@@ -69,13 +71,28 @@ Major Changes for MPI-Start 1.0.x versions until 1.0.4 are:
 
 Check the Changelog file for a detailed list of changes.
 
+\subsubsection{MPI-Utils}
+MPI-utils is a meta package with MPI-Start and the yaim configuration plugin.
+Changes in the yaim version 1.1.9 are:
+\begin{itemize}
+\item Updated documentation for yaim configuration
+\item yaim plugin does not try to create mpirun wrapper in the WN
+\item yaim plugin uses current torque location (or TORQUE variable)
+\item yaim plugin correctly defines the runtimeenvironment variables
+\end{itemize}
+
+Check the Changelog file for a detailed list of changes.
+
 \subsection{Requirements}
 MPI-Start only requires bash compatible shell for working.
 
 \subsection{Source Code}
 
-Source code is available at MPI-Start trac with tag
-\texttt{mpi-start\_R\_1\_0\_4 }
+Source code is available at MPI-Start repository
+(\url{https://devel.ifca.es/hg/mpi-start}) with tag \texttt{mpi-start\_R\_1\_0\_4 }
+and at org.glite.yaim.mpi glite
+(\url{http://jra1mw.cvs.cern.ch/cgi-bin/jra1mw.cgi/org.glite.yaim.mpi/})
+repository with tag \texttt{glite-yaim-mpi\_R\_1\_1\_9\_1} 
 
 \subsection{Known Issues}
 \begin{itemize}
