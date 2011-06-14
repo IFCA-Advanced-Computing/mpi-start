@@ -22,7 +22,7 @@ A generic startup mechanism for different MPI installation in a cluster/grid.
 
 %build
 cd $RPM_BUILD_DIR/@NAME_PREFIX@mpi-start-@VERSION@
-./configure --prefix=%{_prefix} --sysconfdir=%{_sysconfdir} --datadir=%{_datadir} --libdir=%{_libdir}
+./configure --prefix=%{_prefix} --sysconfdir=%{_sysconfdir} --datadir=%{_datadir} --libdir=%{_libdir} --mandir=%{_mandir}
 %{__make}
 
 %install
@@ -38,6 +38,7 @@ rm -rf $RPM_BUILD_ROOT/*
 %{_bindir}/mpi-start
 %{_sysconfdir}/mpi-start/
 %{_datadir}/doc/mpi-start-%{version}/
+%{_mandir}/man1/
 %config(noreplace) %{_sysconfdir}/profile.d/mpi_start.sh
 %config(noreplace) %{_sysconfdir}/profile.d/mpi_start.csh
 

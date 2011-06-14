@@ -18,5 +18,7 @@ clean:
 install:
 	install -m 0644 COPYING $(destdir)/$(docdir)
 	install -m 0644 AUTHORS $(destdir)/$(docdir)
+	mkdir -p $(destdir)/$(mandir)/man1
+	install -m 0644 mpi-start.1 $(destdir)/$(mandir)/man1
 
 

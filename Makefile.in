@@ -83,5 +83,6 @@ export datadir
 export docdir
 export moduledir
 export sysconfdir
+export mandir 
 export name_prefix
 

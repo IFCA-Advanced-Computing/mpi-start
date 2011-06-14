@@ -15,6 +15,7 @@ docdir='${datadir}/doc/${PACKAGE}'
 sysconfdir='${prefix}/etc'
 # modules are in $sysconfdir/mpi-start, should be moved to $datadir/mpi-start?
 moduledir='${sysconfdir}/${name_prefix}mpi-start'
+mandir='${datadir}/man'
 
 vars='VERSION
 PACKAGE
@@ -26,6 +27,7 @@ datadir
 docdir
 sysconfdir
 moduledir
+mandir
 maintainerclean_files
 '
 
@@ -40,6 +42,7 @@ show_help () {
     echo "  --datadir=DATADIR"
     echo "  --libdir=DATADIR"
     echo "  --sysconfdir=DATADIR"
+    echo "  --mandir=DATADIR/man"
     exit 0
 }
 
@@ -92,6 +95,8 @@ do
             prev=sysconfdir ;;
         -sysconfdir=* | --sysconfdir=*)
             sysconfdir=$optarg ;;
+        -mandir=* | --mandir=*)
+            mandir=$optarg ;;
     esac
 done
 
