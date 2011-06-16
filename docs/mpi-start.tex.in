@@ -47,6 +47,10 @@ MPI-Start 1.0.4 is an update release of MPI-Start that includes minor improvemen
 Most of MPI-Start 1.0.3 release notes are applicable to MPI-Start 1.0.4, check
 them at the MPI-Start trac for more information.
 
+MPI-utils is a metapackge (glite-mpi) that depends on MPI-Start and a yaim
+plugin for configuration. In this version the yaim plugin includes fixes to
+several bugs.
+
 \subsection{Changes}
 \subsubsection{MPI-Start}
 Major Changes for MPI-Start 1.0.x versions until 1.0.4 are:
@@ -463,7 +467,6 @@ $ export I2G_MPI_START=/opt/mpi-start/bin/mpi-start
 \end{verbatim}
 \end{small}
 
-
 \subsection{MPI-Start Manual Configuration}
 
 MPI-Start is designed to auto detect most of the site configurations without any administrator intervention. The default installation will automatically detect:
@@ -516,13 +519,11 @@ Site admins can tune the file distribution method with the following variables:
 
 \subsection{MPI-Start Yaim Configuration}
 
-A yaim plugin for site configuration is available for MPI-Start. This plugin
-(glite-yaim-mpi) allows the configuration of CEs and WN. The MPI-Utils web
+Configuration is necessary on both the CE and WNs in order to support and advertise MPI correctly. This is performed by the yaim MPI module which should be run on both types of nodes.
 
-\subsubsection{Configure MPI in site-info.def}
+\subsubsection{WN Configuration}
 
-Individual "flavours" of MPI are enabled by setting the associated variable
-\texttt{MPI\_<FLAVOUR>\_ENABLE} to "yes". For example, to enable Open MPI, add the following:
+The yaim plugin in the WN prepares the environment for the correct execution of mpi-start. Each of the MPI flavours supported by the site must be specified setting the variable \texttt{MPI\_<FLAVOUR>\_ENABLE} to \texttt{"yes"}. For example, to enable Open MPI, add the following:
 
 \begin{small}
 \begin{verbatim}
@@ -530,17 +531,73 @@ MPI_OPENMPI_ENABLE="yes"
 \end{verbatim}
 \end{small}
 
-The version of the MPI implementation must also be specified for the CE configuration with the variable \texttt{MPI\_<FLAVOUR>\_VERSION}, for Open MPI version 1.3:
+Optionally, if you are using a non OS provided MPI implementation, you can
+define the location and version with \texttt{MPI\_<FLAVOUR>\_VERSION} and
+\texttt{MPI\_<FLAVOUR>\_PATH}. \textbf{Do not use these variables if you are
+using the OS provided MPI implementations}. For example for Open MPI version 1.3, installed at /opt/openmpi-1.3:
+
 \begin{small}
 \begin{verbatim}
 MPI_OPENMPI_VERSION="1.3"
+MPI_OPENMPI_PATH="/opt/openmpi-1.3/"
 \end{verbatim}
 \end{small}
 
-You may also set the path to non default locations for a flavour of MPI with the variable \texttt{MPI\_<FLAVOUR>\_PATH}, but should not be used unless necessary:
+MPI flavours that use a particular mpiexec for starting the jobs (e.g. OSC
+mpiexec for PBS/Torque system) may also provide in the
+\texttt{MPI\_<FLAVOUR>\_MPIEXEC} the path to the binary. \textbf{Do not use
+this variable if you are not using a different mpiexec from the one provided
+by the MPI implementation.}
+
+Additionally, you may specify a default MPI flavour to use if non is selected for execution, with the \texttt{MPI\_DEFAULT\_FLAVOUR}. If no default flavour is specified, the first one defined in your site-info.def will be considered as default.
+
+If you provide a shared filesystem for the execution of the applications, but
+it is not the path where the jobs are started, then set the variable
+\texttt{MPI\_SHARED\_HOME} to \texttt{"yes"} and the variable
+\texttt{MPI\_SHARED\_HOME\_PATH} to the the location of the shared filesystem.
+\textbf{Do not use this variable if the application starts its execution in a
+shared directory (e.g. shared home), this situation should be automatically
+detected}.
+
+If you use ssh host based authentication, set the variable \texttt{MPI\_SSH\_HOST\_BASED\_AUTH} to \texttt{"yes"}.
+
+Lastly, if your use a non default location for mpi-start, set its location
+with the \texttt{MPI\_MPI\_START} variable.
+
+The complete list of configuration variables for the WN is shown in the next table:
+\begin{center}
+\begin{tabularx}{\textwidth}{|l|c|X|}
+\hline
+\textbf{Variable}     & \textbf{Mandatory} & \textbf{Description}        \\ \hline
+\texttt{MPI\_<FLAVOUR>\_ENABLE}      & YES & set to "yes" if you want to enable the <flavour> \\ \hline 
+\texttt{MPI\_<FLAVOUR>\_VERSION}     & NO  & set to the supported version of the <flavour>, usually is automatically detected \\ \hline
+\texttt{MPI\_<FLAVOUR>\_PATH}        & NO  & set to the path of supported version of the <flavour>, usually is automatically detected by the yaim WN plugin \\ \hline
+\texttt{MPI\_<FLAVOUR>\_MPIEXEC}     & NO  & If you are using OSC mpiexec (only in PBS/Torque sites), set this to the location of the mpiexec program, e.g. "/usr/bin/mpiexec" \\ \hline
+\texttt{MPI\_DEFAULT\_FLAVOUR}       & NO  & Set it to the default flavour for your site, if undefined, the first defined flavour will be used \\ \hline
+\texttt{MPI\_SHARED\_HOME}           & NO  & set this to "yes" if you have a shared home area between WNs. \\ \hline
+\texttt{MPI\_SHARED\_HOME\_PATH}     & NO  & location of the shared area for execution of MPI applications \\ \hline
+\texttt{MPI\_SSH\_HOST\_BASED\_AUTH} & NO  & set it to "yes" if you have SSH based authentication between WNs \\ \hline
+\texttt{MPI\_MPI\_START}             & NO  & Location of mpi-start if not installed in standard location (/usr/bin/mpi-start) \\ \hline
+\end{tabularx}
+\end{center}
+
+The profile for a worker node is MPI\_WN. Use it along any other profiles you may need for your WN. 
 \begin{small}
 \begin{verbatim}
-MPI_OPENMPI_PATH="/opt/openmpi-1.3/"
+/opt/glite/yaim/bin/yaim -c -s site-info.def  -n MPI_WN -n <other_WN_profiles>
+\end{verbatim}
+\end{small}
+
+\subsubsection{CE Configuration}
+
+As with the WN, individual flavours of MPI are enabled by setting the \texttt{MPI\_<FLAVOUR>\_ENABLE} 
+associated variable to \texttt{"yes"}. The version of the MPI implementation must also
+be specified with the variable \texttt{MPI\_<FLAVOUR>\_VERSION}, e.g. for configuring Open MPI version 1.3:
+
+\begin{small}
+\begin{verbatim}
+MPI_OPENMPI_ENABLE="yes"
+MPI_OPENMPI_VERSION="1.3"
 \end{verbatim}
 \end{small}
 
@@ -552,25 +609,41 @@ Possible flavours are:
 \item[LAM] for LAM-MPI
 \end{description}
 
-The next table shows all the variables that the yaim plugin uses:
+The use of shared homes should be announced also by setting the \texttt{MPI\_SHARED\_HOME} to \texttt{"yes"}.
 
+If you are using PBS/Torque, you can set the variable \texttt{MPI\_SUBMIT\_FILTER} to \texttt{"yes"} in order to enable the submission of parallel jobs in your system.
+
+The complete list of configuration variables for the CE is shown in the next table:
 \begin{center}
 \begin{tabularx}{\textwidth}{|l|c|X|}
 \hline
-\textbf{Variable}     & \textbf{Mandatory} & \textbf{Description}        \\ \hline
-\texttt{MPI\_<FLAVOUR>\_ENABLE}      & YES & set to "yes" if you want to enable the <flavour> \\ \hline
-\texttt{MPI\_<FLAVOUR>\_VERSION}     & YES & set to the supported version of the <flavour> \\ \hline
-\texttt{MPI\_<FLAVOUR>\_PATH}        & NO  & set to the path of supported version of the <flavour>, usually is automatically detected by the yaim WN plugin \\ \hline
-\texttt{MPI\_SHARED\_HOME}           & NO  & set this to "yes" if you have a shared home area between WNs. \\ \hline
-\texttt{MPI\_SSH\_HOST\_BASED\_AUTH} & NO  & set it to "yes" if you have SSH based authentication between WNs \\ \hline
-\texttt{MPI\_<FLAVOUR>\_MPIEXEC}     & NO  & If you are using OSC mpiexec (only in PBS/Torque sites), set this to the location of the mpiexec program, e.g. "/usr/bin/mpiexec" \\ \hline
-\texttt{MPI\_MPI\_START}             & NO  & Location of mpi-start if not installed in standard location (/usr/bin/mpi-start) \\ \hline
-\texttt{MPI\_DEFAULT\_FLAVOUR}       & NO  & Set it to the default flavour for your site, if undefined, the first defined flavour will be used \\ \hline
-\texttt{MPI\_SUBMIT\_FILTER}         & NO  & Set this to "yes" to configure the submit filter for torque batch system that enables the submission of parallel jobs \\ \hline
+\textbf{MPI\_<FLAVOUR>\_ENABLE}    & YES & set to "yes" if you want to enable the <flavour> \\ \hline
+\textbf{MPI\_<FLAVOUR>\_VERSION}   & YES & set to the supported version of the <flavour>, usually is automatically detected \\ \hline
+\textbf{MPI\_SHARED\_HOME}         & NO  & set this to "yes" if you have a shared home area between WNs. \\ \hline
+\textbf{MPI\_SUBMIT\_FILTER}       & NO  & Set this to "yes" to configure the submit filter for torque batch system that enables the submission of parallel jobs \\ \hline
 \end{tabularx}
 \end{center}
 
-Here is an example configuration:
+The profile for configuring the CE is MPI\_CE. 
+\begin{small}
+\begin{verbatim}
+/opt/glite/yaim/bin/yaim -c -s site-info.def  -n MPI_CE -n <other_ce_profiles>
+\end{verbatim}
+\end{small}
+
+\textbf{Batch system and MPI}: The batch system may need extra configuration for the submission of MPI jobs.
+In PBS, you may use the automatic creation of the submit filter with the
+\texttt{MPI\_SUBMIT\_FILTER} variable. In the case of SGE you need to configure a parallel environment.
+Check the documentation of your batch system for any further details.
+
+\textbf{MPI\_CE and other yaim profiles}: The \texttt{MPI\_CE} profile should
+be the first in the yaim configuration, otherwise the Glue variables will not
+be properly defined. This restriction may be removed in future versions.
+
+
+\subsubsection{Example configuration}
+
+Here is an example configuration (with both CEs and WN variables!):
 
 \begin{small}
 \begin{verbatim}
@@ -651,34 +724,6 @@ MPI_SSH_HOST_BASED_AUTH="no"
 MPI_MPICH_MPIEXEC="/usr/bin/mpiexec"
 \end{verbatim}
 \end{small}
-
-\subsubsection{Configure CE}
-
-The profile for configuring the CE is \texttt{MPI\_CE}. 
-\begin{small}
-\begin{verbatim}
-/opt/glite/yaim/bin/yaim -c -s site-info.def  -n MPI_CE -n <other_ce_profiles>
-\end{verbatim}
-\end{small}
-
-\textbf{Batch system and MPI}: The batch system may need extra configuration for the submission of MPI jobs.
-In PBS, you may use the automatic creation of the submit filter with the
-\texttt{MPI\_SUBMIT\_FILTER} variable. In the case of SGE you need to configure a parallel environment.
-Check the documentation of your batch system for any further details.
-
-\textbf{MPI\_CE and other yaim profiles}: The \texttt{MPI\_CE} profile should
-be the first in the yaim configuration, otherwise the Glue variables will not
-be properly defined. This restriction may be removed in future versions.
-
-\subsubsection{Configure WN}
-For a worker node, use the \texttt{MPI\_WN} profile: 
-\begin{small}
-\begin{verbatim}
-/opt/glite/yaim/bin/yaim -c -s site-info.def  -n MPI_WN -n <other_WN_profiles>
-\end{verbatim}
-\end{small}
-
-
 
 \section{Examples}
 
