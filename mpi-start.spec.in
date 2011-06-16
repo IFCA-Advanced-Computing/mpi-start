@@ -1,6 +1,8 @@
 #
 # Copyright (c) 2006-2007 High Performance Computing Center Stuttgart,
 #                         University of Stuttgart.  All rights reserved.
+#               2009-2010 Instituto de Física de Cantabria,
+#                         CSIC - UC. All rights reserved.
 #
 
 Summary: A generic startup mechanism for different MPI installation in a cluster/grid
