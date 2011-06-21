@@ -6,79 +6,79 @@ mpi-start \- start mpi applications
 mpi-start [\fIOPTIONS\fR] [\fIAPPLICATION [\fIAPPLICATIONARGS\fR]\fR]
 .SH DESCRIPTION
 .PP
-A generic startup mechanism for different MPI installation in a cluster/grid. mpi-start options may be also specified as environment variables 
+A generic startup mechanism for different MPI installation in a cluster/grid. mpi-start options may be also specified as environment variables.
 .\" General options
 .SS GENERAL OPTIONS
 .TP
 \fB\-h\fR
-show online help
+show online help.
 .TP
 \fB\-V\fR
-show mpi-start version
+show mpi-start version.
 .TP
 \fB\-t \fITYPE\fB\fR
-use the mpi \fITYPE\fR for execution the application (sets I2G_MPI_TYPE)
+use the mpi \fITYPE\fR for execution the application (sets I2G_MPI_TYPE).
 .TP
 \fB\-v\fR
-Be verbose
+Be verbose.
 .TP
 \fB\-vv\fR
-Include debug information
+Include debug information.
 .TP
 \fB\-vvv\fR
-Full trace of mpi-start execution
+Full trace of mpi-start execution.
 .TP
 \fB\-pre \fIPRE-HOOK\fB\fR
-Use the specified \fIPRE-HOOK\fR file as pre run hook script
+Use the specified \fIPRE-HOOK\fR file as pre run hook script.
 .TP
 \fB\-post \fIPOST-HOOK\fB\fR
-Use the specified \fIPOST-HOOK\fR file as post run hook script
+Use the specified \fIPOST-HOOK\fR file as post run hook script.
 .TP
 \fB\-pcmd \fICMD\fB\fR
-Use the specified \fICMD\fR as pre command
+Use the specified \fICMD\fR as pre command.
 .TP
 \fB\-i \fIFILE\fB\fR
-Use the specified \fIFILE\fR as application standard input
+Use the specified \fIFILE\fR as application standard input.
 .TP
 \fB\-o \fIFILE\fB\fR
-Use the specified \fIFILE\fR as application standard output 
+Use the specified \fIFILE\fR as application standard output.
 .TP
 \fB\-e \fIFILE\fB\fR
-Use the specified \fIFILE\fR as application standard error 
+Use the specified \fIFILE\fR as application standard error.
 .TP
 \fB\-c \fICONFIGFILE\fB\fR
-Use \fICONFIGFILE\fR with configuration variables for mpi-start
+Use \fICONFIGFILE\fR with configuration variables for mpi-start.
 .TP
 \fB\-x \fIVAR[=VALUE]\fB\fR
-Export the \fIVAR\fR into the application environment. Optionally set its \fIVALUE\fR
+Export the \fIVAR\fR into the application environment. Optionally set its \fIVALUE\fR.
 .TP
 \fB\-d \fIVAR=VALUE\fB\fR
-Define mpi-start variable \fIVAR\fR with the specified \fIVALUE\fR
+Define mpi-start variable \fIVAR\fR with the specified \fIVALUE\fR.
 .SS PROCESS OPTIONS 
 .TP
 \fB\-npnode \fIN\fB\fR
-Start \fIN\fR processes at each node
+Start \fIN\fR processes at each node.
 .TP
 \fB\-pcore\fR
-Start only one process per core
+Start only one process per core.
 .TP
 \fB\-psocket\fR
-Start only one process per CPU socket 
+Start only one process per CPU socket.
 .TP
 \fB\-pnode\fR
-Start only one process per node (equivalent to -npnode 1) 
+Start only one process per node (equivalent to -npnode 1).
 .TP
 \fB\-np \fIN\fB\fR
-Start \fIN\fR processes  
+Start \fIN\fR processes.
 .\" --             separator for application and arguments
 .SH FILES
 .PP
-All the mpi-start modules are located in /etc/mpi-start. They can be distinguished by their suffix
+All the mpi-start modules are located in /etc/mpi-start. They can be distinguished by their suffix.
 .nf
-\fI*.mpi\fR for execution environment plugins 
-\fI*.scheduler\fR for scheduler plugins 
-\fI*.hook\fR for local hooks 
-\fI*.filedist\fR for file distribution methods 
+\fI*.mpi\fR for execution environment plugins. 
+\fI*.scheduler\fR for scheduler plugins. 
+\fI*.hook\fR for local hooks. 
+\fI*.filedist\fR for file distribution methods. 
 .fi
 .SH SEE ALSO
 .nf
