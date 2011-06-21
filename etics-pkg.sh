@@ -21,7 +21,7 @@ fi
 BASEDIR=$PWD
 
 # delete old artifacts
-rm -f $BASEDIR/tgz $BASEDIR/RPMS
+rm -rf $BASEDIR/tgz $BASEDIR/RPMS
 
 # create destination directories
 mkdir $BASEDIR/tgz
