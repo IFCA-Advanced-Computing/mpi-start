@@ -14,7 +14,7 @@ shift
 version=$1
 
 if [ "x$version" = "x" ] ; then
-    VERSION=`cat VERSION`
+    version=`cat VERSION`
 fi
 
 
