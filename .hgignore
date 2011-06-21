@@ -9,3 +9,4 @@ docs/mpi-start.pdf
 docs/mpi-start.tex
 docs/mpi-start.toc
 Makefile
+rpms/*
