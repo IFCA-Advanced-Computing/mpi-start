@@ -67,11 +67,11 @@ dist:
 	rm -rf $(name_prefix)mpi-start-$(VERSION)
 
 rpm: dist 
-	mkdir -p rpm/SOURCES rpm/SRPMS rpm/SPECS rpm/BUILD rpm/RPMS
-	rpmbuild --define "_topdir `pwd`/rpm" -ta $(name_prefix)mpi-start-$(VERSION).tar.gz
+	mkdir -p RPMS/SOURCES RPMS/SRPMS RPMS/SPECS RPMS/BUILD RPMS/RPMS
+	rpmbuild --define "_topdir `pwd`/RPMS" -ta $(name_prefix)mpi-start-$(VERSION).tar.gz
 
 maintainer-clean: clean
-	rm -rf rpm
+	rm -rf RPMS 
 	rm -f $(maintainerclean_files)
 
 export VERSION
