@@ -22,9 +22,9 @@ install: mpi-start.1.bz2
 	install -m 0644 COPYING $(destdir)/$(docdir)
 	install -m 0644 AUTHORS $(destdir)/$(docdir)
 	mkdir -p $(destdir)/$(mandir)/man1
-	# install does not seem to work
-	cp mpi-start.1.bz2 $(destdir)/$(mandir)/man1/mpi-start.1.bz2
-	chmod 0644 $(destdir)/$(mandir)/man1/mpi-start.1.bz2
+	install -m 0644 mpi-start.1.bz2 $(destdir)/$(mandir)/man1
+	#cp mpi-start.1.bz2 $(destdir)/$(mandir)/man1/mpi-start.1.bz2
+	#chmod 0644 $(destdir)/$(mandir)/man1/mpi-start.1.bz2
 
 
 
