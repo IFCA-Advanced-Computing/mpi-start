@@ -489,6 +489,13 @@ mpi_start_core_detector() {
         info_msg "Physical layout of CPU not implemented for your OS ($MPI_START_UNAME)"
     fi
     info_msg "Detected $MPI_START_SOCKETS CPU socket(s) and $MPI_START_COREPERSOCKET core(s) per CPU"
+    # fix wrong detections
+    if test "x${MPI_START_SOCKETS}" = "x" -o $MPI_START_SOCKETS -eq 0 ; then
+        MPI_START_SOCKETS=1
+    fi
+    if test "x${MPI_START_COREPERSOCKET}" = "x" -o $MPI_START_COREPERSOCKET -eq 0 ; then
+        MPI_START_COREPERSOCKET=1
+    fi
 }
 
 #======================================================================
