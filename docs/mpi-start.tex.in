@@ -293,7 +293,7 @@ These distribution methods are included in MPI-Start:
 \item[mpiexec] uses OSC mpiexec for copying, needs OSC mpiexec installed.
 \item[cptoshared\_area] copies files to a shared area that is not the current working directory. Needs the following variables:
 \begin{itemize}
-\item \texttt{MPI\_SHARED\_HOME}: set to "yes".
+\item \texttt{MPI\_SHARED\_HOME}: set to \texttt{"yes"}.
 \item \texttt{MPI\_SHARED\_HOME\_PATH}: path of the shared area that will be used for execution.
 \end{itemize}
 \item[mpi\_mt] uses the mpi\_mt for copying the files. Needs mpi\_mt available in all machines.
@@ -569,15 +569,15 @@ The complete list of configuration variables for the WN is shown in the next tab
 \begin{tabularx}{\textwidth}{|l|c|X|}
 \hline
 \textbf{Variable}     & \textbf{Mandatory} & \textbf{Description}        \\ \hline
-\texttt{MPI\_<FLAVOUR>\_ENABLE}      & YES & set to "yes" if you want to enable the <flavour> \\ \hline 
+\texttt{MPI\_<FLAVOUR>\_ENABLE}      & YES & set to \texttt{"yes"} if you want to enable the <flavour> \\ \hline 
 \texttt{MPI\_<FLAVOUR>\_VERSION}     & NO  & set to the supported version of the <flavour>, usually is automatically detected \\ \hline
 \texttt{MPI\_<FLAVOUR>\_PATH}        & NO  & set to the path of supported version of the <flavour>, usually is automatically detected by the yaim WN plugin \\ \hline
-\texttt{MPI\_<FLAVOUR>\_MPIEXEC}     & NO  & If you are using OSC mpiexec (only in PBS/Torque sites), set this to the location of the mpiexec program, e.g. "/usr/bin/mpiexec" \\ \hline
+\texttt{MPI\_<FLAVOUR>\_MPIEXEC}     & NO  & If you are using OSC mpiexec (only in PBS/Torque sites), set this to the location of the mpiexec program, e.g. \texttt{"/usr/bin/mpiexec"} \\ \hline
 \texttt{MPI\_DEFAULT\_FLAVOUR}       & NO  & Set it to the default flavour for your site, if undefined, the first defined flavour will be used \\ \hline
-\texttt{MPI\_SHARED\_HOME}           & NO  & set this to "yes" if you have a shared home area between WNs. \\ \hline
+\texttt{MPI\_SHARED\_HOME}           & NO  & set this to \texttt{"yes"} if you have a shared home area between WNs. \\ \hline
 \texttt{MPI\_SHARED\_HOME\_PATH}     & NO  & location of the shared area for execution of MPI applications \\ \hline
-\texttt{MPI\_SSH\_HOST\_BASED\_AUTH} & NO  & set it to "yes" if you have SSH based authentication between WNs \\ \hline
-\texttt{MPI\_MPI\_START}             & NO  & Location of mpi-start if not installed in standard location (/usr/bin/mpi-start) \\ \hline
+\texttt{MPI\_SSH\_HOST\_BASED\_AUTH} & NO  & set it to \texttt{"yes"} if you have SSH based authentication between WNs \\ \hline
+\texttt{MPI\_MPI\_START}             & NO  & Location of mpi-start if not installed in standard location (\texttt{/usr/bin/mpi-start}) \\ \hline
 \end{tabularx}
 \end{center}
 
@@ -617,10 +617,10 @@ The complete list of configuration variables for the CE is shown in the next tab
 \begin{center}
 \begin{tabularx}{\textwidth}{|l|c|X|}
 \hline
-\textbf{MPI\_<FLAVOUR>\_ENABLE}    & YES & set to "yes" if you want to enable the <flavour> \\ \hline
+\textbf{MPI\_<FLAVOUR>\_ENABLE}    & YES & set to \texttt{"yes"} if you want to enable the <flavour> \\ \hline
 \textbf{MPI\_<FLAVOUR>\_VERSION}   & YES & set to the supported version of the <flavour>, usually is automatically detected \\ \hline
-\textbf{MPI\_SHARED\_HOME}         & NO  & set this to "yes" if you have a shared home area between WNs. \\ \hline
-\textbf{MPI\_SUBMIT\_FILTER}       & NO  & Set this to "yes" to configure the submit filter for torque batch system that enables the submission of parallel jobs \\ \hline
+\textbf{MPI\_SHARED\_HOME}         & NO  & set this to \texttt{"yes"} if you have a shared home area between WNs. \\ \hline
+\textbf{MPI\_SUBMIT\_FILTER}       & NO  & Set this to \texttt{"yes"} to configure the submit filter for torque batch system that enables the submission of parallel jobs. The configuration assumes that torque path is \texttt{/var/torque} or \texttt{TORQUE\_VAR\_DIR} variable if defined. \\ \hline
 \end{tabularx}
 \end{center}
 
@@ -687,9 +687,6 @@ MPI_LAM_VERSION="7.1.2"
 # set Open MPI as default flavour
 MPI_DEFAULT_FLAVOUR=OPENMPI
 
-# Enable the configuration of parallel jobs in torque
-MPI_SUBMIT_FILTER="yes"
-
 #---
 # Example for using an already installed version of MPI.
 # Setting "_PATH" and "_VERSION" variables will prevent YAIM
@@ -703,13 +700,13 @@ MPI_SUBMIT_FILTER="yes"
 
 # If you do NOT provide a shared home, set $MPI_SHARED_HOME to "no" (default).
 #
-MPI_SHARED_HOME="yes"
+# MPI_SHARED_HOME="yes"
 
 #
 # If you do NOT have SSH Hostbased Authentication between your WNs, set the below
 # variable to "no" (default). Else, set it to "yes".
 #
-MPI_SSH_HOST_BASED_AUTH="no"
+# MPI_SSH_HOST_BASED_AUTH="yes"
 
 
 # If you use Torque as batch system, you may want to let the yaim plugin
@@ -721,7 +718,6 @@ MPI_SSH_HOST_BASED_AUTH="no"
 # that file here (http://www.osc.edu/~pw/mpiexec/index.php). Else, leave empty.
 #
 #MPI_MPICH_MPIEXEC="/usr/bin/mpiexec"
-MPI_MPICH_MPIEXEC="/usr/bin/mpiexec"
 \end{verbatim}
 \end{small}
 
