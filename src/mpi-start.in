@@ -25,6 +25,7 @@ MPI_START_MPI_PREFIX=""
 MPI_START_CLEANUP_FILES=""
 MPI_START_SCHEDULER=""
 MPI_START_NP=1
+MPI_START_NPHOST=''
 # mpiexec params
 MPI_GLOBAL_PARAMS=""
 MPI_LOCAL_PARAMS=""
@@ -324,8 +325,9 @@ check_options() {
                    I2G_MPI_PRECOMMAND I2G_MPI_FLAVOUR I2G_MPI_JOB_NUMBER \
                    I2G_MPI_STARTUP_INFO I2G_MPI_RELAY \
                    I2G_MPI_PER_NODE I2G_MPI_PER_CORE I2G_MPI_PER_SOCKET \
+                   I2G_MPI_SINGLE_PROCESS I2G_MPI_SINGLE_CORE I2G_MPI_SINGLE_SOCKET \
                    I2G_MPI_APPLICATION_STDIN I2G_MPI_APPLICATION_STDOUT I2G_MPI_APPLICATION_STDERR \
-                   I2G_MPI_NP I2G_MPI_SINGLE_PROCESS I2G_MPI_CONFIG; 
+                   I2G_MPI_NP I2G_MPI_CONFIG; 
         do
             eval value="\${$var}"
             debug_msg "=> ${var}=${value}"
@@ -350,21 +352,38 @@ check_options() {
     fi
     
     if test "x${I2G_MPI_SINGLE_PROCESS}" = "x1" ; then
-        if test "x${I2G_MPI_PER_NODE}" != "x" ; then
+        if test "x${I2G_MPI_PER_NODE}" != "x" -a "x${I2G_MPI_PER_NODE}" != "x1" ; then
             warn_msg "Process per node option ($I2G_MPI_PER_NODE) overriding single process option!"
         else
             export I2G_MPI_PER_NODE=1
         fi
     fi
 
+    if test "x${I2G_MPI_SINGLE_CORE}" = "x1" ; then
+        if test "x${I2G_MPI_PER_CORE}" != "x" -a "x${I2G_MPI_PER_CORE}" != "x1" ; then
+            warn_msg "Process per core option ($I2G_MPI_PER_CORE) overriding single process option!"
+        else
+            export I2G_MPI_PER_CORE=1
+        fi
+    fi
+
+    if test "x${I2G_MPI_SINGLE_SOCKET}" = "x1" ; then
+        if test "x${I2G_MPI_PER_SOCKET}" != "x" -a "x${I2G_MPI_PER_SOCKET}" != "x1" ; then
+            warn_msg "Process per socket option ($I2G_MPI_PER_SOCKET) overriding single process option!"
+        else
+            export I2G_MPI_PER_SOCKET=1
+        fi
+    fi
+
+
     if test "x${I2G_MPI_PER_NODE}" != "x" ; then
         if test "x${I2G_MPI_PER_SOCKET}${I2G_MPI_PER_CORE}" != "x" ; then
-            warn_msg "node option used together with core or socket! only node specification will be considered"
+            warn_msg "Node option used together with core or socket! only node specification will be considered"
             unset I2G_MPI_PER_CORE
             unset I2G_MPI_PER_SOCKET
         fi
     elif test "x${I2G_MPI_PER_CORE}" != "x" -a  "x${I2G_MPI_PER_SOCKET}" != "x" ; then
-        warn_msg "core option used together with socket! only socket specification will be considered"
+        warn_msg "Core option used together with socket! only socket specification will be considered"
         unset I2G_MPI_PER_CORE
     fi
 
@@ -527,6 +546,7 @@ main() {
     done
 
     if test "x${I2G_MPI_PER_NODE}" != "x" ; then
+        export MPI_START_NPHOST=$I2G_MPI_PER_NODE
         export MPI_START_NP=`expr $MPI_START_NHOSTS '*' $I2G_MPI_PER_NODE`
     elif test "x${I2G_MPI_PER_SOCKET}${I2G_MPI_PER_CORE}" != "x" ; then
         warn_msg "*************************************************************"
@@ -534,9 +554,13 @@ main() {
         warn_msg " and that whole hosts are allocated for the job "
         warn_msg "*************************************************************"
         if test "x${I2G_MPI_PER_SOCKET}" != "x" ; then
-            export MPI_START_NP=`expr $MPI_START_NHOSTS '*' $MPI_START_SOCKETS`
+            export MPI_START_NPHOST=`expr $MPI_START_SOCKETS '*' $I2G_MPI_PER_SOCKET`
+            export MPI_START_NP=`expr $MPI_START_NHOSTS '*' $MPI_START_SOCKETS '*' $I2G_MPI_PER_SOCKET`
         else
-            export MPI_START_NP=`expr $MPI_START_NHOSTS '*' $MPI_START_SOCKETS '*' $MPI_START_COREPERSOCKET`
+            export MPI_START_NPHOST=`expr $MPI_START_SOCKETS '*' $MPI_START_COREPERSOCKET \
+                                         '*' $I2G_MPI_PER_CORE`
+            export MPI_START_NP=`expr $MPI_START_NHOSTS '*' $MPI_START_SOCKETS \
+                                 '*' $MPI_START_COREPERSOCKET '*' $I2G_MPI_PER_CORE`
         fi
     elif test "x${I2G_MPI_NP}" != "x" ; then
         export MPI_START_NP=$I2G_MPI_NP
@@ -546,7 +570,6 @@ main() {
 
     # setup the np count 
     debug_msg "starting with $MPI_START_NP processes."
-
 
     debug_msg "check for site environment"
 
@@ -652,8 +675,10 @@ main() {
 print_usage () {
     echo "mpi-start [-h] [-t mpi_type] [-v] [-vv] [-vvv]" 1>&2
     echo "    [-pre hook] [-post hook] [-pcmd cmd]" 1>&2
-    echo "    [-npnode n] [-np n]" 1>&2
-    echo "    [-pcore] [-psocket] [-pnode]" 1>&2
+    echo "    [-np n]" 1>&2
+    echo "    [-pnode|-npnode n]" 1>&2
+    echo "    [-psocket|-npsocket n]" 1>&2
+    echo "    [-pcore|-npcore n]" 1>&2
     echo "    [-i file] [-o file] [-e file]" 1>&2
     echo "    [-x VAR[=VALUE]] [-d VAR=VALUE] [--]" 1>&2
     echo "    application [...]" 1>&2
@@ -671,9 +696,11 @@ print_usage () {
     echo "  -post hook     use specified post run hook script" 1>&2
     echo "  -pcmd cmd      use specified pre command" 1>&2
     echo "  -npnode n      set number of processes per node" 1>&2
-    echo "  -pcore         start only one process per core" 1>&2
-    echo "  -psocket       start only one process per cpu socket" 1>&2
-    echo "  -pnode         start only one process per node" 1>&2
+    echo "  -pnode         start only one process per node (equivalent to -npnode 1)" 1>&2
+    echo "  -npcore n      set number of processes per core" 1>&2
+    echo "  -pcore         start only one process per core (equivalent to -npcore 1)" 1>&2
+    echo "  -npsocket n    set number of processes per cpu socket" 1>&2
+    echo "  -psocket       start only one process per cpu socket (equivalent to -npsocket 1)" 1>&2
     echo "  -np n          set total number of processes" 1>&2
     echo "  -c file        use file for sourcing mpi-start variables" 1>&2
     echo "  -i file        use file for standard input" 1>&2
@@ -745,16 +772,26 @@ if test "$I2G_MPI_START_ENABLE_TESTING" != "TEST" ; then
                 shift
                 ;;
             -pcore)
-                export I2G_MPI_PER_CORE=1
+                export I2G_MPI_SINGLE_CORE=1
                 shift
                 ;;
             -psocket)
-                export I2G_MPI_PER_SOCKET=1
+                export I2G_MPI_SINGLE_SOCKET=1
                 shift
                 ;;
             -npnode)
                 shift
                 export I2G_MPI_PER_NODE=$1
+                shift
+                ;;
+            -npcore)
+                shift
+                export I2G_MPI_PER_CORE=$1
+                shift
+                ;;
+            -npsocket)
+                shift
+                export I2G_MPI_PER_SOCKET=$1
                 shift
                 ;;
             -np)

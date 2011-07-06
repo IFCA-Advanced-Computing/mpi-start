@@ -35,6 +35,7 @@ fi
 # activate MPI
 mpi_start_activate_mpi $MPI_START_MPI_PREFIX "$MPI_START_MPI_MODULE"
 search_openmpi_info_command
+export OPENMPI_SET_NP=1
 
 if test "x$MPI_START_DISABLE_LRMS_INTEGRATION" == "xyes"; then
     # we are not the primary MPI 
@@ -78,13 +79,16 @@ mpi_exec () {
         $MPI_OPENMPI_INFO --parseable | grep "pls:tm" &> /dev/null
         if test $? -eq 0 ; then
             debug_msg "found openmpi and PBS (with pbs support enabled), don't set machinefile"
-            export machines_params="-np $MPI_START_NP"
         else
-            export machines_params="-machinefile $MPI_START_MACHINEFILE -np $MPI_START_NP"
+            machines_params="-machinefile $MPI_START_MACHINEFILE"
         fi 
     else
         # non pbs, set machine file and np
-        export machines_params="-machinefile $MPI_START_MACHINEFILE -np $MPI_START_NP"
+        machines_params="-machinefile $MPI_START_MACHINEFILE"
+    fi
+
+    if test "x${OPENMPI_SET_NP}" = "x1" ; then
+        machines_params="$machines_params -np $MPI_START_NP"
     fi
 
     if test "x${I2G_MPI_PER_NODE}" != "x" ; then

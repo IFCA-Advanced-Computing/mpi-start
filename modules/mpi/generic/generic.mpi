@@ -15,7 +15,7 @@ mpi_exec () {
         return $?
     fi
 
-    if test "x${I2G_MPI_PER_NODE}" != "x" ; then
+    if test "x${MPI_START_NPHOST}" != "x" ; then
         MPI_GLOBAL_PARAMS="-machinefile $MPI_START_HOSTFILE -np $MPI_START_NP"
     else
         MPI_GLOBAL_PARAMS="-machinefile $MPI_START_MACHINEFILE -np $MPI_START_NP"
