@@ -43,4 +43,6 @@ make rpm
 mv rpms/RPMS/noarch/*.rpm $BASEDIR/RPMS
 mv rpms/SRPMS/*.rpm $BASEDIR/RPMS
 
+# Debian?
+
 exit 0
