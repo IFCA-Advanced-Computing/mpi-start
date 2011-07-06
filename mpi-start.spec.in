@@ -46,6 +46,15 @@ rm -rf $RPM_BUILD_ROOT/*
 %config(noreplace) %{_sysconfdir}/profile.d/mpi_start.csh
 
 %changelog
-* Fri Mar 4 2011 <enolfc _AT_ ifca.unican.es> - @VERSION@-1
+* Wed Aug 10 2011 <enolfc _AT_ ifca.unican.es> - 1.0.5-1
+- Fixed bugs #38 (https://devel.ifca.es/mpi-start/ticket/38), 
+  #31 (https://devel.ifca.es/mpi-start/ticket/31), and
+  #35 (https://devel.ifca.es/mpi-start/ticket/35)
+- New MPI affinity hook
+- New per proc/per socket/per core options for controlling processes
+- New man page
+- Updated documentation
+
+* Fri Mar 4 2011 <enolfc _AT_ ifca.unican.es> - 1.0.4-1
 - Fedora guidelines compliant package.
 - See ChangeLog at doc directory.
