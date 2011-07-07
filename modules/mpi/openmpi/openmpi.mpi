@@ -35,6 +35,10 @@ fi
 # activate MPI
 mpi_start_activate_mpi $MPI_START_MPI_PREFIX "$MPI_START_MPI_MODULE"
 search_openmpi_info_command
+# get openmpi version
+export OPENMPI_VERSION_MAJOR=`$MPI_OPENMPI_INFO --parseable -v ompi major | grep "ompi:version:full" | cut -f4 -d":"` 
+export OPENMPI_VERSION_MINOR=`$MPI_OPENMPI_INFO --parseable -v ompi minor | grep "ompi:version:full" | cut -f4 -d":"` 
+export OPENMPI_VERSION_RELEASE=`$MPI_OPENMPI_INFO --parseable -v ompi release | grep "ompi:version:full" | cut -f4 -d":"` 
 export OPENMPI_SET_NP=1
 
 if test "x$MPI_START_DISABLE_LRMS_INTEGRATION" == "xyes"; then
@@ -87,17 +91,12 @@ mpi_exec () {
         machines_params="-machinefile $MPI_START_MACHINEFILE"
     fi
 
-    if test "x${OPENMPI_SET_NP}" = "x1" ; then
-        machines_params="$machines_params -np $MPI_START_NP"
-    fi
 
-    if test "x${I2G_MPI_PER_NODE}" != "x" ; then
-        # Open MPI does not like to have npernode if it oversubscribes nodes in version 1.2.8 
-        if test ${I2G_MPI_PER_NODE} -le ${MPI_START_NSLOTS_PER_HOST} ; then
-            machines_params="$machines_params -npernode $I2G_MPI_PER_NODE"
-        else
-            warn_msg "Per node count option will not be used in order to avoid node oversubscription!"
-        fi
+    if test "x${MPI_START_NPHOST}" != "x" ; then
+        machines_params="$machines_params -npernode $MPI_START_NPHOST"
+    else
+        # do not set -np if we are using npernode
+        machines_params="$machines_params -np $MPI_START_NP"
     fi
 
     # set the parameters to be always used with Open MPI:
