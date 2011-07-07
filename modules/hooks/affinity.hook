@@ -88,8 +88,6 @@ pre_run_hook () {
         done
         export OPENMPI_PARAMS="$OPENMPI_PARAMS --rankfile $rankfile"
         debug_msg "dump rankfile: `cat $rankfile`"
-        cat $rankfile
-
     else
         warn_msg "Processor affinity is only supported for Open MPI!"
     fi
