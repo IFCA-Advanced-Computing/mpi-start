@@ -540,7 +540,7 @@ mpi_start_core_detector() {
 #======================================================================
 mpi_start_np_setup () {
     debug_msg "dump hosts:"
-    for i in `cat $MPI_START_HOSTFILE` ; do
+    for i in `cat "$MPI_START_HOSTFILE" 2> /dev/null` ; do
         debug_msg "=> $i"
     done
 
