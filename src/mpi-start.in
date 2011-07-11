@@ -127,7 +127,7 @@ mpi_start_find_mktemp () {
 mpi_start_mktemp () {
     MPI_START_TEMP_FILE=`$MPI_START_MKTEMP $*`
     if test $? -ne 0 ; then
-        warn_msg "Unable to create temp file!"
+        error_msg "Unable to create temp file!"
     fi
     MPI_START_CLEANUP_FILES="$MPI_START_TEMP_FILE $MPI_START_CLEANUP_FILES"
 }
@@ -397,7 +397,7 @@ check_options() {
     mpi_start_find_mktemp
 
     # set global internal variables 
-    MPI_START_PREFIX=`dirname $I2G_MPI_START`
+    MPI_START_PREFIX=`dirname "$I2G_MPI_START"`
     # TODO! allow several configuration directories/files
     MPI_START_ETC="$MPI_START_PREFIX/../etc/mpi-start"
     if test ! -d "$MPI_START_ETC" ; then
@@ -413,6 +413,9 @@ check_options() {
     fi
 }
 
+#======================================================================
+# Scheduler detector function 
+#======================================================================
 mpi_start_scheduler_detector() {
     # check for scheduling system and set environment variables
     info_msg "search for scheduler"
@@ -424,7 +427,8 @@ mpi_start_scheduler_detector() {
         debug_msg "source $i"
         . $i
         if test $? -ne 0  ; then 
-            warn_msg "failed to source : $i"
+            error_msg "failed to source : $i"
+            continue
         fi
 
         local scheduler=`basename $i .scheduler`
@@ -467,36 +471,49 @@ mpi_start_scheduler_detector() {
     fi
 }
 
+#======================================================================
+# Detects number of sockets/cores in linux
+#======================================================================
 mpi_start_linux_core_detector() {
     MPI_START_SOCKETS=`cat /proc/cpuinfo | grep "physical id" | sort -u | wc -l`
     if test $? -ne 0 ; then
-        warn_msg "Unable to detect number of cpus, assuming 1"
+        info_msg "Unable to detect number of cpus, assuming 1"
         MPI_START_SOCKETS=1
     fi
     MPI_START_COREPERSOCKET=`cat /proc/cpuinfo | grep "cpu cores" | sort -u | cut -f2 -d":" | tr -d " "`
     if test $? -ne 0 ; then
-        warn_msg "Unable to detect number of cores per cpu, assuming 1"
+        info_msg "Unable to detect number of cores per cpu, assuming 1"
         MPI_START_COREPERSOCKET=1
     fi
 }
 
+#======================================================================
+# Detects number of sockets/cores in darwin (MacOS) 
+#======================================================================
 mpi_start_darwin_core_detector() {
     MPI_START_COREPERSOCKET=`sysctl -n machdep.cpu.cores_per_package`
     if echo $MPI_START_COREPERSOCKET | grep "^machdep:" > /dev/null ; then
-        warn_msg "Unable to detect number of cores per cpu, assuming 1"
+        info_msg "Unable to detect number of cores per cpu, assuming 1"
         MPI_START_COREPERSOCKET=1
     fi
     local totalcpus=`sysctl -n hw.ncpu`
     if test $? -ne 0 ; then
-        warn_msg "Unable to detect total number of cpus, assuming 1"
+        info_msg "Unable to detect total number of cpus, assuming 1"
         MPI_START_SOCKETS=1
     else
         MPI_START_SOCKETS=`expr $totalcpus / $MPI_START_COREPERSOCKET`
     fi  
 }
 
+#======================================================================
+# Detects number of sockets/cores 
+#======================================================================
 mpi_start_core_detector() {
     debug_msg "Detection of core/cpu topology."
+    if test "x${MPI_START_SOCKETS}" != "x" -a "x${MPI_START_COREPERSOCKET}" != "x" ; then
+        info_msg "User defined values for number of sockets ($MPI_START_SOCKETS) and cores per socket ($MPI_START_COREPERSOCKET)"
+        return 0
+    fi
 
     MPI_START_SOCKETS=1
     MPI_START_COREPERSOCKET=1
@@ -515,44 +532,24 @@ mpi_start_core_detector() {
     if test "x${MPI_START_COREPERSOCKET}" = "x" -o $MPI_START_COREPERSOCKET -eq 0 ; then
         MPI_START_COREPERSOCKET=1
     fi
+    return 0
 }
 
 #======================================================================
-# The main function that binds everything together
+# Sets up the number of processes to start 
 #======================================================================
-main() {
-    #
-    # Output general information
-    #
-    info_msg "************************************************************************" 
-    info_msg "UID     = " `whoami` 
-    info_msg "HOST    = " `hostname` 
-    info_msg "DATE    = " `date`
-    info_msg "VERSION =  @VERSION@"  
-    info_msg "************************************************************************"
-
-    debug_msg "Command line arguments: $*" 
-
-    check_options
-    
-    mpi_start_scheduler_detector
-
-    # core/cpu detection
-    mpi_start_core_detector
-
+mpi_start_np_setup () {
     debug_msg "dump hosts:"
     for i in `cat $MPI_START_HOSTFILE` ; do
         debug_msg "=> $i"
     done
 
+    # setup the np count 
     if test "x${I2G_MPI_PER_NODE}" != "x" ; then
         export MPI_START_NPHOST=$I2G_MPI_PER_NODE
         export MPI_START_NP=`expr $MPI_START_NHOSTS '*' $I2G_MPI_PER_NODE`
     elif test "x${I2G_MPI_PER_SOCKET}${I2G_MPI_PER_CORE}" != "x" ; then
-        warn_msg "*************************************************************"
-        warn_msg " MPI-Start will assume all hosts have same number of sockets "
-        warn_msg " and that whole hosts are allocated for the job "
-        warn_msg "*************************************************************"
+        info_msg "Assuming all hosts have same CPU cores configuration and whole hosts are allocated for the job"
         if test "x${I2G_MPI_PER_SOCKET}" != "x" ; then
             export MPI_START_NPHOST=`expr $MPI_START_SOCKETS '*' $I2G_MPI_PER_SOCKET`
             export MPI_START_NP=`expr $MPI_START_NHOSTS '*' $MPI_START_SOCKETS '*' $I2G_MPI_PER_SOCKET`
@@ -568,10 +565,14 @@ main() {
         export MPI_START_NP=$MPI_START_NSLOTS
     fi
 
-    # setup the np count 
     debug_msg "starting with $MPI_START_NP processes."
+}
 
-    debug_msg "check for site environment"
+#======================================================================
+# Load execution environment  
+#======================================================================
+mpi_start_load_execenv () {
+    debug_msg "Loading execution environment"
 
     # check if we should should use default MPI falvour
     if test "x$I2G_MPI_TYPE" = "x"  ; then 
@@ -654,8 +655,36 @@ main() {
         dump_env
         exit 1
     fi
+}
 
-    # export X509_USER_PROXY if it's there.
+#======================================================================
+# The main function that binds everything together
+#======================================================================
+main() {
+    #
+    # Output general information
+    #
+    info_msg "***********************************************************" 
+    info_msg " UID     = " `whoami` 
+    info_msg " HOST    = " `hostname` 
+    info_msg " DATE    = " `date`
+    info_msg " VERSION =  @VERSION@"  
+    info_msg "***********************************************************" 
+
+    debug_msg "Command line arguments: $*" 
+
+    check_options
+    
+    mpi_start_scheduler_detector
+
+    # core/cpu detection
+    mpi_start_core_detector
+
+    mpi_start_np_setup
+
+    mpi_start_load_execenv
+
+    # export X509_USER_PROXY if it's there (grid related)
     if test "x$X509_USER_PROXY" != "x" ; then
         mpi_start_export_variable X509_USER_PROXY
     fi
@@ -712,6 +741,9 @@ print_usage () {
     echo "  --             separator for application and arguments" 1>&2
 }
 
+#======================================================================
+#  Print version.
+#======================================================================
 print_version () {
     echo "mpi-start v@VERSION@" 
 }
