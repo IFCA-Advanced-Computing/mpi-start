@@ -45,9 +45,24 @@ mpi_start_detect_shared_fs() {
     if test "x$MPI_START_SHARED_FS" = "x" ; then
         debug_msg "detect shared filesystem"
 
+        if test "x${MPI_START_UNAME}" = "xlinux" ; then
+            #MOUNT_POINTS=`cat "/etc/mtab" | cut -d ' '  -f2`
+            #MOUNT_POINTS_FS=`cat "/etc/mtab" | cut -d ' ' -f3`
+            # alternative system: use mount
+            MOUNT_POINTS=`mount | sed 's/.* on \([^ ]*\) type \([^ ]*\) .*/\1/'`
+            MOUNT_POINTS_FS=`mount | sed 's/.* on \([^ ]*\) type \([^ ]*\) .*/\2/'`
+
+        elif test "x${MPI_START_UNAME}" = "xdarwin" ; then
+            # this could be more efficient if only done once.
+            MOUNT_POINTS=`mount | sed 's/.* on \(.*\) (\([^,]*\),.*/\1/'`
+            MOUNT_POINTS_FS=`mount | sed 's/.* on \(.*\) (\([^,]*\),.*/\2/'` 
+        else
+            warn_msg "FS detection not supported in your OS, assuming not shared FS"
+            export MPI_START_SHARED_FS=0;
+            return 0
+        fi
+
         CUR_DIR=$PWD
-        MOUNT_POINTS=`cat /etc/mtab | cut -d ' '  -f2`
-        MOUNT_POINTS_FS=`cat /etc/mtab | cut -d ' ' -f3`
         LOCAL_FS_TYPE="unknown"
 
         # dump mount points
@@ -61,19 +76,25 @@ mpi_start_detect_shared_fs() {
         debug_msg "current working directory : $CUR_DIR"
 
         while test "x$CUR_DIR" != "x"  ; do
-            IS_LINK=`stat $CUR_DIR | grep File | awk '{ print $3 }' `
+            IS_LINK=`readlink -n $CUR_DIR`
             if test "x$IS_LINK" != "x" ; then
-                SYM_LINK=`stat -c "%N" $CUR_DIR`
-                debug_msg "found symbolic link : $SYM_LINK "
-                CUR_DIR=`stat $CUR_DIR | grep File | awk '{ print $4 }' | tr -d \\\047 | tr -d \\\140 `
-                # Remove possible trailing slash
-                # that may lead to not find the proper mount point
+                debug_msg "found symbolic link : $CUR_DIR -> $IS_LINK"
+                if test "${IS_LINK#\/}" = "${IS_LINK}" ; then
+                    CUR_DIR=`dirname $CUR_DIR`/${IS_LINK}
+                else
+                    CUR_DIR=${IS_LINK}
+                fi
+            fi
+
+            # be sure to remove trailing slashes (unless it is /!)
+            if test "x$CUR_DIR" != "x/"; then
                 CUR_DIR=${CUR_DIR%"/"}
             fi
 
             MOUNT_POINT_INDEX=1
             for MOUNT_POINT in $MOUNT_POINTS ; do
                 if test "x$MOUNT_POINT" = "x$CUR_DIR" ; then
+                    debug_msg "Found mount point ($MOUNT_POINT) for working directory"
                     LOCAL_FS_TYPE=`echo $MOUNT_POINTS_FS | cut -d ' ' -f$MOUNT_POINT_INDEX `
                     break 2
                 fi
@@ -91,10 +112,12 @@ mpi_start_detect_shared_fs() {
         done
 
         case $LOCAL_FS_TYPE in
-        nfs|gfs|afs|smb|gpfs|lustre) debug_msg "found network fs : $LOCAL_FS_TYPE";
+        nfs|gfs|afs|smb|gpfs|lustre)
+            debug_msg "found network fs : $LOCAL_FS_TYPE";
             export MPI_START_SHARED_FS=1;
              ;;
-        *) debug_msg "found local fs : $LOCAL_FS_TYPE";
+        *)
+            debug_msg "found local fs : $LOCAL_FS_TYPE";
             export MPI_START_SHARED_FS=0;
             ;;
         esac
