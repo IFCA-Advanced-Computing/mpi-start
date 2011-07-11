@@ -55,21 +55,31 @@ Export the \fIVAR\fR into the application environment. Optionally set its \fIVAL
 \fB\-d \fIVAR=VALUE\fB\fR
 Define mpi-start variable \fIVAR\fR with the specified \fIVALUE\fR.
 .SS PROCESS OPTIONS 
+.PP
+All of this options are exclusive between them (e.g. it cannot be specified for the same execution a number of processes per node and a number of processes per core). If more than one is specified in the command line, mpi-start will consider the following order: proceses per node, processes per socket, processes per core, total number of processes.
+.PP 
+Per core and per socket options assume all hosts involved in the execution have the same CPU layout and that all of the CPUs are allocated for the current execution.
 .TP
 \fB\-npnode \fIN\fB\fR
 Start \fIN\fR processes at each node.
 .TP
-\fB\-pcore\fR
-Start only one process per core.
+\fB\-npsocket \fIN\fB\fR
+Start \fIN\fR processes at each CPU socket.
 .TP
-\fB\-psocket\fR
-Start only one process per CPU socket.
+\fB\-npcore \fIN\fB\fR
+Start \fIN\fR processes at each core.
+.TP
+\fB\-np \fIN\fB\fR
+Start \fIN\fR processes.
 .TP
 \fB\-pnode\fR
 Start only one process per node (equivalent to -npnode 1).
 .TP
-\fB\-np \fIN\fB\fR
-Start \fIN\fR processes.
+\fB\-psocket\fR
+Start only one process per CPU socket (equivalent to -npsocket 1).
+.TP
+\fB\-pcore\fR
+Start only one process per core (equivalent to -npcore 1).
 .\" --             separator for application and arguments
 .SH FILES
 .PP
@@ -87,5 +97,5 @@ mpi-start trac: \fBhttp://devel.ifca.es/trac/mpi-start/\fR
 .fi
 
 .SH AUTHOR
-MPI-Start team \- <http://devel.ifca.es/mpi-start>
+mpi-start team \- <http://devel.ifca.es/mpi-start>
 

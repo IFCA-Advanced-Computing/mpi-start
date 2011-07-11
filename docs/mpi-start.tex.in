@@ -3,14 +3,14 @@
 \usepackage{tabularx}
 \usepackage{url}
 
-\title{MPI-Start and MPI-Utils}
+\title{mpi-start and MPI-Utils}
 \author{E. Fernández}
-\DocVersion{1.0.1}
+\DocVersion{1.0.2}
 \EMICompVersion{@VERSION@}
 \Date{\today}
 
 \Abstract{
-MPI-Start is a set of scripts to close the gap between the workload management
+mpi-start is a set of scripts to close the gap between the workload management
 system of a Grid insfrastructure and the configuration of the nodes on which
 MPI applications are run. The package is used to help the user start MPI
 applications on heterogeneous Grid sites.
@@ -26,34 +26,34 @@ applications on heterogeneous Grid sites.
 \newpage
 
 \section{Functional Description}
-MPI-Start is a set of scripts to close the gap between the workload management
+mpi-start is a set of scripts to close the gap between the workload management
 system of a Grid insfrastructure and the configuration of the nodes on which
 MPI applications are run. The package is used to help the user start MPI
 applications on heterogeneous Grid sites. 
 
-MPI-Start was originally developed in the frame of the int.eu.grid project for
+mpi-start was originally developed in the frame of the int.eu.grid project for
 the execution of MPI applications with the CrossBroker metascheduler and then
 extended its use as the official way of starting MPI jobs within EGEE.
 Currently, it is part of the EMI project. 
 
 There is a trac page at \url{http://devel.ifca.es/mpi-start} with information about
-the development of MPI-Start.
+the development of mpi-start.
 
 \section{Release Notes}
 
 \subsection{What's new}
 
-MPI-Start 1.0.4 is an update release of MPI-Start that includes minor improvements and corrections.
-Most of MPI-Start 1.0.3 release notes are applicable to MPI-Start 1.0.4, check
-them at the MPI-Start trac for more information.
+mpi-start 1.0.4 is an update release of mpi-start that includes minor improvements and corrections.
+Most of mpi-start 1.0.3 release notes are applicable to mpi-start 1.0.4, check
+them at the mpi-start trac for more information.
 
-MPI-utils is a metapackge (glite-mpi) that depends on MPI-Start and a yaim
+MPI-utils is a metapackge (glite-mpi) that depends on mpi-start and a yaim
 plugin for configuration. In this version the yaim plugin includes fixes to
 several bugs.
 
 \subsection{Changes}
-\subsubsection{MPI-Start}
-Major Changes for MPI-Start 1.0.x versions until 1.0.4 are:
+\subsubsection{mpi-start}
+Major Changes for mpi-start 1.0.x versions until 1.0.4 are:
 \begin{itemize}
 \item New hook plugin architecture: now hooks can be installed in the configuration directory as independent files with .hook extension.
 \item Revision of scheduler support modules and inclusion of new schedulers, the current supported schedulers are the following:
@@ -66,7 +66,7 @@ Major Changes for MPI-Start 1.0.x versions until 1.0.4 are:
 \end{itemize}
 \item New dummy scheduler and execution environments for testing.
 \item Fine grained mapping of processes to physical resources with -np, -npnode and -pnode options.
-\item New command line options for specifying MPI-Start configuration
+\item New command line options for specifying mpi-start configuration
 \item Basic support for OpenMP
 \item Fixed installation paths, default installation now follows FHS.
 \item Added unit testing
@@ -76,7 +76,7 @@ Major Changes for MPI-Start 1.0.x versions until 1.0.4 are:
 Check the Changelog file for a detailed list of changes.
 
 \subsubsection{MPI-Utils}
-MPI-utils is a meta package with MPI-Start and the yaim configuration plugin.
+MPI-utils is a meta package with mpi-start and the yaim configuration plugin.
 Changes in the yaim version 1.1.9 are:
 \begin{itemize}
 \item Updated documentation for yaim configuration
@@ -88,11 +88,11 @@ Changes in the yaim version 1.1.9 are:
 Check the Changelog file for a detailed list of changes.
 
 \subsection{Requirements}
-MPI-Start only requires bash compatible shell for working.
+mpi-start only requires bash compatible shell for working.
 
 \subsection{Source Code}
 
-Source code is available at MPI-Start repository
+Source code is available at mpi-start repository
 (\url{https://devel.ifca.es/hg/mpi-start}) with tag \texttt{mpi-start\_R\_1\_0\_4 }
 and at org.glite.yaim.mpi glite
 (\url{http://jra1mw.cvs.cern.ch/cgi-bin/jra1mw.cgi/org.glite.yaim.mpi/})
@@ -108,13 +108,13 @@ schedulers.
 \section{User Guide}
 
 \subsection{Description}
-MPI-Start is an abstraction layer that offers a unique interface to start
+mpi-start is an abstraction layer that offers a unique interface to start
 parallel jobs with different execution environments implementations. It
 provides support for different MPI implementations.
 
 \subsection{Installation}
 
-Normally users do not need to install MPI-Start. However if they want to use
+Normally users do not need to install mpi-start. However if they want to use
 it in a site without an existing installation, the recommendation is to create
 a tarball installation that can be transfered in the input sandbox of the job.
 
@@ -127,15 +127,15 @@ $ make tarball
 \end{small}
 
 This will create a mpi-start-X.Y.Z.tar.gz (with X.Y.Z being the version of
-MPI-Start) that contains all that is needed for the execution of jobs. In your
+mpi-start) that contains all that is needed for the execution of jobs. In your
 job script unpack the tarball and set the \texttt{I2G\_MPI\_START} environment
 variable to \texttt{\$PWD/bin/mpi-start}.
 
 \subsection{Usage}
 
-MPI-Start can be controlled via environment variables or command line
+mpi-start can be controlled via environment variables or command line
 switches, most configuration dependent paramenters are automatically detected
-by MPI-Start and do not need to be specified by the user. The following
+by mpi-start and do not need to be specified by the user. The following
 command line will be enough to run the application with the site defaults:
 
 \begin{small}
@@ -156,12 +156,16 @@ $ mpi-start application [application arguments ...]
 \item[-post hook] use \texttt{hook}  as post-hook file
 \item[-pcmd cmd ] use  \texttt{cmd} as pre-command
 \item[-npnode n] start $n$ processes per node
-\item[-pnode] start 1 process per node
-\item[-np n] start exactly $n$ processes
+\item[-pnode] start only one process per node (equivalent to -npnode 1)
+\item[-npsocket n] start $n$ processes per CPU socket 
+\item[-psocket] start only one process per CPU socket (equivalent to -npsocket 1)
+\item[-npcore n] start $n$ processes per core
+\item[-pcore] start only one process per core (equivalent to -npcore 1)
+\item[-np n] set total number of processes
 \item[-i file] use \texttt{file} as standard input file
 \item[-o file] use \texttt{file} as standard output file
 \item[-e file] use \texttt{file} as standard error file
-\item[-x VAR[=VALUE]] define variable VAR with optional VALUE for the application's environment (will not be seen by MPI-Start!)
+\item[-x VAR[=VALUE]] define variable VAR with optional VALUE for the application's environment (will not be seen by mpi-start!)
 \item[-d VAR=VALUE] define variable VAR with VALUE
 \item[--] optional separator for application and arguments, after this, any arguments will be considered the application to run and its arguments
 \end{description}
@@ -179,49 +183,89 @@ $ mpi-start -t openmpi -npnode 3 -- /bin/hostname
 Prior to version 1.0.0 mpi-start only used environment variables to control
 its behavior. This is still possible, although command line arguments will
 override the environment variables defined. Next table shows the complete list
-of variables:
+of variables, with the command line options that can be used to set them:
 
 \begin{center}
-\begin{tabularx}{\textwidth}{|l|X|}
+\begin{tabularx}{\textwidth}{llX}
 \hline
-\textbf{Variable}        &              \textbf{Meaning}         \\
+\textbf{Variable}                      & \textbf{Cmd line}  &   \textbf{Meaning}         \\
+\hline \hline
+\texttt{I2G\_MPI\_APPLICATION}         & &
+The application binary to execute. \\
 \hline
-\texttt{I2G\_MPI\_APPLICATION} & The application binary to execute. \\
+\texttt{I2G\_MPI\_APPLICATION\_ARGS}   & &
+The command line parameters for the application \\
 \hline
-\texttt{I2G\_MPI\_APPLICATION\_ARGS} & The command line parameters for the application \\
+\texttt{I2G\_MPI\_TYPE}                & -t &
+The name of the MPI implementation to use. \\
 \hline
-\texttt{I2G\_MPI\_TYPE} & The name of the MPI implementation to use. \\
+
+\texttt{I2G\_MPI\_PRE\_RUN\_HOOK}      & -pre &
+This variable can be set to a script which must define the pre\_run\_hook function. This function will be called after the MPI support has been established and before the internal pre-run hooks. This hook can be used to prepare input data or compile the program. \\
 \hline
-\texttt{I2G\_MPI\_VERSION} & Specifies the version of the MPI implementation specified by I2G\_MPI\_TYPE. If not specified the default version will be used. \\
+\texttt{I2G\_MPI\_POST\_RUN\_HOOK}     & -post &
+This variable can be set to a script which must define the post\_run\_hook function. This function will be called after the mpirun has finished. \\
 \hline
-\texttt{I2G\_MPI\_PRE\_RUN\_HOOK} & This variable can be set to a script which must define the pre\_run\_hook function. This function will be called after the MPI support has been established and before the internal pre-run hooks. This hook can be used to prepare input data or compile the program. \\
+\texttt{I2G\_MPI\_START\_VERBOSE}      & -v & 
+Set to 1 to turn on the additional output.\\
 \hline
-\texttt{I2G\_MPI\_POST\_RUN\_HOOK} & This variable can be set to a script which must define the post\_run\_hook function. This function will be called after the mpirun has finished. \\
+\texttt{I2G\_MPI\_START\_DEBUG}        & -vv &
+Set to 1 to enable debugging output \\
 \hline
-\texttt{I2G\_MPI\_START\_VERBOSE} & Set to 1 to turn on the additional output.\\
+\texttt{I2G\_MPI\_START\_TRACE}        & -vvv &
+Set to 1 to trace every operation that is performed by mpi-start \\
 \hline
-\texttt{I2G\_MPI\_START\_DEBUG} & Set to 1 to enable debugging output \\
+\texttt{I2G\_MPI\_APPLICATION\_STDIN}  & -i &
+Standard input file to use. \\
 \hline
-\texttt{I2G\_MPI\_START\_TRACE}  & Set to 1 to trace every operation that is performed by mpi-start \\
+\texttt{I2G\_MPI\_APPLICATION\_STDOUT} & -o & 
+Standard output file to use. \\
 \hline
-\texttt{I2G\_MPI\_APPLICATION\_STDIN} & Standard input file to use. \\
+\texttt{I2G\_MPI\_APPLICATION\_STDERR} & -e &
+Standard error file to use. \\
 \hline
-\texttt{I2G\_MPI\_APPLICATION\_STDOUT} & Standard output file to use. \\
+\texttt{I2G\_MPI\_SINGLE\_PROCESS}     & -pnode
+& Set it to 1 to start only one process per node. \\
 \hline
-\texttt{I2G\_MPI\_APPLICATION\_STDERR} & Standard error file to use. \\
+\texttt{I2G\_MPI\_PER\_NODE}           & -npnode
+& Number of processes to start per node. \\
 \hline
-\texttt{I2G\_MPI\_SINGLE\_PROCESS} & Set it to 1 to start only one process per node. \\
+\texttt{I2G\_MPI\_SINGLE\_SOCKET}      & -psocket
+& Set it to 1 to start only one process per CPU socket.\\
 \hline
-\texttt{I2G\_MPI\_PER\_NODE} & Number of processes to start per node. \\
+\texttt{I2G\_MPI\_PER\_SOCKET}         & -npsocket
+& Number of processes to start per CPU socket. \\
 \hline
-\texttt{I2G\_MPI\_NP} & Total number of processes to start.\\
+\texttt{I2G\_MPI\_SINGLE\_CORE}        & -pcore
+& Set it to 1 to start only one process per core. \\
+\hline
+\texttt{I2G\_MPI\_PER\_CORE}           & -npcore
+& Number of processes to start per core. \\
+\hline
+\texttt{I2G\_MPI\_NP}                  & -np
+& Total number of processes to start.\\
+\hline
+\end{tabularx} 
+\end{center}
+
+There are also other variables that can modify the behaviour of mpi-start.
+They do not have a command line switch, but can be set with the \texttt{-d}
+option (i.e. \texttt{mpi-start -d I2G\_MPI\_VERSION=1.2}
+
+\begin{center}
+\begin{tabularx}{\textwidth}{lX}
+\hline
+\textbf{Variable}                      &  \textbf{Meaning}         \\
+\hline
+\hline
+\texttt{I2G\_MPI\_VERSION}             &  Specifies the version of the MPI implementation specified by I2G\_MPI\_TYPE. If not specified the default version will be used. \\
 \hline
 \end{tabularx} 
 \end{center}
 
 \subsection{Scheduler and Execution Environment Support}
 
-MPI-Start support different combinations of batch schedulers and execution
+mpi-start support different combinations of batch schedulers and execution
 environments using plugins. The schedulers are automatically detected from the
 environment and the execution environment can be selected with the
 \texttt{I2G\_MPI\_TYPE} variable or the $-t$ command line option. 
@@ -250,9 +294,9 @@ environment and the execution environment can be selected with the
 \end{center}
 
 \section{Hooks}
-The MPI-Start Hooks Framework allow the extension of MPI-Start features without changing the core functionality.
+The mpi-start Hooks Framework allow the extension of mpi-start features without changing the core functionality.
 
-Several hooks are included in the default distribution of MPI-Start for
+Several hooks are included in the default distribution of mpi-start for
 dealing with file distribution and some MPI extensions. Site admins can check
 the local hooks description while users probably are interested in developing
 their own hooks for compilation.
@@ -261,18 +305,18 @@ their own hooks for compilation.
 
 File distribution hooks are responsible for providing a common set of files prior to the execution of the application in all the hosts involved in that execution. Two steps are taken for file distribution:
 \begin{itemize}
-\item Detection of shared filesystem: MPI-Start will try to detect if the
+\item Detection of shared filesystem: mpi-start will try to detect if the
 current working directory is in a network file system (currently considered as
 such are: nfs, gfs, afs, smb, gpfs and lustre). If the detection is positive,
 the distribution of files is not performed. Detection can be totally skipped
-by setting: \texttt{MPI\_START\_SHARED\_FS} to 0 or 1 (0 means that MPI-Start
+by setting: \texttt{MPI\_START\_SHARED\_FS} to 0 or 1 (0 means that mpi-start
 will try distribution in the next step, and 1 that it won't). 
 
-\item File distribution: in this step, MPI-Start copies files from the current
+\item File distribution: in this step, mpi-start copies files from the current
 host to the other hosts involved in the execution. It uses the most suitable
 of the available distribution methods. Distribution methods are plugins that
 are detected at runtime by checking all the files with \texttt{.filedist}
-extension in the MPI-Start \texttt{etc} directory.
+extension in the mpi-start \texttt{etc} directory.
 \end{itemize}
 
 The file distribution method can be fixed by using the \texttt{I2G\_MPI\_FILE\_DIST} variable.
@@ -287,7 +331,7 @@ are in a gzipped tarball pointed by the \texttt{TARBALL} variable.
 \item \texttt{clean()}: clean up any files once the execution is finished.
 \end{itemize}
 
-These distribution methods are included in MPI-Start:
+These distribution methods are included in mpi-start:
 \begin{description}
 \item[ssh] uses scp to copy files, needs passwordless ssh properly configured.
 \item[mpiexec] uses OSC mpiexec for copying, needs OSC mpiexec installed.
@@ -301,7 +345,7 @@ These distribution methods are included in MPI-Start:
 
 \subsection{Extensions Hooks}
 
-Extension hooks are local site hooks that come in the default MPI-Start
+Extension hooks are local site hooks that come in the default mpi-start
 distribution. These 3 hooks are available:
 
 \begin{description}
@@ -317,7 +361,7 @@ directory.
 
 \subsection{Local Site Hooks}
 
-Site admins can define their own hooks by creating \texttt{.hook} files in the configuration directory of MPI-Start (by default /etc/mpi-start). The file must contain one of the following functions:
+Site admins can define their own hooks by creating \texttt{.hook} files in the configuration directory of mpi-start (by default /etc/mpi-start). The file must contain one of the following functions:
 \begin{itemize}
 
 \item \texttt{pre\_run\_hook ()}: it will be executed before the user hooks and the user application gets executed.
@@ -325,7 +369,7 @@ Site admins can define their own hooks by creating \texttt{.hook} files in the c
 \end{itemize}
 
 \subsection{Developing User Hooks}
-Users can also customize the MPI-Start behavior defining their own hooks by setting the \texttt{I2G\_MPI\_PRE\_RUN\_HOOK} or \texttt{I2G\_MPI\_POST\_RUN\_HOOK} variables.
+Users can also customize the mpi-start behavior defining their own hooks by setting the \texttt{I2G\_MPI\_PRE\_RUN\_HOOK} or \texttt{I2G\_MPI\_POST\_RUN\_HOOK} variables.
 
 \begin{description}
 \item[\texttt{I2G\_MPI\_PRE\_RUN\_HOOK}] path of the file containing the pre-hook, in this file a \texttt{pre\_run\_hook()} function must be available. This function will be called before the application execution. The pre-hook can be used, for example, to compile the executable itself or download data.
@@ -336,7 +380,7 @@ Users can also customize the MPI-Start behavior defining their own hooks by sett
 Both pre and post hooks can be in the same file. In the next sections there are some hooks examples
 
 \subsubsection{Compilation}
-Pre-run hook can be used for generating the binaries of the application that will be run by MPI-Start. The following sample shows a hook that compiles an application using \texttt{mpicc}. It assumes that the source code is called like the application binary, but with a \texttt{.c} extension. Use of complex compilation commands like configure, make, etc is also possible. This code is only executed in the first host. The results of the compilation will be available to all hosts thanks to the file distribution mechanisms.
+Pre-run hook can be used for generating the binaries of the application that will be run by mpi-start. The following sample shows a hook that compiles an application using \texttt{mpicc}. It assumes that the source code is called like the application binary, but with a \texttt{.c} extension. Use of complex compilation commands like configure, make, etc is also possible. This code is only executed in the first host. The results of the compilation will be available to all hosts thanks to the file distribution mechanisms.
 
 \begin{small}
 \begin{verbatim}
@@ -383,7 +427,7 @@ Applications that write output files in each of the hosts involved in the
 execution may need to fetch all those files to transfer them back to the user
 once the execution is finished. The following example copies all the
 \texttt{mydata.*} files to the first host. It uses the
-\texttt{mpi\_start\_foreach\_host} function of MPI-Start that will call the
+\texttt{mpi\_start\_foreach\_host} function of mpi-start that will call the
 first argument for each of the hosts passing the name of the host as
 parameter. 
 
@@ -412,7 +456,7 @@ post_run_hook () {
 
 \subsubsection{Binary Packages}
 
-Binary packages for MPI-Start are generated in EMI using ETICS. Check their repositories for the correct package for your distribution. Once you have the repositories configured you only need to install the package using your favorite package manager:
+Binary packages for mpi-start are generated in EMI using ETICS. Check their repositories for the correct package for your distribution. Once you have the repositories configured you only need to install the package using your favorite package manager:
 
 For RedHat based distributions:
 \begin{small}
@@ -467,9 +511,9 @@ $ export I2G_MPI_START=/opt/mpi-start/bin/mpi-start
 \end{verbatim}
 \end{small}
 
-\subsection{MPI-Start Manual Configuration}
+\subsection{mpi-start Manual Configuration}
 
-MPI-Start is designed to auto detect most of the site configurations without any administrator intervention. The default installation will automatically detect:
+mpi-start is designed to auto detect most of the site configurations without any administrator intervention. The default installation will automatically detect:
 \begin{itemize}
 \item the batch scheduler at the site: currently PBS/Torque, SGE, LSF, Condor and Slurm are supported.
 \item existence of shared file system in the job running directory
@@ -497,27 +541,27 @@ If the automatic detection fails for any of these, the administrator can set the
 A known issue with the setting of the I2G\_<flavour>\_PREFIX variable makes
 them useless, please use the MPI\_<flavour>\_PATH variable instead!
 
-If \texttt{MPI\_<flavour>\_MPIEXEC} or \texttt{MPI\_<flavour>\_MPIRUN} are not defined, MPI-Start will try to use the mpiexec or mpirun that are found in the current PATH.
+If \texttt{MPI\_<flavour>\_MPIEXEC} or \texttt{MPI\_<flavour>\_MPIRUN} are not defined, mpi-start will try to use the mpiexec or mpirun that are found in the current PATH.
 
 \subsubsection{Hooks}
-Hooks may change the behavior of MPI-Start and provide additional features
+Hooks may change the behavior of mpi-start and provide additional features
 such as file distribution and configuration of compiler flags. Site admins can
 add their own hooks via the local hook mechanism.
 
-MPI-Start includes hooks for distributing the files needed for the execution of an application. By default it tries to find the most suitable method for copying the files, using shared filesystems whenever they are found. However, the filesystem detection may not work for all sites, or the shared filesystem may be in a different location to the execution path making it impossible for MPI-Start to detect its availability.
+mpi-start includes hooks for distributing the files needed for the execution of an application. By default it tries to find the most suitable method for copying the files, using shared filesystems whenever they are found. However, the filesystem detection may not work for all sites, or the shared filesystem may be in a different location to the execution path making it impossible for mpi-start to detect its availability.
 
 Site admins can tune the file distribution method with the following variables:
 \begin{center}
 \begin{tabularx}{\textwidth}{|l|X|}
 \hline
 \textbf{Variable}        &              \textbf{Meaning}         \\ \hline
- \texttt{MPI\_START\_SHARED\_FS} & If undefined, MPI-Start will try to detect a shared file system in the execution directory. If defined and equal to 1, MPI-Start will assume that the execution directory is shared between all hosts and will not try to copy files. Any other value will make MPI-Start assume that the execution directory is not shared. \\ \hline
- \texttt{MPI\_SHARED\_HOME} & If set to \texttt{yes} , MPI-Start will use the path defined in \texttt{MPI\_SHARED\_HOME\_PATH} for copying the files and executing the application \\ \hline
+ \texttt{MPI\_START\_SHARED\_FS} & If undefined, mpi-start will try to detect a shared file system in the execution directory. If defined and equal to 1, mpi-start will assume that the execution directory is shared between all hosts and will not try to copy files. Any other value will make mpi-start assume that the execution directory is not shared. \\ \hline
+ \texttt{MPI\_SHARED\_HOME} & If set to \texttt{yes} , mpi-start will use the path defined in \texttt{MPI\_SHARED\_HOME\_PATH} for copying the files and executing the application \\ \hline
  \texttt{MPI\_SHARED\_HOME\_PATH} & Path to a shared directory \\ \hline
 \end{tabularx} 
 \end{center}
 
-\subsection{MPI-Start Yaim Configuration}
+\subsection{mpi-start Yaim Configuration}
 
 Configuration is necessary on both the CE and WNs in order to support and advertise MPI correctly. This is performed by the yaim MPI module which should be run on both types of nodes.
 
@@ -812,7 +856,7 @@ $I2G_MPI_START
 \end{verbatim}
 \end{small}
 
-\subsection{Using MPI-Start with gLite}
+\subsection{Using mpi-start with gLite}
 
 gLite uses the WMS software for submitting jobs to the different available resources. The WMS gets a job description in the JDL language and performs the selection and actual submission of the job into the resources on behalf of the user. The following sections describe how to submit a job using the WMS.
 
@@ -820,10 +864,10 @@ gLite uses the WMS software for submitting jobs to the different available resou
 Jobs are described with the JDL language. Most relevant attributes for parallel job submission are:
 \begin{itemize}
 \item CPUNumber: number of processes to allocate.
-\item Requirements: requirements of the job, will allow to force the selection of sites with MPI-Start support.
+\item Requirements: requirements of the job, will allow to force the selection of sites with mpi-start support.
 \end{itemize}
 
-The following example shows a job that will use 6 processes and it is executed with Open MPI. The \texttt{requirements} attribute makes the WMS to select sites that publish that they support MPI-Start and Open MPI.
+The following example shows a job that will use 6 processes and it is executed with Open MPI. The \texttt{requirements} attribute makes the WMS to select sites that publish that they support mpi-start and Open MPI.
 
 \begin{small}
 \begin{verbatim}
@@ -840,10 +884,10 @@ Requirements  = member("MPI-START", other.GlueHostApplicationSoftwareRunTimeEnvi
 \end{verbatim}
 \end{small}
 
-The \texttt{Executable} attribute is a script that will invoke MPI-Start with the correct options for the execution of the user's application. We propose a generic wrapper that can be used for any application and MPI flavour that gets in the \texttt{Arguments} attribute:
+The \texttt{Executable} attribute is a script that will invoke mpi-start with the correct options for the execution of the user's application. We propose a generic wrapper that can be used for any application and MPI flavour that gets in the \texttt{Arguments} attribute:
 
 \begin{itemize}
-\item Name of MPI-Start execution environment (I2G\_MPI\_FLAVOUR variable), in the example: OPENMPI
+\item Name of mpi-start execution environment (I2G\_MPI\_FLAVOUR variable), in the example: OPENMPI
 \item Name of user binary, in the example: hello\_bin
 \item Arguments for the user binary, in the example: hello arguments
 \end{itemize}
@@ -924,9 +968,9 @@ Hello world from gcsic055wn. Process 5 of 6
 \end{verbatim}
 \end{small}
 
-\subsubsection{Modifying MPI-Start Behavior}
-MPI-Start behavior can be customized by setting different environment
-variables. If using the generic wrapper, one easy way of customizing MPI-Start
+\subsubsection{Modifying mpi-start Behavior}
+mpi-start behavior can be customized by setting different environment
+variables. If using the generic wrapper, one easy way of customizing mpi-start
 execution is using the \texttt{Environment} attribute of the JDL. The following JDL adds debugging to
 the previous example by setting the \texttt{I2G\_MPI\_START\_VERBOSE} and
 \texttt{I2G\_MPI\_START\_DEBUG} variables to 1:
@@ -948,7 +992,7 @@ Environment   = {"I2G_MPI_START_VERBOSE=1", "I2G_MPI_START_DEBUG=1"};
 \end{small}
 
 Use of hooks is also possible using this mechanism. If the user has a file
-with the MPI-Start hooks called \texttt{hooks.sh}, the following JDL would add
+with the mpi-start hooks called \texttt{hooks.sh}, the following JDL would add
 it to the execution (notice that the file is also added in the
 \texttt{InputSandbox}):
 
