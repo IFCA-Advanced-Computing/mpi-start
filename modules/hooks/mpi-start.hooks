@@ -56,7 +56,7 @@ mpi_start_detect_shared_fs() {
             MOUNT_POINTS=`mount | sed 's/.* on \(.*\) (\([^,]*\),.*/\1/'`
             MOUNT_POINTS_FS=`mount | sed 's/.* on \(.*\) (\([^,]*\),.*/\2/'` 
         else
-            warn_msg " detection not supported in your OS, assuming not shared FS"
+            warn_msg "FS detection not supported in your OS, assuming not shared"
             export MPI_START_SHARED_FS=0;
             return 0
         fi
