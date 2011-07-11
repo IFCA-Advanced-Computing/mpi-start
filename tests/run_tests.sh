@@ -14,7 +14,6 @@ fi
 rm -f $TMPFILE    
 
 
-
 DOWNLOAD_MY_SHUNIT=0
 REMOVE_MY_SHUNIT=0
 
@@ -22,13 +21,15 @@ REMOVE_MY_SHUNIT=0
 RUN_UNIT_TESTS=1
 RUN_BASIC_TESTS=1
 RUN_HOOK_TESTS=1
+RUN_AFFINITY_TESTS=1
+RUN_NP_TESTS=1
 RUN_SCH_TESTS=1
 # if running these tests, ensure you have proper environment loaded!
 RUN_OMP_TESTS=1
-RUN_MPICH2_TESTS=0
+RUN_MPICH2_TESTS=1
 RUN_MPICH_TESTS=0
-RUN_OPENMPI_TESTS=0
-RUN_LAM_TESTS=0
+RUN_OPENMPI_TESTS=1
+RUN_LAM_TESTS=1
 
 # Non SL5 installation of mpi (ubuntu)
 export MPICC=mpicc
@@ -89,23 +90,35 @@ if test "x${RUN_UNIT_TESTS}" = "x1" ; then
     ./test_unit.sh || exitcode=1
 fi
 if test "x${RUN_BASIC_TESTS}" = "x1" ; then
-    echo "*******************"
+    echo "********************"
     echo "    Basic Tests"
-    echo "*******************"
+    echo "********************"
     ./test_basic.sh || exitcode=1
 fi
 if test "x${RUN_HOOK_TESTS}" = "x1" ; then
     echo
-    echo "*******************"
+    echo "********************"
     echo "    Hook Tests"
-    echo "*******************"
+    echo "********************"
     ./test_hooks.sh || exitcode=1
+fi
+if test "x${RUN_NP_TESTS}" = "x1" ; then
+    echo "********************"
+    echo "Process Distribution"
+    echo "********************"
+    ./test_pdistribution.sh || exitcode=1
+fi
+if test "x${RUN_AFFINITY_TESTS}" = "x1" ; then
+    echo "********************"
+    echo "  Affinity Tests"
+    echo "********************"
+    ./test_affinity.sh || exitcode=1
 fi
 if test "x${RUN_SCH_TESTS}" = "x1" ; then
     echo
-    echo "*******************"
+    echo "********************"
     echo "  Scheduler Tests"
-    echo "*******************"
+    echo "********************"
     echo " ----- PBS -----"
     ./test_pbs.sh || exitcode=1
     echo " ----- SGE -----"
@@ -119,40 +132,40 @@ if test "x${RUN_SCH_TESTS}" = "x1" ; then
 fi
 if test "x${RUN_OMP_TESTS}" = "x1" ; then
     echo
-    echo "*******************"
+    echo "********************"
     echo "     OMP Tests"
-    echo "*******************"
+    echo "********************"
     ./test_omp.sh || exitcode=1
 fi
 if test "x${RUN_MPICH2_TESTS}" = "x1" ; then
     echo
-    echo "*******************"
+    echo "********************"
     echo "   MPICH2 Tests"
-    echo "*******************"
+    echo "********************"
     export I2G_MPI_TYPE=mpich2
     ./test_mpi.sh || exitcode=1
 fi
 if test "x${RUN_MPICH_TESTS}" = "x1" ; then
     echo
-    echo "*******************"
+    echo "********************"
     echo "     MPICH Tests"
-    echo "*******************"
+    echo "********************"
     export I2G_MPI_TYPE=mpich
     ./test_mpi.sh || exitcode=1
 fi
 if test "x${RUN_OPENMPI_TESTS}" = "x1" ; then
     echo
-    echo "*******************"
+    echo "********************"
     echo "  Open MPI Tests"
-    echo "*******************"
+    echo "********************"
     export I2G_MPI_TYPE=openmpi
     ./test_mpi.sh || exitcode=1
 fi
 if test "x${RUN_LAM_TESTS}" = "x1" ; then
     echo
-    echo "*******************"
+    echo "********************"
     echo "     LAM Tests"
-    echo "*******************"
+    echo "********************"
     export I2G_MPI_TYPE=lam
     ./test_mpi.sh || exitcode=1
 fi
