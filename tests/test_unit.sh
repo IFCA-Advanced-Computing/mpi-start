@@ -173,6 +173,27 @@ testExecuteWrapper () {
     assertEquals "hello world" "$output"
 }
 
+testHookOrder() {
+    # load options, to get MPI_START_ETC
+    check_options
+    # load hooks
+    . $MPI_START_ETC/mpi-start.hooks
+    # change MPI_START_ETC to tmp, so I can define which hooks to load
+    MPI_START_ETC=`$MYMKTEMP -d`
+    echo "echo -n 1" >> $MPI_START_ETC/1.hook
+    echo "echo -n 2" >> $MPI_START_ETC/2.hook
+    echo "echo -n 3" >> $MPI_START_ETC/mpi-start.hooks.local
+    I2G_MPI_PRE_RUN_HOOK=$MPI_START_ETC/user
+    echo "echo -n 4" >> $I2G_MPI_PRE_RUN_HOOK
+    I2G_MPI_POST_RUN_HOOK=$I2G_MPI_PRE_RUN_HOOK
+    # now test the hooks
+    output=`mpi_start_pre_run_hook`
+    assertEquals "1234" "$output"
+    output=`mpi_start_post_run_hook`
+    assertEquals "1234" "$output"
+    rm -rf $mydir
+}
+
 
 . $SHUNIT2
 
