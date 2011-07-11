@@ -155,6 +155,9 @@ testExportVariable() {
     cat $MPI_START_MPI_WRAPPER | grep "^export OTHERVAR=\"VALUE\"$" > /dev/null
     st=$?
     assertEquals 0 $st
+    cat $MPI_START_MPI_WRAPPER | grep "^export MYVAR$" > /dev/null
+    st=$?
+    assertEquals 0 $st
 }
 
 testExecuteWrapperNoWrapper () {
