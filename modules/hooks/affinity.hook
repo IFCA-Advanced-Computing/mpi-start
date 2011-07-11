@@ -17,18 +17,15 @@ pre_run_hook () {
     if test "x${I2G_MPI_TYPE}" = "xopenmpi" ; then
 
         # check ompi version
-        local version=`ompi_info --parseable | grep "ompi:version:full" | cut -d":" -f4-`
-        local major=`echo $version | cut -f1 -d"."`
-        local minor=`echo $version | cut -f2 -d"."`
-        if test ${major} -ne 1 -o ${minor} -eq 1 ; then
-            warn_msg "Processor affinity is only supported for Open MPI versions 1.x.x!"
+        if test ${OPENMPI_VERSION_MAJOR} -ne 1 -o ${OPENMPI_VERSION_MINOR} -eq 1 ; then
+            info_msg "Processor affinity is only supported for Open MPI versions 1.x.x!"
             return 0
         fi
-        if test ${minor} -eq 2 ; then
+        if test ${OPENMPI_VERSION_MINOR} -eq 2 ; then
             if test "x${I2G_MPI_PER_CORE}" != "x" ; then
                 export OPENMPI_PARAMS="$OPENMPI_PARAMS --mca mpi_paffinity_alone 1"
             else
-                warn_msg "Processor affinity only supported if per core options used in Open MPI 1.2.x"
+                info_msg "Processor affinity only supported if per core options used in Open MPI 1.2.x"
             fi
             return 0
         fi
