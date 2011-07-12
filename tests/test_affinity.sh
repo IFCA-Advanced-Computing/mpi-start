@@ -126,21 +126,25 @@ EOF
     env > $tmpdir/e1
     pre_run_hook
     status=$?
-    env > $tmpdir/e2
     assertEquals "0" "$status"
+    env > $tmpdir/e2
     diff $tmpdir/e1 $tmpdir/e2 > /dev/null
     status=$?
-    assertEquals "1" "$status"
-    RANK=$tmpdir/myrank
-    cat > $RANK << EOF
+    if test $OPENMPI_VERSION_MAJOR -eq 1 -a $OPENMPI_VERSION_MINOR -eq 2 ; then
+        assertEquals "0" "$status"
+    else
+        assertEquals "1" "$status"
+        RANK=$tmpdir/myrank
+        cat > $RANK << EOF
 rank 0=host1 slot=0-7
 rank 1=host2 slot=0-7
 rank 2=host3 slot=0-7
 EOF
-    rankfile=`echo $OPENMPI_PARAMS | cut -f2 -d" " `
-    diff $rankfile $RANK
-    status=$?
-    assertEquals "0" "$status"
+        rankfile=`echo $OPENMPI_PARAMS | cut -f2 -d" " `
+        diff $rankfile $RANK
+        status=$?
+        assertEquals "0" "$status"
+    fi
 }
 
 testAffinityOpenMPINodeOversuscribe() {
@@ -169,9 +173,12 @@ EOF
     assertEquals "0" "$status"
     diff $tmpdir/e1 $tmpdir/e2 > /dev/null
     status=$?
-    assertEquals "1" "$status"
-    RANK=$tmpdir/myrank
-    cat > $RANK << EOF
+    if test $OPENMPI_VERSION_MAJOR -eq 1 -a $OPENMPI_VERSION_MINOR -eq 2 ; then
+        assertEquals "0" "$status"
+    else
+        assertEquals "1" "$status"
+        RANK=$tmpdir/myrank
+        cat > $RANK << EOF
 rank 0=host1 slot=0-7
 rank 1=host1 slot=0-7
 rank 2=host1 slot=0-7
@@ -182,10 +189,11 @@ rank 6=host3 slot=0-7
 rank 7=host3 slot=0-7
 rank 8=host3 slot=0-7
 EOF
-    rankfile=`echo $OPENMPI_PARAMS | cut -f2 -d" " `
-    diff -u $rankfile $RANK
-    status=$?
-    assertEquals "0" "$status"
+        rankfile=`echo $OPENMPI_PARAMS | cut -f2 -d" " `
+        diff -u $rankfile $RANK
+        status=$?
+        assertEquals "0" "$status"
+    fi
 }
 
 testAffinityOpenMPISocket() {
@@ -214,9 +222,12 @@ EOF
     assertEquals "0" "$status"
     diff $tmpdir/e1 $tmpdir/e2 > /dev/null
     status=$?
-    assertEquals "1" "$status"
-    RANK=$tmpdir/myrank
-    cat > $RANK << EOF
+    if test $OPENMPI_VERSION_MAJOR -eq 1 -a $OPENMPI_VERSION_MINOR -eq 2 ; then
+        assertEquals "0" "$status"
+    else
+        assertEquals "1" "$status"
+        RANK=$tmpdir/myrank
+        cat > $RANK << EOF
 rank 0=host1 slot=0:0-3
 rank 1=host1 slot=1:0-3
 rank 2=host2 slot=0:0-3
@@ -224,10 +235,11 @@ rank 3=host2 slot=1:0-3
 rank 4=host3 slot=0:0-3
 rank 5=host3 slot=1:0-3
 EOF
-    rankfile=`echo $OPENMPI_PARAMS | cut -f2 -d" " `
-    diff $rankfile $RANK
-    status=$?
-    assertEquals "0" "$status"
+        rankfile=`echo $OPENMPI_PARAMS | cut -f2 -d" " `
+        diff $rankfile $RANK
+        status=$?
+        assertEquals "0" "$status"
+    fi
 }
 
 testAffinityOpenMPISocketOversuscribe() {
@@ -256,9 +268,12 @@ EOF
     assertEquals "0" "$status"
     diff $tmpdir/e1 $tmpdir/e2 > /dev/null
     status=$?
-    assertEquals "1" "$status"
-    RANK=$tmpdir/myrank
-    cat > $RANK << EOF
+    if test $OPENMPI_VERSION_MAJOR -eq 1 -a $OPENMPI_VERSION_MINOR -eq 2 ; then
+        assertEquals "0" "$status"
+    else
+        assertEquals "1" "$status"
+        RANK=$tmpdir/myrank
+        cat > $RANK << EOF
 rank 0=host1 slot=0:0-3
 rank 1=host1 slot=0:0-3
 rank 2=host1 slot=0:0-3
@@ -278,10 +293,11 @@ rank 15=host3 slot=1:0-3
 rank 16=host3 slot=1:0-3
 rank 17=host3 slot=1:0-3
 EOF
-    rankfile=`echo $OPENMPI_PARAMS | cut -f2 -d" " `
-    diff -u $rankfile $RANK
-    status=$?
-    assertEquals "0" "$status"
+        rankfile=`echo $OPENMPI_PARAMS | cut -f2 -d" " `
+        diff -u $rankfile $RANK
+        status=$?
+        assertEquals "0" "$status"
+    fi
 }
 
 testAffinityOpenMPICore() {
@@ -310,9 +326,14 @@ EOF
     assertEquals "0" "$status"
     diff $tmpdir/e1 $tmpdir/e2 > /dev/null
     status=$?
-    assertEquals "1" "$status"
-    RANK=$tmpdir/myrank
-    cat > $RANK << EOF
+    if test $OPENMPI_VERSION_MAJOR -eq 1 -a $OPENMPI_VERSION_MINOR -eq 2 ; then
+        assertEquals "1" "$status"
+        echo "$OPENMPI_PARAMS" | grep "mpi_paffinity_alone" > /dev/null
+        assertEquals "0" "$?"
+    else
+        assertEquals "1" "$status"
+        RANK=$tmpdir/myrank
+        cat > $RANK << EOF
 rank 0=host1 slot=0:0
 rank 1=host1 slot=0:1
 rank 2=host1 slot=0:2
@@ -338,10 +359,11 @@ rank 21=host3 slot=1:1
 rank 22=host3 slot=1:2
 rank 23=host3 slot=1:3
 EOF
-    rankfile=`echo $OPENMPI_PARAMS | cut -f2 -d" " `
-    diff $rankfile $RANK
-    status=$?
-    assertEquals "0" "$status"
+        rankfile=`echo $OPENMPI_PARAMS | cut -f2 -d" " `
+        diff $rankfile $RANK
+        status=$?
+        assertEquals "0" "$status"
+    fi
 }
 
 testAffinityOpenMPICoreOversuscribe() {
@@ -370,9 +392,14 @@ EOF
     assertEquals "0" "$status"
     diff $tmpdir/e1 $tmpdir/e2 > /dev/null
     status=$?
-    assertEquals "1" "$status"
-    RANK=$tmpdir/myrank
-    cat > $RANK << EOF
+    if test $OPENMPI_VERSION_MAJOR -eq 1 -a $OPENMPI_VERSION_MINOR -eq 2 ; then
+        assertEquals "1" "$status"
+        echo "$OPENMPI_PARAMS" | grep "mpi_paffinity_alone" > /dev/null
+        assertEquals "0" "$?"
+    else
+        assertEquals "1" "$status"
+        RANK=$tmpdir/myrank
+        cat > $RANK << EOF
 rank 0=host1 slot=0:0
 rank 1=host1 slot=0:0
 rank 2=host1 slot=0:1
@@ -422,9 +449,10 @@ rank 45=host3 slot=1:2
 rank 46=host3 slot=1:3
 rank 47=host3 slot=1:3
 EOF
-    rankfile=`echo $OPENMPI_PARAMS | cut -f2 -d" " `
-    diff -u $rankfile $RANK
-    status=$?
-    assertEquals "0" "$status"
+        rankfile=`echo $OPENMPI_PARAMS | cut -f2 -d" " `
+        diff -u $rankfile $RANK
+        status=$?
+        assertEquals "0" "$status"
+    fi
 }
 . $SHUNIT2
