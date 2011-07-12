@@ -77,12 +77,17 @@ mpi_start_detect_shared_fs() {
         while test "x$CUR_DIR" != "x"  ; do
             IS_LINK=`readlink -n $CUR_DIR`
             if test "x$IS_LINK" != "x" ; then
-                debug_msg " found symbolic link : $CUR_DIR -> $IS_LINK"
+                debug_msg " found link $CUR_DIR -> $IS_LINK"
                 if test "${IS_LINK#\/}" = "${IS_LINK}" ; then
-                    CUR_DIR=`dirname $CUR_DIR`/${IS_LINK}
+                    if test `dirname $CUR_DIR` = "/" ; then
+                        CUR_DIR="/${IS_LINK}"
+                    else
+                        CUR_DIR=`dirname $CUR_DIR`/${IS_LINK}
+                    fi
                 else
                     CUR_DIR=${IS_LINK}
                 fi
+                debug_msg "            resolved to $CUR_DIR"
             fi
 
             # be sure to remove trailing slashes (unless it is /!)
