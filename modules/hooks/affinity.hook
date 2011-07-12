@@ -24,6 +24,9 @@ pre_run_hook () {
         if test ${OPENMPI_VERSION_MINOR} -eq 2 ; then
             if test "x${I2G_MPI_PER_CORE}" != "x" ; then
                 export OPENMPI_PARAMS="$OPENMPI_PARAMS --mca mpi_paffinity_alone 1"
+                if test ${I2G_MPI_PER_CORE} -gt 1 ; then
+                    warn_msg "Using affinity with more than one process per core!"
+                fi
             else
                 info_msg "Processor affinity only supported if per core options used in Open MPI 1.2.x"
             fi
