@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 #
 # helpers for testing schedulers. 
