@@ -73,7 +73,6 @@ setUp () {
     export MPI_START_SHARED_FS=1
 }
 
-
 testMPISource() {
     unset FOOBARVAR
     export I2G_MPI_APPLICATION_ARGS="FOOBARVAR foo"

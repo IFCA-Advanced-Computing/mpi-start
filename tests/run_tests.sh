@@ -32,6 +32,7 @@ RUN_OPENMPI_TESTS=0
 RUN_AFFINITY_TESTS=0
 RUN_LAM_TESTS=0
 
+
 # Non SL5 installation of mpi (ubuntu)
 export MPICC=mpicc
 # paths
@@ -161,6 +162,8 @@ if test "x${RUN_OPENMPI_TESTS}" = "x1" ; then
     echo "********************"
     export I2G_MPI_TYPE=openmpi
     ./test_mpi.sh || exitcode=1
+    # test for bug 38
+    ./test_38.sh || exitcode=1
 fi
 if test "x${RUN_AFFINITY_TESTS}" = "x1" -a "x${RUN_OPENMPI_TESTS}" = "x1" ; then
     echo "********************"
