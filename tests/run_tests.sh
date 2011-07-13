@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # check mktemp
 export MYMKTEMP="mktemp"
@@ -18,29 +18,29 @@ DOWNLOAD_MY_SHUNIT=0
 REMOVE_MY_SHUNIT=0
 
 # tests to run
-RUN_UNIT_TESTS=0
-RUN_BASIC_TESTS=0
-RUN_HOOK_TESTS=0
-RUN_NP_TESTS=0
-RUN_SCH_TESTS=0
+RUN_UNIT_TESTS=1
+RUN_BASIC_TESTS=1
+RUN_HOOK_TESTS=1
+RUN_NP_TESTS=1
+RUN_SCH_TESTS=1
 RUN_FSDETECT_TESTS=1
 # if running these tests, ensure you have proper environment loaded!
-RUN_OMP_TESTS=0
+RUN_OMP_TESTS=1
 RUN_MPICH2_TESTS=0
 RUN_MPICH_TESTS=0
 RUN_OPENMPI_TESTS=0
-RUN_AFFINITY_TESTS=1
+RUN_AFFINITY_TESTS=0
 RUN_LAM_TESTS=0
 
 # Non SL5 installation of mpi (ubuntu)
 export MPICC=mpicc
 # paths
 export MPI_MPICH_PATH=/usr/lib/mpich
-#export MPI_OPENMPI_MPIEXEC=mpiexec.openmpi
+export MPI_OPENMPI_MPIEXEC=mpiexec.openmpi
 export MPI_LAM_MPIRUN=mpirun.lam
 
 # compilers
-#export MPI_OPENMPI_MPICC=mpicc.openmpi
+export MPI_OPENMPI_MPICC=mpicc.openmpi
 export MPI_MPICH2_MPICC=mpicc.mpich2
 export MPI_LAM_MPICC=mpicc.lam
 
