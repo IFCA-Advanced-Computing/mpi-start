@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 #
 # Tests for MPI-Start with MPI
@@ -20,6 +20,7 @@ oneTimeSetUp () {
 
 int main (int argc, char *argv[]) {
     int myid, numprocs;
+    int err=0;
 
     MPI_Init(&argc,&argv);
     MPI_Comm_size(MPI_COMM_WORLD,&numprocs);
@@ -35,14 +36,18 @@ int main (int argc, char *argv[]) {
             char *env = getenv(argv[i]);
             if (!env) {
                 fprintf(stderr, "%s not defined!\n", argv[i]);
+                err=1;
             } else {
                 if (i + 1 >= argc) continue;
-                if (strcmp(env, argv[i + 1])) fprintf(stderr, "%s value is not %s", env, argv[i+1]);
+                if (strcmp(env, argv[i + 1])) {
+                    fprintf(stderr, "%s value is not %s!\n", argv[i], argv[i+1]);
+                    err=1;
+                }
             }
         }
     }
     MPI_Finalize();
-    return 0;
+    return err;
 }
 EOF
     myhook=$MPI_TEST_DIR/hook.sh
@@ -70,18 +75,28 @@ setUp () {
 
 
 testMPISource() {
-    OUTPUT=`$I2G_MPI_START -np 2 -e /dev/null -pre $myhook`
+    unset FOOBARVAR
+    export I2G_MPI_APPLICATION_ARGS="FOOBARVAR foo"
+    ERR=`$MYMKTEMP`
+    OUTPUT=`$I2G_MPI_START -x FOOBARVAR=foo -np 2 -e $ERR -pre $myhook`
     st=$?
     assertEquals 0 $st
     assertEquals "NP = 2" "$OUTPUT"
+    assertNull "`cat $ERR`"
+    rm -rf $ERR
 }
 
 # this test goes after the source test so we have the application compiled in the right env.
 testMPIBinary () {
-    OUTPUT=`$I2G_MPI_START -np 2 -e /dev/null $MPI_TEST_DIR/app`
+    unset FOOBARVAR
+    export I2G_MPI_APPLICATION_ARGS="FOOBARVAR foo"
+    ERR=`$MYMKTEMP`
+    OUTPUT=`$I2G_MPI_START -x FOOBARVAR=foo -np 2 -e $ERR $MPI_TEST_DIR/app`
     st=$?
     assertEquals 0 $st
     assertEquals "NP = 2" "$OUTPUT"
+    assertNull "`cat $ERR`"
+    rm -rf $ERR
 }
 
 . $SHUNIT2
