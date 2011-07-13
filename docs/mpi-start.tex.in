@@ -12,7 +12,7 @@
 \Abstract{
 mpi-start is a set of scripts to close the gap between the workload management
 system of a Grid insfrastructure and the configuration of the nodes on which
-MPI applications are run. The package is used to help the user start MPI
+MPI applications are run. The package is used to help the user to start MPI
 applications on heterogeneous Grid sites.
 }
 
@@ -28,7 +28,7 @@ applications on heterogeneous Grid sites.
 \section{Functional Description}
 mpi-start is a set of scripts to close the gap between the workload management
 system of a Grid insfrastructure and the configuration of the nodes on which
-MPI applications are run. The package is used to help the user start MPI
+MPI applications are run. The package is used to help the user to start MPI
 applications on heterogeneous Grid sites. 
 
 mpi-start was originally developed in the frame of the int.eu.grid project for
@@ -177,9 +177,8 @@ of variables, with the command line options that can be used to set them:
 
 \begin{center}
 \begin{tabularx}{\textwidth}{llX}
-\hline
 \textbf{Variable}                      & \textbf{Cmd line}  &   \textbf{Meaning}         \\
-\hline \hline
+\hline
 \texttt{I2G\_MPI\_APPLICATION}         & &
 The application binary to execute. \\
 \hline
@@ -250,60 +249,40 @@ site configuration of mpi-start are documented in the Site Administrator
 Section (\ref{sec:sysadmin}), and the variables dealing with the Hooks are
 summarized in Section \ref{sec:hookvars}.
 
-%\begin{center}
-%\begin{tabularx}{\textwidth}{lX}
-%\textbf{Variable}            &  \textbf{Meaning}         \\
-%\hline
-%\texttt{I2G\_MPI\_VERSION}   &  Specifies the version of the MPI implementation specified by I2G\_MPI\_TYPE. If not specified the default version will be used. \\
-%\hline
-%\texttt{
-%\hline
-%\end{tabularx} 
-%\end{center}
-
-
-%\begin{center}
-%\begin{tabularx}{\textwidth}{lX}
-%\multicolumn{2}{c} {\textbf{Hook Variables}} \\ \hline
-%\textbf{Variable}                      &  \textbf{Meaning}         \\
-%\hline
-%\end{tabularx} 
-%\end{center}
-
 \subsection{Scheduler and Execution Environment Support}
 
 mpi-start support different combinations of batch schedulers and execution
 environments using plugins. The schedulers are automatically detected from the
 environment and the execution environment can be selected with the
-\texttt{I2G\_MPI\_TYPE} variable or the $-t$ command line option. 
+\texttt{I2G\_MPI\_TYPE} variable or the \texttt{-t} command line option. 
 
 \begin{center}
-\begin{tabularx}{\textwidth}{|l|X|}
+\begin{tabularx}{\textwidth}{lX}
 \multicolumn{2}{c} {\textbf{Scheduler Plugins}} \\ \hline
- \texttt{sge} & supports Grid Engine. \\ \hline
- \texttt{pbs} & for supporting PBS/Torque. \\ \hline
- \texttt{lsf} & supports LSF. \\ \hline
- \texttt{condor} & gives support for Condor. This plugin lacks the possibility to select how many processes per node should be run. \\ \hline
- \texttt{slurm} & for supporting Slurm. As with condor, the plugin currently lacks the processes per node support. \\ \hline
+ \texttt{sge} & supports Grid Engine. \\ 
+ \texttt{pbs} & for supporting PBS/Torque. \\
+ \texttt{lsf} & supports LSF. \\
+ \texttt{condor} & gives support for Condor. This plugin lacks the possibility to select how many processes per node should be run. \\
+ \texttt{slurm} & for supporting Slurm. As with condor, the plugin currently lacks the processes per node support. \\
+ \hline
 \end{tabularx} 
 \end{center}
 
 \begin{center}
-\begin{tabularx}{\textwidth}{|l|X|}
+\begin{tabularx}{\textwidth}{lX}
 \multicolumn{2}{c} {\textbf{Execution Environment Plugins}} \\ \hline
- \texttt{openmpi} & Open MPI \\ \hline
- \texttt{mpich2}  & MPICH2\\ \hline
- \texttt{mpich}   & MPICH \\ \hline
- \texttt{lam}     & LAM-MPI \\ \hline
- \texttt{pacx}    & PACX-MPI \\ \hline
- \texttt{dummy}   & Debugging environment, just executes application in current host. \\ \hline
+ \texttt{openmpi} & Open MPI \\ 
+ \texttt{mpich2}  & MPICH2\\ 
+ \texttt{mpich}   & MPICH \\
+ \texttt{lam}     & LAM-MPI \\
+ \texttt{pacx}    & PACX-MPI \\
+ \texttt{dummy}   & Debugging environment, just executes application in current host. \\ 
+ \hline
 \end{tabularx} 
 \end{center}
 
 \section{Hooks}\label{sec:hooks}
-The mpi-start Hooks Framework allow the extension of mpi-start features without changing the core functionality.
-
-Several hooks are included in the default distribution of mpi-start for
+The mpi-start Hooks Framework allow the extension of mpi-start features without changing the core functionality.  Several hooks are included in the default distribution of mpi-start for
 dealing with file distribution and some MPI extensions. Site admins can check
 the local hooks description while users probably are interested in developing
 their own hooks for compilation.
@@ -347,13 +326,14 @@ These distribution methods are included in mpi-start:
 \item \texttt{MPI\_SHARED\_HOME}: set to \texttt{"yes"}.
 \item \texttt{MPI\_SHARED\_HOME\_PATH}: path of the shared area that will be used for execution.
 \end{itemize}
-\item[mpi\_mt] uses the mpi\_mt for copying the files. Needs mpi\_mt available in all machines.
+\item[mpi\_mt] uses mpi\_mt for copying the files. Needs the mpi\_mt binary to
+be available in all machines.
 \end{description}
 
 \subsection{Extensions Hooks}
 
 Extension hooks are local site hooks that come in the default mpi-start
-distribution. These hooks are available:
+distribution. The following hooks are available:
 
 \begin{description}
 \item [Affinity] The Affinity hook is enabled by setting the
@@ -381,20 +361,18 @@ Site admins can define their own hooks by creating \texttt{.hook} files in the c
 
 \subsection{Developing User Hooks}
 Users can also customize the mpi-start behavior defining their own hooks by
-setting:
-\begin{itemize}
-\item \texttt{-pre} command line switch or \texttt{I2G\_MPI\_PRE\_RUN\_HOOK}
-variable
-\item \texttt{-post} command line switch or \texttt{I2G\_MPI\_POST\_RUN\_HOOK} variable.
-\end{itemize}
+using the \texttt{-pre} and \texttt{-post} command line switches or by setting the \texttt{I2G\_MPI\_PRE\_RUN\_HOOK}
+ and \texttt{I2G\_MPI\_POST\_RUN\_HOOK} environment variables
 
 \begin{description}
-\item[\texttt{I2G\_MPI\_PRE\_RUN\_HOOK}] path of the file containing the pre-hook, in this file a \texttt{pre\_run\_hook()} function must be available. This function will be called before the application execution. The pre-hook can be used, for example, to compile the executable itself or download data.
+\item[\texttt{-pre} / \texttt{I2G\_MPI\_PRE\_RUN\_HOOK}] path of the file
+containing the pre-hook, in this file a function called \texttt{pre\_run\_hook()} must be available. This function will be called before the application execution. The pre-hook can be used, for example, to compile the executable itself or download data.
 
-\item[\texttt{I2G\_MPI\_POST\_RUN\_HOOK}] path of the file containing the post-hook, in this file a \texttt{post\_run\_hook()} function must be available. This function will be called once the applications finishes its execution. The post-hook can be used to analyze results or to save the results on the grid.
+\item[\texttt{-post} / \texttt{I2G\_MPI\_POST\_RUN\_HOOK}] path of the file
+containing the post-hook, in this file a function called \texttt{post\_run\_hook()} must be available. This function will be called once the applications finishes its execution. The post-hook can be used to analyze results or to save the results on the grid.
 \end{description}
 
-Both pre and post hooks can be in the same file. In the next sections there are some hooks examples
+Both pre and post hooks can be in the same file. Next sections contain some hook examples
 
 \subsubsection{Compilation}
 Pre-run hook can be used for generating the binaries of the application that will be run by mpi-start. The following sample shows a hook that compiles an application using \texttt{mpicc}. It assumes that the source code is called like the application binary, but with a \texttt{.c} extension. Use of complex compilation commands like configure, make, etc is also possible. This code is only executed in the first host. The results of the compilation will be available to all hosts thanks to the file distribution mechanisms.
@@ -499,11 +477,6 @@ MPItrace & \texttt{I2G\_USE\_MPITRACE} & If set to $1$, enable MPItrace hook.\\
 \hline
 Marmot & \texttt{I2G\_USE\_MARMOT} & If set to $1$, enable Marmot hook.\\
 \hline
-
-%\texttt{I2G\_MPI\_VERSION}   &  Specifies the version of the MPI implementation specified by I2G\_MPI\_TYPE. If not specified the default version will be used. \\
-%\hline
-%\texttt{
-%\hline
 \end{tabularx} 
 \end{center}
 
@@ -549,6 +522,11 @@ yum install openmpi openmpi-devel
 \end{verbatim}
 \end{small}
 
+\textbf{devel packages may require also the installation of a C/C++/Fortran
+compiler}. Some devel packages of the MPI packages do not include the compiler
+as (e.g. gcc, gcc-gfortran, gcc-g++) dependency! They should be installed also
+if you want to support the compilation of MPI applications.
+
 \subsubsection{Source Distribution}
 
 Source can be retrieved from the mercurial repository.
@@ -582,8 +560,7 @@ mpi-start is designed to auto detect most of the site configurations without any
 If the automatic detection fails for any of these, the administrator can set the following configuration variables:
 
 \begin{center}
-\begin{tabularx}{\textwidth}{|l|X|}
-\hline
+\begin{tabularx}{\textwidth}{lX}
 \textbf{Variable}        &              \textbf{Meaning}         \\ \hline
 \texttt{MPI\_DEFAULT\_FLAVOUR} & name of the default flavour for jobs running at the site \\ \hline
 \texttt{MPI\_<flavour>\_PATH} & Path of the bin and lib directories for the MPI flavour \\ \hline
@@ -664,8 +641,7 @@ with the \texttt{MPI\_MPI\_START} variable.
 
 The complete list of configuration variables for the WN is shown in the next table:
 \begin{center}
-\begin{tabularx}{\textwidth}{|l|c|X|}
-\hline
+\begin{tabularx}{\textwidth}{llX}
 \textbf{Variable}     & \textbf{Mandatory} & \textbf{Description}        \\ \hline
 \texttt{MPI\_<FLAVOUR>\_ENABLE}      & YES & set to \texttt{"yes"} if you want to enable the <flavour> \\ \hline 
 \texttt{MPI\_<FLAVOUR>\_VERSION}     & NO  & set to the supported version of the <flavour>, usually is automatically detected \\ \hline
@@ -713,8 +689,8 @@ If you are using PBS/Torque, you can set the variable \texttt{MPI\_SUBMIT\_FILTE
 
 The complete list of configuration variables for the CE is shown in the next table:
 \begin{center}
-\begin{tabularx}{\textwidth}{|l|c|X|}
-\hline
+\begin{tabularx}{\textwidth}{llX}
+\textbf{Variable}     & \textbf{Mandatory} & \textbf{Description}        \\ \hline
 \textbf{MPI\_<FLAVOUR>\_ENABLE}    & YES & set to \texttt{"yes"} if you want to enable the <flavour> \\ \hline
 \textbf{MPI\_<FLAVOUR>\_VERSION}   & YES & set to the supported version of the <flavour>, usually is automatically detected \\ \hline
 \textbf{MPI\_SHARED\_HOME}         & NO  & set this to \texttt{"yes"} if you have a shared home area between WNs. \\ \hline
