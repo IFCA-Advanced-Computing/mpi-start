@@ -55,6 +55,10 @@ mpi_exec () {
 	    export machines_params="-np $MPI_START_NP"
     fi
 
+    for var in $MPI_START_ENV_VARIABLES; do
+        MPI_GLOBAL_PARAMS="$MPI_GLOBAL_PARAMS -x $var"
+    done
+
     # check for user supplied mpiexec 
     MPI_GLOBAL_PARAMS="$MPI_GLOBAL_PARAMS $LAM_PARAMS $machines_params"
 
