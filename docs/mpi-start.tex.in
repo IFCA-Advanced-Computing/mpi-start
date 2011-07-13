@@ -43,34 +43,23 @@ the development of mpi-start.
 
 \subsection{What's new}
 
-mpi-start 1.0.4 is an update release of mpi-start that includes minor improvements and corrections.
-Most of mpi-start 1.0.3 release notes are applicable to mpi-start 1.0.4, check
-them at the mpi-start trac for more information.
+mpi-start 1.0.5 is an update release of mpi-start 1.x series that includes minor improvements and corrections.
+Information about previous versions is available at mpi-start's trac page at
+\url{http://devel.ifca.es/mpi-start/versions/}.
 
 MPI-utils is a metapackge (glite-mpi) that depends on mpi-start and a yaim
-plugin for configuration. In this version the yaim plugin includes fixes to
-several bugs.
+plugin for configuration. No changes are introduced in this release.
 
 \subsection{Changes}
 \subsubsection{mpi-start}
-Major Changes for mpi-start 1.0.x versions until 1.0.4 are:
+Changes for mpi-start 1.0.5 are:
 \begin{itemize}
-\item New hook plugin architecture: now hooks can be installed in the configuration directory as independent files with .hook extension.
-\item Revision of scheduler support modules and inclusion of new schedulers, the current supported schedulers are the following:
-\begin{itemize}
-\item PBS/Torque
-\item LSF
-\item SGE
-\item Slurm
-\item Condor
-\end{itemize}
-\item New dummy scheduler and execution environments for testing.
-\item Fine grained mapping of processes to physical resources with -np, -npnode and -pnode options.
-\item New command line options for specifying mpi-start configuration
-\item Basic support for OpenMP
-\item Fixed installation paths, default installation now follows FHS.
-\item Added unit testing
-\item Revision of MPI implementations support.
+\item New parameters for process mapping that allow specifying how many
+processes per core/socket/node to start.
+\item Support for processor and memory affinity in Open MPI (new hook)
+\item Fixed bugs: \#38, \#27, \#31, \#35, \#41. 
+\item Updated documentation with new options.
+\item More testing coverage. 
 \end{itemize}
 
 Check the Changelog file for a detailed list of changes.
@@ -88,12 +77,14 @@ Changes in the yaim version 1.1.9 are:
 Check the Changelog file for a detailed list of changes.
 
 \subsection{Requirements}
-mpi-start only requires bash compatible shell for working.
+mpi-start only requires bash compatible shell for working. mpi-start uses
+several commands that are available in most unix systems: readlink, mount and
+mktemp.
 
 \subsection{Source Code}
 
 Source code is available at mpi-start repository
-(\url{https://devel.ifca.es/hg/mpi-start}) with tag \texttt{mpi-start\_R\_1\_0\_4 }
+(\url{https://devel.ifca.es/hg/mpi-start}) with tag \texttt{mpi-start\_R\_1\_0\_5 }
 and at org.glite.yaim.mpi glite
 (\url{http://jra1mw.cvs.cern.ch/cgi-bin/jra1mw.cgi/org.glite.yaim.mpi/})
 repository with tag \texttt{glite-yaim-mpi\_R\_1\_1\_9\_1} 
@@ -102,7 +93,6 @@ repository with tag \texttt{glite-yaim-mpi\_R\_1\_1\_9\_1}
 \begin{itemize}
 \item Fine grained process mapping is not supported with Slurm or Condor
 schedulers.
-\item Shared filesystem detection only works in Linux
 \end{itemize}
 
 \section{User Guide}
@@ -199,7 +189,6 @@ The command line parameters for the application \\
 \texttt{I2G\_MPI\_TYPE}                & -t &
 The name of the MPI implementation to use. \\
 \hline
-
 \texttt{I2G\_MPI\_PRE\_RUN\_HOOK}      & -pre &
 This variable can be set to a script which must define the pre\_run\_hook function. This function will be called after the MPI support has been established and before the internal pre-run hooks. This hook can be used to prepare input data or compile the program. \\
 \hline
@@ -248,20 +237,38 @@ Standard error file to use. \\
 \end{tabularx} 
 \end{center}
 
-There are also other variables that can modify the behaviour of mpi-start.
-They do not have a command line switch, but can be set with the \texttt{-d}
-option (i.e. \texttt{mpi-start -d I2G\_MPI\_VERSION=1.2}
+These variables can also be set with the \texttt{-d} command line switch. The
+following example shows how to set the \texttt{I2G\_MPI\_TYPE} variable to
+\texttt{openmpi}:
+\begin{verbatim}
+mpi-start -d I2G_MPI_TYPE=openmpi
+\end{verbatim}
 
-\begin{center}
-\begin{tabularx}{\textwidth}{lX}
-\hline
-\textbf{Variable}                      &  \textbf{Meaning}         \\
-\hline
-\hline
-\texttt{I2G\_MPI\_VERSION}             &  Specifies the version of the MPI implementation specified by I2G\_MPI\_TYPE. If not specified the default version will be used. \\
-\hline
-\end{tabularx} 
-\end{center}
+There are also other variables that can modify the behaviour of mpi-start, but
+they are described in other sections of this document. The ones dealing with
+site configuration of mpi-start are documented in the Site Administrator
+Section (\ref{sec:sysadmin}), and the variables dealing with the Hooks are
+summarized in Section \ref{sec:hookvars}.
+
+%\begin{center}
+%\begin{tabularx}{\textwidth}{lX}
+%\textbf{Variable}            &  \textbf{Meaning}         \\
+%\hline
+%\texttt{I2G\_MPI\_VERSION}   &  Specifies the version of the MPI implementation specified by I2G\_MPI\_TYPE. If not specified the default version will be used. \\
+%\hline
+%\texttt{
+%\hline
+%\end{tabularx} 
+%\end{center}
+
+
+%\begin{center}
+%\begin{tabularx}{\textwidth}{lX}
+%\multicolumn{2}{c} {\textbf{Hook Variables}} \\ \hline
+%\textbf{Variable}                      &  \textbf{Meaning}         \\
+%\hline
+%\end{tabularx} 
+%\end{center}
 
 \subsection{Scheduler and Execution Environment Support}
 
@@ -293,7 +300,7 @@ environment and the execution environment can be selected with the
 \end{tabularx} 
 \end{center}
 
-\section{Hooks}
+\section{Hooks}\label{sec:hooks}
 The mpi-start Hooks Framework allow the extension of mpi-start features without changing the core functionality.
 
 Several hooks are included in the default distribution of mpi-start for
@@ -346,16 +353,20 @@ These distribution methods are included in mpi-start:
 \subsection{Extensions Hooks}
 
 Extension hooks are local site hooks that come in the default mpi-start
-distribution. These 3 hooks are available:
+distribution. These hooks are available:
 
 \begin{description}
+\item [Affinity] The Affinity hook is enabled by setting the
+\texttt{MPI\_USE\_AFFINITY} variable to \texttt{1}. When enabled (and the
+execution environment supports it), it will define the appropriate options for
+setting the processor affinity.
 \item [OpenMP] The OpenMP hook is enabled by setting the \texttt{MPI\_USE\_OMP} variable to \texttt{1}. When enabled it will define the \texttt{OMP\_NUM\_THREADS} environment variable to the number of processors available per mpi process. 
-\item [MPI\_TRACE] MPI\_TRACE is enabled by setting the \texttt{I2G\_USE\_MPITRACE} variable to \texttt{1}. It adds to the execution the mpitrace utility, assuming it is installed at \texttt{MPITRACE\_INSTALLATION}. Once the execution is finished, it gathers and creates the output files at the first host.
+\item [MPItrace] MPItrace is enabled by setting the \texttt{I2G\_USE\_MPITRACE} variable to \texttt{1}. It adds to the execution the mpitrace utility, assuming it is installed at \texttt{MPITRACE\_INSTALLATION}. Once the execution is finished, it gathers and creates the output files at the first host.
 \item [MARMOT] Marmot is a tool for analysing and checking MPI programs. This hook enables the use of the tool if the variable \texttt{I2G\_USE\_MARMOT} is set to \texttt{1}. It also copies the analysis output to the first host.
 \item [Compiler flags] Sites that do have various compilers and support various architectures may not have proper compiler flags (\texttt{MPI\_MPIxx\_OPTS}) for all the possible combination. This plugin tries to avoid compilation errors by checking the current compiler options and change them to the default architecture of the compiler if the binaries are not generated.
 \end{description}
 
-These hooks can be completely removed by deleting the openmp.hook,
+These hooks can be completely removed by deleting the affinity.hook, openmp.hook,
 mpitrace.hook, marmot.hook, or compiler.hook in the mpi-start configuration
 directory.
 
@@ -369,7 +380,13 @@ Site admins can define their own hooks by creating \texttt{.hook} files in the c
 \end{itemize}
 
 \subsection{Developing User Hooks}
-Users can also customize the mpi-start behavior defining their own hooks by setting the \texttt{I2G\_MPI\_PRE\_RUN\_HOOK} or \texttt{I2G\_MPI\_POST\_RUN\_HOOK} variables.
+Users can also customize the mpi-start behavior defining their own hooks by
+setting:
+\begin{itemize}
+\item \texttt{-pre} command line switch or \texttt{I2G\_MPI\_PRE\_RUN\_HOOK}
+variable
+\item \texttt{-post} command line switch or \texttt{I2G\_MPI\_POST\_RUN\_HOOK} variable.
+\end{itemize}
 
 \begin{description}
 \item[\texttt{I2G\_MPI\_PRE\_RUN\_HOOK}] path of the file containing the pre-hook, in this file a \texttt{pre\_run\_hook()} function must be available. This function will be called before the application execution. The pre-hook can be used, for example, to compile the executable itself or download data.
@@ -450,7 +467,48 @@ post_run_hook () {
 \end{verbatim}
 \end{small}
 
-\section{System Administrator Guide}
+\subsection{Hooks Variable Summary}\label{sec:hookvars}
+
+This section contains a summary of the variables that can modify the existing
+hook behaviour. They can be set using the \texttt{-d} command line switch.
+
+\begin{center}
+\begin{tabularx}{\textwidth}{llX}
+\textbf{Hook} &  \textbf{Variable}  & \textbf{Meaning}         \\
+\hline
+File Distribution & \texttt{MPI\_SHARED\_FS} &
+If undefined, mpi-start will try to detect a shared file system in the
+execution directory. If defined and equal to $1$, mpi-start will assume that the execution directory is shared between all hosts and will not try to copy files. Any other value will make mpi-start assume that the execution directory is not shared. \\ \hline
+File Distribution & \texttt{I2G\_MPI\_FILE\_DIST} &
+Forces the use of a specific distribution method. \\
+\hline
+File Distribution & \texttt{MPI\_SHARED\_HOME} &
+If set to \texttt{"yes"}, mpi-start will use the path defined in
+\texttt{MPI\_SHARED\_HOME\_PATH} for copying the files and executing the
+application. \\
+\hline
+File Distribution & \texttt{MPI\_SHARED\_HOME\_PATH} &
+Path to a shared directory. \\
+\hline
+Affinity & \texttt{MPI\_USE\_AFFINITY} & If set to $1$, enable processor
+affinity hook. \\
+\hline
+OpenMP & \texttt{MPI\_USE\_OMP} & If set to $1$, enable Open MP hook. \\
+\hline
+MPItrace & \texttt{I2G\_USE\_MPITRACE} & If set to $1$, enable MPItrace hook.\\
+\hline
+Marmot & \texttt{I2G\_USE\_MARMOT} & If set to $1$, enable Marmot hook.\\
+\hline
+
+%\texttt{I2G\_MPI\_VERSION}   &  Specifies the version of the MPI implementation specified by I2G\_MPI\_TYPE. If not specified the default version will be used. \\
+%\hline
+%\texttt{
+%\hline
+\end{tabularx} 
+\end{center}
+
+
+\section{System Administrator Guide}\label{sec:sysadmin}
 
 \subsection{Installation}
 
@@ -548,18 +606,14 @@ Hooks may change the behavior of mpi-start and provide additional features
 such as file distribution and configuration of compiler flags. Site admins can
 add their own hooks via the local hook mechanism.
 
-mpi-start includes hooks for distributing the files needed for the execution of an application. By default it tries to find the most suitable method for copying the files, using shared filesystems whenever they are found. However, the filesystem detection may not work for all sites, or the shared filesystem may be in a different location to the execution path making it impossible for mpi-start to detect its availability.
-
-Site admins can tune the file distribution method with the following variables:
-\begin{center}
-\begin{tabularx}{\textwidth}{|l|X|}
-\hline
-\textbf{Variable}        &              \textbf{Meaning}         \\ \hline
- \texttt{MPI\_START\_SHARED\_FS} & If undefined, mpi-start will try to detect a shared file system in the execution directory. If defined and equal to 1, mpi-start will assume that the execution directory is shared between all hosts and will not try to copy files. Any other value will make mpi-start assume that the execution directory is not shared. \\ \hline
- \texttt{MPI\_SHARED\_HOME} & If set to \texttt{yes} , mpi-start will use the path defined in \texttt{MPI\_SHARED\_HOME\_PATH} for copying the files and executing the application \\ \hline
- \texttt{MPI\_SHARED\_HOME\_PATH} & Path to a shared directory \\ \hline
-\end{tabularx} 
-\end{center}
+mpi-start includes hooks for distributing the files needed for the execution
+of an application. By default it tries to find the most suitable method for
+copying the files, using shared filesystems whenever they are found. However,
+the filesystem detection may not work for all sites, or the shared filesystem
+may be in a different location to the execution path making it impossible for
+mpi-start to detect its availability. Check Section \ref{sec:hooks} for more
+information. Section \ref{sec:hookvars} contains a summary of relevant
+variables that may defined.
 
 \subsection{mpi-start Yaim Configuration}
 
