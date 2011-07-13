@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 #
 # Tests for MPI-Start process distribution features 
@@ -84,6 +84,72 @@ testPDefault() {
     mpi_start_np_setup
     assertEquals "$MPI_START_NSLOTS" "$MPI_START_NP"
     assertNull "$MPI_START_NPHOST"
+}
+
+testMultipleNodeCore() {
+    export I2G_MPI_START_VERBOSE=0
+    export I2G_MPI_PER_NODE=1
+    export I2G_MPI_PER_CORE=2
+    mpi_start_np_setup
+    assertEquals "3" "$MPI_START_NP"
+    assertEquals "1" "$MPI_START_NPHOST"
+}
+
+testMultipleNodeSocket() {
+    export I2G_MPI_START_VERBOSE=0
+    export I2G_MPI_PER_NODE=1
+    export I2G_MPI_PER_SOCKET=2
+    mpi_start_np_setup
+    assertEquals "3" "$MPI_START_NP"
+    assertEquals "1" "$MPI_START_NPHOST"
+}
+
+testMultipleNodeNP() {
+    export I2G_MPI_START_VERBOSE=0
+    export I2G_MPI_PER_NODE=1
+    export I2G_MPI_NP=2
+    mpi_start_np_setup
+    assertEquals "3" "$MPI_START_NP"
+    assertEquals "1" "$MPI_START_NPHOST"
+}
+
+testMultipleNodeCoreSocketNP() {
+    export I2G_MPI_START_VERBOSE=0
+    export I2G_MPI_PER_NODE=1
+    export I2G_MPI_NP=2
+    export I2G_MPI_PER_SOCKET=2
+    export I2G_MPI_PER_CORE=2
+    mpi_start_np_setup
+    assertEquals "3" "$MPI_START_NP"
+    assertEquals "1" "$MPI_START_NPHOST"
+}
+
+testMultipleCoreSocket() {
+    export I2G_MPI_START_VERBOSE=0
+    export I2G_MPI_PER_SOCKET=2
+    export I2G_MPI_PER_CORE=2
+    mpi_start_np_setup
+    assertEquals "12" "$MPI_START_NP"
+    assertEquals "4" "$MPI_START_NPHOST"
+}
+
+testMultipleCoreSocketNP() {
+    export I2G_MPI_START_VERBOSE=0
+    export I2G_MPI_NP=2
+    export I2G_MPI_PER_SOCKET=2
+    export I2G_MPI_PER_CORE=2
+    mpi_start_np_setup
+    assertEquals "12" "$MPI_START_NP"
+    assertEquals "4" "$MPI_START_NPHOST"
+}
+
+testMultipleCoreNP() {
+    export I2G_MPI_START_VERBOSE=0
+    export I2G_MPI_NP=2
+    export I2G_MPI_PER_CORE=2
+    mpi_start_np_setup
+    assertEquals "48" "$MPI_START_NP"
+    assertEquals "16" "$MPI_START_NPHOST"
 }
 
 . $SHUNIT2
