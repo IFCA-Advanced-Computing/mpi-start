@@ -10,10 +10,7 @@
 \Date{\today}
 
 \Abstract{
-mpi-start is a set of scripts to close the gap between the workload management
-system of a Grid insfrastructure and the configuration of the nodes on which
-MPI applications are run. The package is used to help the user to start MPI
-applications on heterogeneous Grid sites.
+mpi-start and MPI-Utils help grid users and administrators to close the gap between the workload management system of a Grid insfrastructure and the configuration of the nodes on which MPI applications are run. The package is used to help users to start MPI applications on heterogeneous Grid sites.
 }
 
 \begin{document}
@@ -25,83 +22,50 @@ applications on heterogeneous Grid sites.
 
 \newpage
 
-\section{Functional Description}
+\section{About}
+
+\subsection{mpi-start}
+\subsubsection{Description}
 mpi-start is a set of scripts to close the gap between the workload management
 system of a Grid insfrastructure and the configuration of the nodes on which
 MPI applications are run. The package is used to help the user to start MPI
 applications on heterogeneous Grid sites. 
+
+mpi-start provides an abstraction layer that offers a unique interface to start parallel jobs with different execution environments implementations. It supports several different MPI implementations under different batch systems.
 
 mpi-start was originally developed in the frame of the int.eu.grid project for
 the execution of MPI applications with the CrossBroker metascheduler and then
 extended its use as the official way of starting MPI jobs within EGEE.
 Currently, it is part of the EMI project. 
 
-There is a trac page at \url{http://devel.ifca.es/mpi-start} with information about
-the development of mpi-start.
+There is a trac page at \url{http://devel.ifca.es/mpi-start} with information about the development of mpi-start.
 
-\section{Release Notes}
+\subsubsection{Requirements}
+mpi-start only requires bash compatible shell for working. mpi-start uses several commands that are available in most unix systems: readlink, mount and mktemp.
 
-\subsection{What's new}
+\subsubsection{Source Code}
+Source code is available at mpi-start mercurial repository (\url{https://devel.ifca.es/hg/mpi-start}). Released versions are tagged as \texttt{mpi-start\_R\_X\_Y\_Z-r}, where X.Y.Z is the mpi-start version and r the revision number for that version.
 
-mpi-start 1.0.5 is an update release of mpi-start 1.x series that includes minor improvements and corrections.
-Information about previous versions is available at mpi-start's trac page at
-\url{http://devel.ifca.es/mpi-start/versions/}.
-
-MPI-utils is a metapackge (glite-mpi) that depends on mpi-start and a yaim
-plugin for configuration. No changes are introduced in this release.
-
-\subsection{Changes}
-\subsubsection{mpi-start}
-Changes for mpi-start 1.0.5 are:
-\begin{itemize}
-\item New parameters for process mapping that allow specifying how many
-processes per core/socket/node to start.
-\item Support for processor and memory affinity in Open MPI (new hook)
-\item Fixed bugs: \#38, \#27, \#31, \#35, \#41. 
-\item Updated documentation with new options.
-\item More testing coverage. 
-\end{itemize}
-
-Check the Changelog file for a detailed list of changes.
-
-\subsubsection{MPI-Utils}
-MPI-utils is a meta package with mpi-start and the yaim configuration plugin.
-Changes in the yaim version 1.1.9 are:
-\begin{itemize}
-\item Updated documentation for yaim configuration
-\item yaim plugin does not try to create mpirun wrapper in the WN
-\item yaim plugin uses current torque location (or TORQUE variable)
-\item yaim plugin correctly defines the runtimeenvironment variables
-\end{itemize}
-
-Check the Changelog file for a detailed list of changes.
-
-\subsection{Requirements}
-mpi-start only requires bash compatible shell for working. mpi-start uses
-several commands that are available in most unix systems: readlink, mount and
-mktemp.
-
-\subsection{Source Code}
-
-Source code is available at mpi-start repository
-(\url{https://devel.ifca.es/hg/mpi-start}) with tag \texttt{mpi-start\_R\_1\_0\_5 }
-and at org.glite.yaim.mpi glite
-(\url{http://jra1mw.cvs.cern.ch/cgi-bin/jra1mw.cgi/org.glite.yaim.mpi/})
-repository with tag \texttt{glite-yaim-mpi\_R\_1\_1\_9\_1} 
-
-\subsection{Known Issues}
+\subsubsection{Known Issues}
 \begin{itemize}
 \item Fine grained process mapping is not supported with Slurm or Condor
 schedulers.
 \end{itemize}
 
+
+\subsection{MPI-Utils}
+\subsubsection{Description}
+MPI-utils is a metapackge (glite-mpi) that depends on mpi-start and a yaim plugin for easy configuration of the MPI support in grid sites.
+
+\subsubsection{Requirements}
+MPI-Utils contains a yaim plugin, therefore it needs yaim-core installation available. The plugin does not use any non-standard tools. 
+
+\subsubsection{Source Code}
+The source code of the yaim plugin is available at glite CVS (\url{http://jra1mw.cvs.cern.ch/cgi-bin/jra1mw.cgi/org.glite.yaim.mpi}) under org.glite.yaim.mpi module. Released versions are tagged with tags in the form \texttt{glite-yaim-mpi\_R\_X\_Y\_Z\_r},   where X.Y.Z is the plugin version and r the revision number for that version.
+
+\newpage
+
 \section{User Guide}
-
-\subsection{Description}
-mpi-start is an abstraction layer that offers a unique interface to start
-parallel jobs with different execution environments implementations. It
-provides support for different MPI implementations.
-
 \subsection{Installation}
 
 Normally users do not need to install mpi-start. However if they want to use
@@ -280,6 +244,8 @@ environment and the execution environment can be selected with the
  \hline
 \end{tabularx} 
 \end{center}
+
+\newpage
 
 \section{Hooks}\label{sec:hooks}
 The mpi-start Hooks Framework allow the extension of mpi-start features without changing the core functionality.  Several hooks are included in the default distribution of mpi-start for
@@ -480,6 +446,7 @@ Marmot & \texttt{I2G\_USE\_MARMOT} & If set to $1$, enable Marmot hook.\\
 \end{tabularx} 
 \end{center}
 
+\newpage
 
 \section{System Administrator Guide}\label{sec:sysadmin}
 
@@ -698,10 +665,10 @@ The complete list of configuration variables for the CE is shown in the next tab
 \begin{center}
 \begin{tabularx}{\textwidth}{llX}
 \textbf{Variable}     & \textbf{Mandatory} & \textbf{Description}        \\ \hline
-\textbf{MPI\_<FLAVOUR>\_ENABLE}    & YES & set to \texttt{"yes"} if you want to enable the <flavour> \\ \hline
-\textbf{MPI\_<FLAVOUR>\_VERSION}   & YES & set to the supported version of the <flavour>, usually is automatically detected \\ \hline
-\textbf{MPI\_SHARED\_HOME}         & NO  & set this to \texttt{"yes"} if you have a shared home area between WNs. \\ \hline
-\textbf{MPI\_SUBMIT\_FILTER}       & NO  & Set this to \texttt{"yes"} to configure the submit filter for torque batch system that enables the submission of parallel jobs. The configuration assumes that torque path is \texttt{/var/torque} or \texttt{TORQUE\_VAR\_DIR} variable if defined. \\ \hline
+\texttt{MPI\_<FLAVOUR>\_ENABLE}    & YES & set to \texttt{"yes"} if you want to enable the <flavour> \\ \hline
+\texttt{MPI\_<FLAVOUR>\_VERSION}   & YES & set to the supported version of the <flavour>, usually is automatically detected \\ \hline
+\texttt{MPI\_SHARED\_HOME}         & NO  & set this to \texttt{"yes"} if you have a shared home area between WNs. \\ \hline
+\texttt{MPI\_SUBMIT\_FILTER}       & NO  & Set this to \texttt{"yes"} to configure the submit filter for torque batch system that enables the submission of parallel jobs. The configuration assumes that torque path is \texttt{/var/torque} or \texttt{TORQUE\_VAR\_DIR} variable if defined. \\ \hline
 \end{tabularx}
 \end{center}
 
@@ -801,6 +768,8 @@ MPI_DEFAULT_FLAVOUR=OPENMPI
 #MPI_MPICH_MPIEXEC="/usr/bin/mpiexec"
 \end{verbatim}
 \end{small}
+
+\newpage
 
 \section{Examples}
 
