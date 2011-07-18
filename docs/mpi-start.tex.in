@@ -540,7 +540,7 @@ $ make install  PREFIX=/opt/mpi-start
 \end{small}
 
 In this case, is recommendable setting the installation the environment
-variable I2G\_MPI\_START to point to mpi-start script (although it is not mandatory anymore). 
+variable I2G\_MPI\_START to point to mpi-start script (although this is not mandatory anymore). 
 \begin{small}
 \begin{verbatim}
 $ export I2G_MPI_START=/opt/mpi-start/bin/mpi-start
