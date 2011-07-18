@@ -485,7 +485,7 @@ Marmot & \texttt{I2G\_USE\_MARMOT} & If set to $1$, enable Marmot hook.\\
 
 \subsection{Installation}
 
-\subsubsection{Binary Packages}
+\subsubsection{Binary Distribution}
 
 Binary packages for mpi-start are generated in EMI using ETICS. Check their repositories for the correct package for your distribution. Once you have the repositories configured you only need to install the package using your favorite package manager:
 
@@ -685,7 +685,14 @@ Possible flavours are:
 
 The use of shared homes should be announced also by setting the \texttt{MPI\_SHARED\_HOME} to \texttt{"yes"}.
 
-If you are using PBS/Torque, you can set the variable \texttt{MPI\_SUBMIT\_FILTER} to \texttt{"yes"} in order to enable the submission of parallel jobs in your system.
+If you are using PBS/Torque, you can set the variable
+\texttt{MPI\_SUBMIT\_FILTER} to \texttt{"yes"} in order to enable the
+submission of parallel jobs in your system. The submit filter assumes that
+your Worker Nodes are correctly configured to publish in their status the \texttt{ncpus}
+variable with the number of available slots. If that's not true in your case,
+you may edit the file \texttt{/var/torque/submit\_filter} in line 71 to fit
+your pbsnodes output. An example for using the \texttt{np} value is commented
+out in the file.
 
 The complete list of configuration variables for the CE is shown in the next table:
 \begin{center}
