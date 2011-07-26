@@ -137,6 +137,7 @@ if test "x${RUN_OMP_TESTS}" = "x1" ; then
     echo "********************"
     echo "     OMP Tests"
     echo "********************"
+    ./test_unit_omp.sh || exitcode=1
     ./test_omp.sh || exitcode=1
 fi
 if test "x${RUN_MPICH2_TESTS}" = "x1" ; then
