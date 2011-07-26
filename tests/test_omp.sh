@@ -59,6 +59,8 @@ setUp () {
     unset I2G_MPI_START_TRACE
     unset I2G_MPI_SINGLE_PROCESS
     export MPI_START_SHARED_FS=1
+    export MPI_START_SOCKETS=1
+    export MPI_START_COREPERSOCKET=1
 }
 
 testPreCompiledOMP () {
