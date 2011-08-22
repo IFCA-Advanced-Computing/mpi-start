@@ -216,8 +216,10 @@ mpi_start_pre_run_hook_copy () {
         exit 1
     fi
     copy
+    status=$?
 
     rm -f $TARBALL
+    return $status
 }
 
 
