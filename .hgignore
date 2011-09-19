@@ -10,3 +10,4 @@ docs/mpi-start.tex
 docs/mpi-start.toc
 Makefile
 rpms/*
+.DS_Store
