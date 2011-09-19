@@ -601,7 +601,7 @@ it is not the path where the jobs are started, then set the variable
 shared directory (e.g. shared home), this situation should be automatically
 detected}.
 
-If you use ssh host based authentication, set the variable \texttt{MPI\_SSH\_HOST\_BASED\_AUTH} to \texttt{"yes"}.
+If you use ssh host based authentication, set the variable \texttt{MPI\_SSH\_HOST\_BASED\_AUTH} to \texttt{"yes"}. \textbf{Note that this does NOT configure passwordless SSH between the nodes, just sets an environmnet variable}
 
 Lastly, if your use a non default location for mpi-start, set its location
 with the \texttt{MPI\_MPI\_START} variable.
