@@ -53,27 +53,27 @@ testNodeDistribution() {
     export I2G_MPI_APPLICATION_STDOUT=`$MYMKTEMP`
     I2G_MPI_PER_NODE=1
     pre_run_hook
-    mpi_start_execute_wrapper "echo -n \$OMP_NUM_THREADS"
+    mpi_start_execute_wrapper "echo \$OMP_NUM_THREADS"
     assertEquals 8 `cat $I2G_MPI_APPLICATION_STDOUT`
     I2G_MPI_PER_NODE=2
     pre_run_hook
-    mpi_start_execute_wrapper "echo -n \$OMP_NUM_THREADS"
+    mpi_start_execute_wrapper "echo \$OMP_NUM_THREADS"
     assertEquals 4 `cat $I2G_MPI_APPLICATION_STDOUT`
     I2G_MPI_PER_NODE=4
     pre_run_hook
-    mpi_start_execute_wrapper "echo -n \$OMP_NUM_THREADS"
+    mpi_start_execute_wrapper "echo \$OMP_NUM_THREADS"
     assertEquals 2 `cat $I2G_MPI_APPLICATION_STDOUT`
     I2G_MPI_PER_NODE=8
     pre_run_hook
-    mpi_start_execute_wrapper "echo -n \$OMP_NUM_THREADS"
+    mpi_start_execute_wrapper "echo \$OMP_NUM_THREADS"
     assertEquals 1 `cat $I2G_MPI_APPLICATION_STDOUT`
     I2G_MPI_PER_NODE=16
     pre_run_hook
-    mpi_start_execute_wrapper "echo -n \$OMP_NUM_THREADS"
+    mpi_start_execute_wrapper "echo \$OMP_NUM_THREADS"
     assertEquals 1 `cat $I2G_MPI_APPLICATION_STDOUT`
     I2G_MPI_PER_NODE=3
     pre_run_hook
-    mpi_start_execute_wrapper "echo -n \$OMP_NUM_THREADS"
+    mpi_start_execute_wrapper "echo \$OMP_NUM_THREADS"
     assertEquals 2 `cat $I2G_MPI_APPLICATION_STDOUT`
     rm -f $I2G_MPI_APPLICATION_STDOUT
 }
@@ -82,23 +82,23 @@ testSocketDistribution() {
     export I2G_MPI_APPLICATION_STDOUT=`$MYMKTEMP`
     I2G_MPI_PER_SOCKET=1
     pre_run_hook
-    mpi_start_execute_wrapper "echo -n \$OMP_NUM_THREADS"
+    mpi_start_execute_wrapper "echo \$OMP_NUM_THREADS"
     assertEquals 4 `cat $I2G_MPI_APPLICATION_STDOUT`
     I2G_MPI_PER_SOCKET=2
     pre_run_hook
-    mpi_start_execute_wrapper "echo -n \$OMP_NUM_THREADS"
+    mpi_start_execute_wrapper "echo \$OMP_NUM_THREADS"
     assertEquals 2 `cat $I2G_MPI_APPLICATION_STDOUT`
     I2G_MPI_PER_SOCKET=4
     pre_run_hook
-    mpi_start_execute_wrapper "echo -n \$OMP_NUM_THREADS"
+    mpi_start_execute_wrapper "echo \$OMP_NUM_THREADS"
     assertEquals 1 `cat $I2G_MPI_APPLICATION_STDOUT`
     I2G_MPI_PER_SOCKET=8
     pre_run_hook
-    mpi_start_execute_wrapper "echo -n \$OMP_NUM_THREADS"
+    mpi_start_execute_wrapper "echo \$OMP_NUM_THREADS"
     assertEquals 1 `cat $I2G_MPI_APPLICATION_STDOUT`
     I2G_MPI_PER_SOCKET=3
     pre_run_hook
-    mpi_start_execute_wrapper "echo -n \$OMP_NUM_THREADS"
+    mpi_start_execute_wrapper "echo \$OMP_NUM_THREADS"
     assertEquals 1 `cat $I2G_MPI_APPLICATION_STDOUT`
     rm -f $I2G_MPI_APPLICATION_STDOUT
 }
@@ -107,15 +107,15 @@ testCoreDistribution() {
     export I2G_MPI_APPLICATION_STDOUT=`$MYMKTEMP`
     I2G_MPI_PER_CORE=1
     pre_run_hook
-    mpi_start_execute_wrapper "echo -n \$OMP_NUM_THREADS"
+    mpi_start_execute_wrapper "echo \$OMP_NUM_THREADS"
     assertEquals 1 `cat $I2G_MPI_APPLICATION_STDOUT`
     I2G_MPI_PER_CORE=2
     pre_run_hook
-    mpi_start_execute_wrapper "echo -n \$OMP_NUM_THREADS"
+    mpi_start_execute_wrapper "echo \$OMP_NUM_THREADS"
     assertEquals 1 `cat $I2G_MPI_APPLICATION_STDOUT`
     I2G_MPI_PER_CORE=3
     pre_run_hook
-    mpi_start_execute_wrapper "echo -n \$OMP_NUM_THREADS"
+    mpi_start_execute_wrapper "echo \$OMP_NUM_THREADS"
     assertEquals 1 `cat $I2G_MPI_APPLICATION_STDOUT`
     rm -f $I2G_MPI_APPLICATION_STDOUT
 }
@@ -123,7 +123,7 @@ testCoreDistribution() {
 testNoDistribution() {
     export I2G_MPI_APPLICATION_STDOUT=`$MYMKTEMP`
     pre_run_hook
-    mpi_start_execute_wrapper "echo -n \$OMP_NUM_THREADS"
+    mpi_start_execute_wrapper "echo \$OMP_NUM_THREADS"
     assertEquals 5 `cat $I2G_MPI_APPLICATION_STDOUT`
     rm -f $I2G_MPI_APPLICATION_STDOUT
 }
