@@ -46,7 +46,7 @@ rm -rf $RPM_BUILD_ROOT/*
 %config(noreplace) %{_sysconfdir}/profile.d/mpi_start.csh
 
 %changelog
-* Wed Aug 10 2011 <enolfc _AT_ ifca.unican.es> - 1.1.0-1
+* Wed Aug 10 2011 Enol Fernandez <enolfc _AT_ ifca.unican.es> - 1.1.0-1
 - Fixed bugs #38 (https://devel.ifca.es/mpi-start/ticket/38), 
   #31 (https://devel.ifca.es/mpi-start/ticket/31), and
   #35 (https://devel.ifca.es/mpi-start/ticket/35)
@@ -55,6 +55,6 @@ rm -rf $RPM_BUILD_ROOT/*
 - New man page
 - Updated documentation
 
-* Fri Mar 4 2011 <enolfc _AT_ ifca.unican.es> - 1.0.4-1
+* Fri Mar 4 2011 Enol Fernandez <enolfc _AT_ ifca.unican.es> - 1.0.4-1
 - Fedora guidelines compliant package.
 - See ChangeLog at doc directory.
