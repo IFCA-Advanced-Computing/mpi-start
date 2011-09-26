@@ -91,36 +91,29 @@
 	* simplify GLOBUS_TCP_PORT_RANGE export logic for Open MPI module
 
 2007-09-05  Sven Stork  <hpcstork _AT_ hlrs.de>
-
 	* replace source with .
 	* more POSIX compliant fixes
 
 2007-09-04  Sven Stork  <hpcstork _AT_ hlrs.de>
-
 	* replace [] with test for protability 
 
 2007-08-22  Sven Stork  <hpcstork _AT_ hlrs.de>
-
 	* add MPI_START_DISTRIBUTE_PROXY to force mpi-start to distribute
-          the proxy when there is a shared file system.
+	  the proxy when there is a shared file system.
 
 2007-08-20  Sven Stork  <hpcstork _AT_ hlrs.de>
-
 	* fix small ordering bug in the MPI modules for the debug output
 
 2007-08-15  Sven Stork  <hpcstork _AT_ hlrs.de>
-
 	* add copyright header information
 	* add distclean target
 	* add support for user provided mpiexec/mpirun replacements
 	  MPI<FLAVOUR>_MPIEXEC/MPIRUN
 
 2007-07-24  Sven Stork  <hpcstork _AT_ hlrs.de>
-
 	* Improve the template plugins
 
 2007-07-23  Sven Stork  <hpcstork _AT_ hlrs.de>
-
 	* Add more documentation about the MPI plugins.
 
 2007-07-13  Sven Stork  <hpcstork _AT_ hlrs.de>
@@ -128,18 +121,15 @@
 	* Fix bug in user documentation concering the debugging variables.
 
 2007-07-12  Sven Stork  <hpcstork _AT_ hlrs.de>
-
 	* Extend shared file system detection to correctly follow symbolic links.
 
 2007-07-09  Sven Stork  <hpcstork _AT_ hlrs.de>
-
 	* Add support for MPI_DEFAULT_FLAVOUR of the EGEE environment. If
-          the user doesn't specify I2G_MPI_TYPE mpi-start will look for this
-          (site specific) variable to detect the default MPI flavour of the
-          site.
+	the user doesn't specify I2G_MPI_TYPE mpi-start will look for this
+	(site specific) variable to detect the default MPI flavour of the
+	site.
 
 2007-07-06  Sven Stork  <hpcstork _AT_ hlrs.de>
-
 	* Apply Stephen Childs patch to fix the LSF component.
 	* Add modules support
 	* improve shared filesystem dectection code based on a
@@ -147,7 +137,6 @@
 	* Lots of formating updates 
 
 2007-05-24  sven  <sven _AT_ hlrs.de>
-
 	* require that the mpi-mt tools are installed in the same
 	directory as mpi-start itself
 
@@ -156,49 +145,39 @@
 	* fix problem with detection the right mpi-mt tool
 
 2007-03-13  Sven Stork  <hpcstork _AT_ hlrs.de>
-
 	* add support for distribution of the voms-proxy to the remote nodes
 
 2007-03-07  Sven Stork  Sven Stork  <hpcstork _AT_ hlrs.de>
-
 	* add gpfs and lustre to the know file systems
 
 2007-03-06  Sven Stork  Sven Stork  <hpcstork _AT_ hlrs.de>
-
 	* let user/admins predefine the shared fs value
 
 2007-03-01  Sven Stork  <hpcstork _AT_ hlrs.de>
-
 	* add absolute paths for mpiexec/mpirun in the different plugins.
 
 2007-02-15  Sven Stork  <hpcstork _AT_ hlrs.de>
-
 	* Applied patches from Stephen Childs for mpich/mpich2
 	plugins. These patches enable the plugins to use osc mpiexec if
 	available else fall back to the standard mpirun.
 	* Fix error handling problem for mpich.
 
 2007-01-25  Sven Stork  <hpcstork _AT_ hlrs.de>
-
 	* Disable PBS/SGE pls _and_ ras components
 
 2007-01-22  Sven Stork  <hpcstork _AT_ hlrs.de>
-
 	* add dump of machinefile in debug mode
 	* fix broken GLOBUS_TCP_PORT_RANGE handling
 
 2006-12-20  Sven Stork  <hpcstork _AT_ hlrs.de>
-
 	* Fix broken return value.
 
 2006-12-19  Sven Stork  <hpcstork _AT_ hlrs.de>
-
 	* Use stat on $PWD instead of $I2G_MPI_APPLICATION, because the 
 	  binary doesn't need to exist before the pre-run hook. Therefore 
 	  the test for the shared file system can fail.
 
 2006-12-19  Sven Stork  <hpcstork _AT_ hlrs.de>
-
 	* version 0.0.27
 	* fix broken mpich2 mpdboot support
 	* always take care that the ".mpd.conf" file is available and in 

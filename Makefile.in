@@ -63,6 +63,7 @@ dist:
 	sed -e "s/@NAME_PREFIX@/$(name_prefix)/" \
 		-e "s/@VERSION@/$(VERSION)/" mpi-start.spec.in \
 		> $(name_prefix)mpi-start-$(VERSION)/$(name_prefix)mpi-start.spec
+	chmod 644 $(name_prefix)mpi-start-$(VERSION)/$(name_prefix)mpi-start.spec
 	tar czf $(name_prefix)mpi-start-$(VERSION).tar.gz $(name_prefix)mpi-start-$(VERSION)
 	rm -rf $(name_prefix)mpi-start-$(VERSION)
 
