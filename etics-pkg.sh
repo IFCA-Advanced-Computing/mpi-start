@@ -17,7 +17,6 @@ if [ "x$version" = "x" ] ; then
     version=`cat VERSION`
 fi
 
-
 BASEDIR=$PWD
 
 # delete old artifacts
