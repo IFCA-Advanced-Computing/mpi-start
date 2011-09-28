@@ -299,6 +299,13 @@ mpi_start_pre_run_hook_generic () {
         if test ! -x $app ; then
             chmod +x $app 2> /dev/null # do not care if it fails.
         fi
+        # add complete path to application so . does not need to be in PATH
+        which $app &> /dev/null
+        if test $? -ne 0 ; then 
+            if test "${I2G_MPI_APPLICATION/#\/}" == "${I2G_MPI_APPLICATION}" ;  then
+                export I2G_MPI_APPLICATION=$PWD/$I2G_MPI_APPLICATION
+            fi
+        fi
     fi
 
     if  test "x$MPI_START_SHARED_FS" != "x1" -o "x$MPI_START_DISTRIBUTE_PROXY" = "x1" ; then 

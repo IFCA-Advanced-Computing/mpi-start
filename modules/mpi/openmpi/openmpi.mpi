@@ -81,8 +81,8 @@ mpi_exec () {
     local machines_params=""
     if test "x${MPI_START_SCHEDULER}" = "xpbs" -a "x${MPI_START_DISABLE_LRMS_INTEGRATION}" != "xyes" ; then
         $MPI_OPENMPI_INFO --parseable | grep "pls:tm" &> /dev/null
-        if test $? -eq 0 ; then
-            debug_msg "found openmpi and PBS (with pbs support enabled), don't set machinefile"
+        if test $? -eq 0 -a "${OPENMPI_VERSION_MAJOR}.${OPENMPI_VERSION_MINOR}" -eq "1.2" ; then
+            debug_msg "found openmpi 1.2 and PBS (with pbs support enabled), don't set machinefile"
         else
             machines_params="-machinefile $MPI_START_MACHINEFILE"
         fi 
