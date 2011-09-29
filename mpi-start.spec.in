@@ -15,8 +15,8 @@ Source: https://devel.ifca.es/hg/mpi-start/archive/mpi-start-@VERSION@.tar.gz
 URL: http://devel.ifca.es/mpi-start/
 BuildRoot: %{_tmppath}/%{name}-%{version}-rpmroot
 BuildArch: noarch
+Vendor: EMI
 # Packager: Enol Fernandez <enofc@ifca.unican.es>
-# Vendor: EMI
 
 %description
 A generic startup mechanism for different MPI installation in a cluster/grid.
