@@ -33,6 +33,12 @@ cd $RPM_BUILD_DIR/@NAME_PREFIX@mpi-start-@VERSION@
 rm -rf $RPM_BUILD_ROOT/*
 cd $RPM_BUILD_DIR/@NAME_PREFIX@mpi-start-@VERSION@
 %{__make} destdir=$RPM_BUILD_ROOT install
+# do the compression of the man page
+ls -ltr $RPM_BUILD_ROOT/%{_mandir}/man1
+if [ ! -f $RPM_BUILD_ROOT/%{_mandir}/man1/mpi-start.1.bz2 ] ; then
+    rm -f $RPM_BUILD_ROOT/%{_mandir}/man1/*
+    cp docs/mpi-start.1.bz2 $RPM_BUILD_ROOT/%{_mandir}/man1/
+fi
 
 %clean
 rm -rf $RPM_BUILD_ROOT/*
