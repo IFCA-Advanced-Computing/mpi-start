@@ -70,6 +70,13 @@ EOF
 pre_run_hook () {
     debug_msg "compiler_hooks"
 
+    which mpicc &> /dev/null
+    st=$?
+    if test $st -ne 0 ; then
+        debug_msg "compiler not found, ignoring hook"
+        return 0
+    fi
+
     compiler_hook_check_compiler_flags
     status=$?
     if test $status -ne 0 ; then

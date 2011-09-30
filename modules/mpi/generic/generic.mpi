@@ -21,10 +21,12 @@ mpi_exec () {
         MPI_GLOBAL_PARAMS="-machinefile $MPI_START_MACHINEFILE -np $MPI_START_NP"
     fi
 
-    MPIEXEC=`which mpirun`
+    MPIEXEC=`which mpirun 2> /dev/null`
     st=$?
-    if test $? -ne 0 ; then
-        debug_msg "No mpirun found"
+    if test $st -ne 0 ; then
+        error_msg "No mpirun found"
+        dump_env
+        exit 1
     fi
    
     . $MPI_START_ETC/generic_mpiexec.sh
