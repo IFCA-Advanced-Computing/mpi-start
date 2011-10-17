@@ -8,7 +8,7 @@
 Summary: A generic startup mechanism for different MPI installation in a cluster/grid
 Name: @NAME_PREFIX@mpi-start
 Version: @VERSION@
-Release: 1
+Release: 1%{dist}
 License: GPLv2
 Group: System Environment/Libraries
 Source: https://devel.ifca.es/hg/mpi-start/archive/mpi-start-@VERSION@.tar.gz
@@ -54,7 +54,7 @@ rm -rf $RPM_BUILD_ROOT/*
 %config(noreplace) %{_sysconfdir}/profile.d/mpi_start.csh
 
 %changelog
-* Fri Sep 30 2011 Enol Fernandez <enolfc _AT_ ifca.unican.es> - 1.1.0-1
+* Fri Sep 30 2011 Enol Fernandez <enolfc _AT_ ifca.unican.es> - 1.1.0-1%{dist}
 - Fixed bugs #38 (https://devel.ifca.es/mpi-start/ticket/38), 
   #31 (https://devel.ifca.es/mpi-start/ticket/31), and
   #35 (https://devel.ifca.es/mpi-start/ticket/35)
