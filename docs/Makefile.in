@@ -19,8 +19,8 @@ mpi-start.1.bz2:
 	bzip2 -k mpi-start.1
 
 install: mpi-start.1.bz2
-	install -m 0644 COPYING $(destdir)/$(docdir)
-	install -m 0644 AUTHORS $(destdir)/$(docdir)
+	#install -m 0644 COPYING $(destdir)/$(docdir)
+	#install -m 0644 AUTHORS $(destdir)/$(docdir)
 	mkdir -p $(destdir)/$(mandir)/man1
 	install -m 0644 mpi-start.1.bz2 $(destdir)/$(mandir)/man1
 	#cp mpi-start.1.bz2 $(destdir)/$(mandir)/man1/mpi-start.1.bz2
