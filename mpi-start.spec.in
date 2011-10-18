@@ -11,7 +11,7 @@ Version: @VERSION@
 Release: 1%{?dist}
 License: GPLv2
 Group: System Environment/Libraries
-Source: https://devel.ifca.es/hg/mpi-start/archive/mpi-start-@VERSION@.tar.gz
+Source: https://devel.ifca.es/hg/mpi-start/archive/mpi-start-%{version}.tar.gz
 URL: http://devel.ifca.es/mpi-start/
 BuildRoot: %{_tmppath}/%{name}-%{version}-rpmroot
 BuildArch: noarch
@@ -27,7 +27,7 @@ A generic startup mechanism for different MPI installation in a cluster/grid.
 
 %build
 cd $RPM_BUILD_DIR/@NAME_PREFIX@mpi-start-@VERSION@
-./configure --prefix=%{_prefix} --sysconfdir=%{_sysconfdir} --datadir=%{_datadir} --libdir=%{_libdir} --mandir=%{_mandir} --docdir=%{_defaultdocdir}/%{name}-%{version}
+%configure 
 %{__make}
 
 %install
@@ -48,10 +48,10 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root,-)
 %{_bindir}/mpi-start
 %{_sysconfdir}/mpi-start/
-%{_defaultdocdir}/%{name}-%{version}/
 %{_mandir}/man1/*
 %config(noreplace) %{_sysconfdir}/profile.d/mpi_start.sh
 %config(noreplace) %{_sysconfdir}/profile.d/mpi_start.csh
+%doc docs/AUTHORS docs/COPYING docs/LICENSE 
 
 %changelog
 * Mon Oct 17 2011 Enol Fernandez <enolfc _AT_ ifca.unican.es> - 1.1.0-1
