@@ -15,9 +15,7 @@ Source: https://devel.ifca.es/mpi-start/downloads/mpi-start-%{version}.tar.gz
 URL: http://devel.ifca.es/mpi-start/
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n) 
 BuildArch: noarch
-#Vendor: EMI
-# ETICS as Packager!
-#Packager: ETICS
+Packager: Enol Fernandez <enolfc AT ifca DOT unican DOT es> 
 
 %description
 A generic startup mechanism for different MPI installation in a cluster/grid.
