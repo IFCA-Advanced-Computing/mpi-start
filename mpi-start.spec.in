@@ -54,7 +54,7 @@ rm -rf $RPM_BUILD_ROOT
 %doc docs/AUTHORS docs/COPYING docs/LICENSE 
 
 %changelog
-* Mon Oct 17 2011 Enol Fernandez <enolfc _AT_ ifca.unican.es> - 1.1.0-1
+* Mon Oct 17 2011 Enol Fernandez <enolfc _AT_ ifca.unican.es> - 1.1.0-1%{?dist}
 - Better EPEL compliance
 
 * Fri Sep 30 2011 Enol Fernandez <enolfc _AT_ ifca.unican.es> - 1.1.0-1
