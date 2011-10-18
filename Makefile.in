@@ -68,8 +68,8 @@ rpm: dist
 	cp $(name_prefix)mpi-start-$(VERSION).tar.gz rpms/SOURCES
 	sed -e "s/@NAME_PREFIX@/$(name_prefix)/" \
 		-e "s/@VERSION@/$(VERSION)/" mpi-start.spec.in \
-		> rpms/SPECS/$(name_prefix)mpi-start-$(VERSION).spec
-	rpmbuild --define "_topdir `pwd`/rpms" -ba rpms/SPECS/$(name_prefix)mpi-start-$(VERSION).spec
+		> rpms/SPECS/$(name_prefix)mpi-start.spec
+	rpmbuild --define "_topdir `pwd`/rpms" -ba rpms/SPECS/$(name_prefix)mpi-start.spec
 
 maintainer-clean: clean
 	rm -rf rpms 
