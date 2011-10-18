@@ -1,14 +1,14 @@
 #
 # Copyright (c) 2006-2007 High Performance Computing Center Stuttgart,
 #                         University of Stuttgart.  All rights reserved.
-#               2009-2010 Instituto de Física de Cantabria,
+#               2009-2011 Instituto de Física de Cantabria,
 #                         CSIC - UC. All rights reserved.
 #
 
 Summary: MPI startup mechanism abstraction layer 
 Name: @NAME_PREFIX@mpi-start
 Version: @VERSION@
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: GPLv2
 Group: Development/Tools
 Source: https://devel.ifca.es/mpi-start/downloads/mpi-start-%{version}.tar.gz
@@ -46,7 +46,7 @@ rm -rf $RPM_BUILD_ROOT
 %doc docs/AUTHORS docs/COPYING docs/LICENSE 
 
 %changelog
-* Mon Oct 17 2011 Enol Fernandez <enolfc _AT_ ifca.unican.es> - 1.1.0-1%{?dist}
+* Mon Oct 17 2011 Enol Fernandez <enolfc _AT_ ifca.unican.es> - 1.1.0-2%{?dist}
 - Better EPEL compliance
 
 * Fri Sep 30 2011 Enol Fernandez <enolfc _AT_ ifca.unican.es> - 1.1.0-1
