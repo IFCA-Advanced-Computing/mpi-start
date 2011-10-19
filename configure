@@ -107,7 +107,7 @@ do
 done
 
 if [ ! -z "$packager" ] ; then
-    PACKAGER="--define packager \"$packager\""
+    PACKAGER="--define \"packager $packager\""
 fi
 
 files='Makefile
