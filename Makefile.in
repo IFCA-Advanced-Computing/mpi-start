@@ -36,7 +36,7 @@ install: all
 	echo "setenv I2G_MPI_START $(bindir)/mpi-start" > \
 					$(destdir)/$(sysconfdir)/profile.d/mpi_start.csh
 
-tarball:all
+tarball: all
 	mkdir -p bin
 	mkdir -p etc
 	$(MAKE) -C src install destdir=`pwd` prefix="" 
@@ -69,7 +69,9 @@ rpm: dist
 	sed -e "s/@NAME_PREFIX@/$(name_prefix)/" \
 		-e "s/@VERSION@/$(VERSION)/" mpi-start.spec.in \
 		> rpms/SPECS/$(name_prefix)mpi-start.spec
-	rpmbuild --define "_topdir `pwd`/rpms" -ba rpms/SPECS/$(name_prefix)mpi-start.spec
+	rpmbuild --define "_topdir `pwd`/rpms" -bs rpms/SPECS/$(name_prefix)mpi-start.spec
+	rpmbuild $(PACKAGER) --define "_topdir `pwd`/rpms" -bb rpms/SPECS/$(name_prefix)mpi-start.spec
+
 
 maintainer-clean: clean
 	rm -rf rpms 
