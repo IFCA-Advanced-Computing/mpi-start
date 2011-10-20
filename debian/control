@@ -1,5 +1,5 @@
 Source: mpi-start
-Section: unknown
+Section: net
 Priority: optional
 Maintainer: Enol Fernandez <enolfc@ifca.unican.es>
 Build-Depends: debhelper (>= 7), autotools-dev
@@ -10,9 +10,9 @@ Homepage: https://devel.ifca.es/mpi-start/
 
 Package: mpi-start
 Architecture: all
-Depends: ${shlibs:Depends}, ${misc:Depends}
+Depends: bash, coreutils
 Description: MPI startup mechanism abstraction layer
- mpi-start is a a set of scripts to close the gap between the workload
+ mpi-start is a set of scripts to close the gap between the workload
  management system of a Grid insfrastructure and the configuration of
  the nodes on which MPI applications are run. The package is used to
  help the user start MPI applications on heterogeneous Grid sites. 
