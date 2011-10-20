@@ -19,28 +19,23 @@ clean:
 distclean:clean
 
 install: all
-	mkdir -p $(destdir)/$(bindir)
-	mkdir -p $(destdir)/$(sysconfdir)
-	mkdir -p $(destdir)/$(moduledir)
-	mkdir -p $(destdir)/$(docdir)
-	install -m 0644 README $(destdir)/$(docdir)
-	install -m 0644 ChangeLog $(destdir)/$(docdir)
+	install -d $(DESTDIR)/$(bindir) $(DESTDIR)/$(sysconfdir) $(DESTDIR)/$(moduledir) 
 	$(MAKE) -C src install
 	$(MAKE) -C modules install
 	$(MAKE) -C templates install
 	$(MAKE) -C docs install
 	$(MAKE) -C tests install 
-	mkdir -p $(destdir)/$(sysconfdir)/profile.d
+	install -d $(DESTDIR)/$(sysconfdir)/profile.d
 	echo "export I2G_MPI_START=$(bindir)/mpi-start" > \
-					$(destdir)/$(sysconfdir)/profile.d/mpi_start.sh
+					$(DESTDIR)/$(sysconfdir)/profile.d/mpi_start.sh
 	echo "setenv I2G_MPI_START $(bindir)/mpi-start" > \
-					$(destdir)/$(sysconfdir)/profile.d/mpi_start.csh
+					$(DESTDIR)/$(sysconfdir)/profile.d/mpi_start.csh
 
 tarball: all
 	mkdir -p bin
 	mkdir -p etc
-	$(MAKE) -C src install destdir=`pwd` prefix="" 
-	$(MAKE) -C modules install destdir=`pwd` prefix="" 
+	$(MAKE) -C src install DESTDIR=`pwd` prefix="" 
+	$(MAKE) -C modules install DESTDIR=`pwd` prefix="" 
 	tar czf mpi-start-$(VERSION).tar.gz bin/* etc/*
 
 DISTFILES=src\
@@ -79,7 +74,7 @@ maintainer-clean: clean
 
 export VERSION
 export prefix
-export destdir
+export DESTDIR
 export exec_prefix
 export bindir
 export datadir

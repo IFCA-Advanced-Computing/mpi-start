@@ -4,13 +4,13 @@ all:
 clean:
 
 install:
-	mkdir -p $(destdir)/$(moduledir)
-	install -m 0755 mpi-start.hooks $(destdir)/$(moduledir)
-	install -m 0755 mpi-start.hooks.local $(destdir)/$(moduledir)
-	install -m 0755 compiler.hook $(destdir)/$(moduledir)
-	install -m 0755 marmot.hook $(destdir)/$(moduledir)
-	install -m 0755 mpitrace.hook $(destdir)/$(moduledir)
-	install -m 0755 openmp.hook $(destdir)/$(moduledir)
-	install -m 0755 affinity.hook $(destdir)/$(moduledir)
+	install -d $(DESTDIR)/$(moduledir)
+	install -m 0755 mpi-start.hooks $(DESTDIR)/$(moduledir)
+	install -m 0755 mpi-start.hooks.local $(DESTDIR)/$(moduledir)
+	install -m 0755 compiler.hook $(DESTDIR)/$(moduledir)
+	install -m 0755 marmot.hook $(DESTDIR)/$(moduledir)
+	install -m 0755 mpitrace.hook $(DESTDIR)/$(moduledir)
+	install -m 0755 openmp.hook $(DESTDIR)/$(moduledir)
+	install -m 0755 affinity.hook $(DESTDIR)/$(moduledir)
 	$(MAKE) -C file-dist install
 

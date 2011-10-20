@@ -3,6 +3,6 @@ all:
 clean:
 
 install:
-	mkdir -p $(destdir)/$(moduledir)
-	install -m 0755 condor.scheduler $(destdir)/$(moduledir)/
+	install -d $(DESTDIR)/$(moduledir)
+	install -m 0755 condor.scheduler $(DESTDIR)/$(moduledir)/
 

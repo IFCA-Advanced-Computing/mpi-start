@@ -7,6 +7,6 @@ clean:
 	rm -f mpi-start
 
 install:
-	install -m 0755 mpi-start $(destdir)/$(bindir)/
-#	install -m 0755 mpi-sh $(destdir)/$(bindir)
+	install -m 0755 mpi-start $(DESTDIR)/$(bindir)/
+#	install -m 0755 mpi-sh $(DESTDIR)/$(bindir)
 
