@@ -1,13 +1,20 @@
 Source: mpi-start
 Section: unknown
-Priority: extra
+Priority: optional
 Maintainer: Enol Fernandez <enolfc@ifca.unican.es>
 Build-Depends: debhelper (>= 7), autotools-dev
 Standards-Version: 3.8.3
-Homepage: <insert the upstream URL, if relevant>
+Vcs-hg: https://devel.ifca.es/hg/mpi-start
+Vcs-browser: https://devel.ifca.es/hg/mpi-start
+Homepage: https://devel.ifca.es/mpi-start/
 
 Package: mpi-start
-Architecture: any
+Architecture: all
 Depends: ${shlibs:Depends}, ${misc:Depends}
-Description: <insert up to 60 chars description>
- <insert long description, indented with spaces>
+Description: MPI startup mechanism abstraction layer
+ mpi-start is a a set of scripts to close the gap between the workload
+ management system of a Grid insfrastructure and the configuration of
+ the nodes on which MPI applications are run. The package is used to
+ help the user start MPI applications on heterogeneous Grid sites. 
+ .
+ Check the project home page at: http://devel.ifca.es/mpi-start/
