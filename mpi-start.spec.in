@@ -42,7 +42,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man1/*
 %config(noreplace) %{_sysconfdir}/profile.d/mpi_start.sh
 %config(noreplace) %{_sysconfdir}/profile.d/mpi_start.csh
-%doc docs/AUTHORS docs/COPYING docs/LICENSE README Changelog
+%doc docs/AUTHORS docs/COPYING docs/LICENSE README ChangeLog
 
 %changelog
 * Mon Oct 17 2011 Enol Fernandez <enolfc _AT_ ifca.unican.es> - 1.1.0-2%{?dist}
