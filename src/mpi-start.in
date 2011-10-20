@@ -481,7 +481,7 @@ mpi_start_linux_core_detector() {
         MPI_START_SOCKETS=1
     fi
     MPI_START_COREPERSOCKET=`cat /proc/cpuinfo | grep "cpu cores" | sort -u | cut -f2 -d":" | tr -d " "`
-    if test $? -ne 0 ; then
+    if test $? -ne 0 -o "x$MPI_START_COREPERSOCKET" = "x" ; then
         info_msg "Unable to detect number of cores per cpu, assuming 1"
         MPI_START_COREPERSOCKET=1
     fi

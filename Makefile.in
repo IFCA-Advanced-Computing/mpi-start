@@ -36,7 +36,7 @@ install: all
 	echo "setenv I2G_MPI_START $(bindir)/mpi-start" > \
 					$(destdir)/$(sysconfdir)/profile.d/mpi_start.csh
 
-tarball:all
+tarball: all
 	mkdir -p bin
 	mkdir -p etc
 	$(MAKE) -C src install destdir=`pwd` prefix="" 
@@ -60,16 +60,18 @@ dist:
 	# hg archive $(name_prefix)mpi-start-$(VERSION)
 	mkdir $(name_prefix)mpi-start-$(VERSION)
 	cp -a $(DISTFILES) $(name_prefix)mpi-start-$(VERSION)
-	sed -e "s/@NAME_PREFIX@/$(name_prefix)/" \
-		-e "s/@VERSION@/$(VERSION)/" mpi-start.spec.in \
-		> $(name_prefix)mpi-start-$(VERSION)/$(name_prefix)mpi-start.spec
-	chmod 644 $(name_prefix)mpi-start-$(VERSION)/$(name_prefix)mpi-start.spec
 	tar czf $(name_prefix)mpi-start-$(VERSION).tar.gz $(name_prefix)mpi-start-$(VERSION)
 	rm -rf $(name_prefix)mpi-start-$(VERSION)
 
 rpm: dist 
 	mkdir -p rpms/SOURCES rpms/SRPMS rpms/SPECS rpms/BUILD rpms/RPMS
-	rpmbuild --define "_topdir `pwd`/rpms" -ta $(name_prefix)mpi-start-$(VERSION).tar.gz
+	cp $(name_prefix)mpi-start-$(VERSION).tar.gz rpms/SOURCES
+	sed -e "s/@NAME_PREFIX@/$(name_prefix)/" \
+		-e "s/@VERSION@/$(VERSION)/" mpi-start.spec.in \
+		> rpms/SPECS/$(name_prefix)mpi-start.spec
+	rpmbuild --define "_topdir `pwd`/rpms" -bs rpms/SPECS/$(name_prefix)mpi-start.spec
+	rpmbuild $(PACKAGER) --define "_topdir `pwd`/rpms" -bb rpms/SPECS/$(name_prefix)mpi-start.spec
+
 
 maintainer-clean: clean
 	rm -rf rpms 

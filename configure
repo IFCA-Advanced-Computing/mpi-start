@@ -7,6 +7,8 @@ VERSION=`cat VERSION`
 
 PACKAGE='${name_prefix}mpi-start-${VERSION}'
 
+PACKAGER=""
+
 prefix=/usr/local
 exec_prefix='${prefix}'
 bindir='${exec_prefix}/bin'
@@ -29,6 +31,7 @@ sysconfdir
 moduledir
 mandir
 maintainerclean_files
+PACKAGER
 '
 
 show_help () {
@@ -43,6 +46,7 @@ show_help () {
     echo "  --libdir=DATADIR"
     echo "  --sysconfdir=DATADIR"
     echo "  --mandir=DATADIR/man"
+    echo "  --packager=''"
     exit 0
 }
 
@@ -97,8 +101,14 @@ do
             sysconfdir=$optarg ;;
         -mandir=* | --mandir=*)
             mandir=$optarg ;;
+        -packager=* | --packager=*)
+            packager=$optarg ;;
     esac
 done
+
+if [ ! -z "$packager" ] ; then
+    PACKAGER="--define \"packager $packager\""
+fi
 
 files='Makefile
 src/Makefile
@@ -127,11 +137,11 @@ maintainerclean_files="$files"
 
 for f in $files ; do
     cat > $f << EOF
-#
+##########################################################################
+# WARNING
 # DO NOT EDIT!
-# Makefile automatically generated from Makefile.in by configure script
-#
-
+# File automatically generated from `basename $f`.in by configure script
+##########################################################################
 EOF
     for v in $vars;  do
         echo "$v=`eval echo \\$${v}`" >> $f
