@@ -5,22 +5,19 @@
 name_prefix=""
 VERSION=`cat VERSION`
 
-PACKAGE='${name_prefix}mpi-start-${VERSION}'
-
 PACKAGER=""
 
 prefix=/usr/local
 exec_prefix='${prefix}'
 bindir='${exec_prefix}/bin'
 datadir='${prefix}/share'
-docdir='${datadir}/doc/${PACKAGE}'
+docdir='${datadir}/doc/${name_prefix}mpi-start'
 sysconfdir='${prefix}/etc'
 # modules are in $sysconfdir/mpi-start, should be moved to $datadir/mpi-start?
 moduledir='${sysconfdir}/${name_prefix}mpi-start'
 mandir='${datadir}/man'
 
 vars='VERSION
-PACKAGE
 name_prefix
 prefix
 exec_prefix
