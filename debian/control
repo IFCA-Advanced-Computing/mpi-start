@@ -10,7 +10,7 @@ Homepage: https://devel.ifca.es/mpi-start/
 
 Package: mpi-start
 Architecture: all
-Depends: bash, coreutils
+Depends: ${misc:Depends}
 Description: MPI startup mechanism abstraction layer
  mpi-start is a set of scripts to close the gap between the workload
  management system of a Grid insfrastructure and the configuration of
