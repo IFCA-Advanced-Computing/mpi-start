@@ -10,4 +10,6 @@ docs/mpi-start.tex
 docs/mpi-start.toc
 Makefile
 rpms/*
+debian/mpi-start
+debian/files
 .DS_Store
