@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# MPI-Start affinity tests
+# tests for bug #53
 
 export I2G_MPI_START_ENABLE_TESTING="TEST"
 # source the mpi-start code to have all functions
