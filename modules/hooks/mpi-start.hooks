@@ -115,6 +115,12 @@ mpi_start_detect_shared_fs() {
             fi
         done
 
+        echo $LOCAL_FS_TYPE | grep "\<nfs[0-9]\>" > /dev/null
+        st=$?
+        if test $st -eq 0 ; then
+            LOCAL_FS_TYPE="nfs"
+        fi
+
         case $LOCAL_FS_TYPE in
         nfs|gfs|afs|smb|gpfs|lustre)
             debug_msg " found network fs : $LOCAL_FS_TYPE";
