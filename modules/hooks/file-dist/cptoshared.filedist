@@ -8,9 +8,8 @@
 
 check_distribution_method(){
     result=255
-    if test "x$MPI_SHARED_HOME" = "xyes" ; then
+    if test "x$MPI_SHARED_HOME" = "xyes" -a "x${MPI_SHARED_HOME_PATH}" != "x"; then
         result=0
-        export MPI_START_SHARED_FS=1;
     fi
     return $result
 }
@@ -31,23 +30,35 @@ copy() {
         chmod a+w ${SHARED_BASE_PATH}/${EDG_WL_SCRATCH}
         chmod a+w ${SHARED_BASE_PATH}/${EDG_WL_SCRATCH}/.mpi
     fi
-    if test "${I2G_MPI_APPLICATION/#\/}" == "${I2G_MPI_APPLICATION}" ;  then
-        export I2G_MPI_APPLICATION=${SHARED_BASE_PATH}/${MYDIR}/${I2G_MPI_APPLICATION}
-    else
-        local APP_CANONIC=`readlink -f ${I2G_MPI_APPLICATION}`
-        local MYDIR_CANONIC=`readlink -f $MYDIR`
-        if test $? -eq 0; then      # readlink may not available, just do not correct path.
-            if test `dirname ${APP_CANONIC}` == $MYDIR_CANONIC; then
-                export I2G_MPI_APPLICATION=${SHARED_BASE_PATH}/${MYDIR}/`basename ${APP_CANONIC}`
+
+
+    if test "x${I2G_MPI_APPLICATION}" != "x" ; then
+        if test "${I2G_MPI_APPLICATION/#\/}" == "${I2G_MPI_APPLICATION}" ;  then
+            WHICHAPP=`which $I2G_MPI_APPLICATION 2> /dev/null`
+            if test $? -eq 0 ; then 
+                if test `dirname $WHICHAPP` == '.' ; then
+                    export I2G_MPI_APPLICATION=${SHARED_BASE_PATH}/${MYDIR}/${I2G_MPI_APPLICATION}
+                fi
+            else
+                export I2G_MPI_APPLICATION=${SHARED_BASE_PATH}/${MYDIR}/${I2G_MPI_APPLICATION}
+            fi
+        else
+            local APP_CANONIC=`readlink -f ${I2G_MPI_APPLICATION}`
+            local MYDIR_CANONIC=`readlink -f $MYDIR`
+            if test $? -eq 0; then      # readlink may not available, just do not correct path.
+                if test `dirname ${APP_CANONIC}` == $MYDIR_CANONIC; then
+                    export I2G_MPI_APPLICATION=${SHARED_BASE_PATH}/${MYDIR}/`basename ${APP_CANONIC}`
+                fi
             fi
         fi
     fi
     cd ${SHARED_BASE_PATH}/${MYDIR}
+    export MPI_START_SHARED_FS=1
     return 0
 }
 
 clean() {
-    debug_msg "removing distributed files"
+    debug_msg "Removing distributed files"
     cd $MPI_START_CPTOSHARED_HOME
     rm -rf ${SHARED_BASE_PATH}
     return 0
