@@ -18,31 +18,37 @@ check_distribution_method(){
 copy() {
     debug_msg "distribute using cptoshared"
     export MPI_START_CPTOSHARED_HOME=$PWD
-    tar xzf ${TARBALL} -C ${MPI_SHARED_HOME_PATH} 
+
+    # create temp directory in shared area, 
+    # to avoid any false sharing or recursive copy
+    export SHARED_BASE_PATH=${MPI_SHARED_HOME_PATH}/`hostname`.${$}
+    mkdir ${SHARED_BASE_PATH}
+
+    tar xzf ${TARBALL} -C ${SHARED_BASE_PATH} 
     # change the permissions of the "prefix" to allow
     # other users to create files there
     if test "x$EDG_WL_SCRATCH" != "x"; then
-        chmod a+w ${MPI_SHARED_HOME_PATH}/${EDG_WL_SCRATCH}
-        chmod a+w ${MPI_SHARED_HOME_PATH}/${EDG_WL_SCRATCH}/.mpi
+        chmod a+w ${SHARED_BASE_PATH}/${EDG_WL_SCRATCH}
+        chmod a+w ${SHARED_BASE_PATH}/${EDG_WL_SCRATCH}/.mpi
     fi
     if test "${I2G_MPI_APPLICATION/#\/}" == "${I2G_MPI_APPLICATION}" ;  then
-        export I2G_MPI_APPLICATION=${MPI_SHARED_HOME_PATH}/${MYDIR}/${I2G_MPI_APPLICATION}
+        export I2G_MPI_APPLICATION=${SHARED_BASE_PATH}/${MYDIR}/${I2G_MPI_APPLICATION}
     else
         local APP_CANONIC=`readlink -f ${I2G_MPI_APPLICATION}`
         local MYDIR_CANONIC=`readlink -f $MYDIR`
         if test $? -eq 0; then      # readlink may not available, just do not correct path.
             if test `dirname ${APP_CANONIC}` == $MYDIR_CANONIC; then
-                export I2G_MPI_APPLICATION=${MPI_SHARED_HOME_PATH}/${MYDIR}/`basename ${APP_CANONIC}`
+                export I2G_MPI_APPLICATION=${SHARED_BASE_PATH}/${MYDIR}/`basename ${APP_CANONIC}`
             fi
         fi
     fi
-    cd ${MPI_SHARED_HOME_PATH}/${MYDIR}
+    cd ${SHARED_BASE_PATH}/${MYDIR}
     return 0
 }
 
 clean() {
     debug_msg "removing distributed files"
     cd $MPI_START_CPTOSHARED_HOME
-    rm -rf ${MPI_SHARED_HOME_PATH}/${MYDIR}
+    rm -rf ${SHARED_BASE_PATH}
     return 0
 }
