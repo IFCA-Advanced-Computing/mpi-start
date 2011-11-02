@@ -147,6 +147,38 @@ mpi_start_pre_run_hook_copy () {
         return 0
     fi
 
+	#check all available file distribution plugins
+    priority=255
+    chosenDistrMethod="undef"
+
+    #check if some file distribution method has been explicitely given
+    #if it was not, try to pick the best method
+    if test "x$I2G_MPI_FILE_DIST" = "x"
+    then
+    	for i in $MPI_START_ETC/*.filedist ; do
+	        unset check_distribution_method
+	        . $i
+	        check_distribution_method
+	        returnPrior=$?
+            #should we change the file distribution method?
+	        if test $priority -gt $returnPrior ; then
+	            chosenDistrMethod=$i	
+	            priority=$returnPrior
+                I2G_MPI_FILE_DIST=`echo "$i" | sed -e 's/^[-.0-9a-zA-Z_/]*\///g' | sed -e 's/\.filedist//g'`
+	        fi
+    	done
+    else
+        chosenDistrMethod="$MPI_START_ETC/$I2G_MPI_FILE_DIST.filedist"
+    fi
+    debug_msg "I2G_MPI_FILE_DIST => $I2G_MPI_FILE_DIST"
+
+    #if no plugin was suitable, program is interrupted
+    if test "x$chosenDistrMethod" = "xundef" ; then
+        error_msg "no file distribution method was found"
+        dump_env
+        exit 1
+    fi
+
     # create tarball
     mpi_start_mktemp
     export TARBALL=$MPI_START_TEMP_FILE
@@ -182,38 +214,6 @@ mpi_start_pre_run_hook_copy () {
         exit 1
     fi
  
-	#check all available file distribution plugins
-    priority=255
-    chosenDistrMethod="undef"
-
-    #check if some file distribution method has been explicitely given
-    #if it was not, try to pick the best method
-    if test "x$I2G_MPI_FILE_DIST" = "x"
-    then
-    	for i in $MPI_START_ETC/*.filedist ; do
-	        unset check_distribution_method
-	        . $i
-	        check_distribution_method
-	        returnPrior=$?
-            #should we change the file distribution method?
-	        if test $priority -gt $returnPrior ; then
-	            chosenDistrMethod=$i	
-	            priority=$returnPrior
-                I2G_MPI_FILE_DIST=`echo "$i" | sed -e 's/^[-.0-9a-zA-Z_/]*\///g' | sed -e 's/\.filedist//g'`
-	        fi
-    	done
-    else
-        chosenDistrMethod="$MPI_START_ETC/$I2G_MPI_FILE_DIST.filedist"
-    fi
-    debug_msg "I2G_MPI_FILE_DIST => $I2G_MPI_FILE_DIST"
-
-    #if no plugin was suitable, program is interrupted
-    if test "x$chosenDistrMethod" = "xundef" ; then
-        error_msg "no file distribution method was found"
-        dump_env
-        exit 1
-    fi
-
     unset copy
     . $chosenDistrMethod &> /dev/null
     if test $? -ne 0 ; then
@@ -296,17 +296,19 @@ mpi_start_pre_run_hook_generic () {
 
     mpi_start_run_pre_hook $I2G_MPI_PRE_RUN_HOOK 1
 
-    # set the +x permission to executable, so it does not fail
-    for i in ${I2G_MPI_APPLICATION}; do
-        app=$i
-        break
-    done
-    if test "x${app}" != "x" ; then
-        if test ! -x $app ; then
-            chmod +x $app 2> /dev/null # do not care if it fails.
+    # make sure I2G_MPI_APPLICATION is a single thing, the rest is arguments
+    set -- foo $I2G_MPI_APPLICATION
+    shift
+    export I2G_MPI_APPLICATION=$1
+    shift
+    export I2G_MPI_APPLICATION_ARGS="$* $I2G_MPI_APPLICATION_ARGS"
+
+    if test "x${I2G_MPI_APPLICATION}" != "x" ; then
+        if test ! -x $I2G_MPI_APPLICATION; then
+            chmod +x $I2G_MPI_APPLICATION 2> /dev/null # do not care if it fails.
         fi
-        # add complete path to application so . does not need to be in PATH
-        which $app &> /dev/null
+        # add complete path to I2G_MPI_APPLICATIONlication so . does not need to be in PATH
+        which $I2G_MPI_APPLICATION &> /dev/null
         if test $? -ne 0 ; then 
             if test "${I2G_MPI_APPLICATION/#\/}" == "${I2G_MPI_APPLICATION}" ;  then
                 export I2G_MPI_APPLICATION=$PWD/$I2G_MPI_APPLICATION
@@ -366,9 +368,6 @@ mpi_start_run_post_hook() {
 mpi_start_post_run_hook_generic () {
     debug_msg "mpi_start_post_run_hook_generic"
 
-    # determine local filesystem
-    mpi_start_detect_shared_fs
-
     for hook in $MPI_START_ETC/*.hook; do
         mpi_start_run_post_hook $hook
     done
@@ -378,19 +377,14 @@ mpi_start_post_run_hook_generic () {
 
     mpi_start_run_post_hook $I2G_MPI_POST_RUN_HOOK 1
 
-    if  test "x$MPI_START_SHARED_FS" != "x1" -o "x$MPI_START_DISTRIBUTE_PROXY" = "x1"  ; then 
-        if test $MPI_START_NHOSTS -le 1 ; then
-            debug_msg "only localhost, skip cleanup"
-        else
-            # this may be unset if only running on localhost
-            if test "x$chosenDistrMethod" != "x"; then
-                unset clean
-                . $chosenDistrMethod
-                clean
-            fi
-        fi
-    else
-       debug_msg "fs shared -> do not cleanup"
+    # It makes no sense to check this, just call the cleanup
+    # method if available
+
+    if test "x$chosenDistrMethod" != "x" -a "x$chosenDistrMethod" != "xundef" ; then
+        unset clean
+        . $chosenDistrMethod &> /dev/null
+        debug_msg "Calling post-hook file cleaning"
+        clean
     fi
 }
 
