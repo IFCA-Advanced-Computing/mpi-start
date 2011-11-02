@@ -18,3 +18,10 @@ install:
 	$(MAKE) -C lsf install
 	$(MAKE) -C slurm install
 	$(MAKE) -C condor install
+
+uninstall:
+	$(MAKE) -C pbs uninstall
+	$(MAKE) -C sge uninstall
+	$(MAKE) -C lsf uninstall
+	$(MAKE) -C slurm uninstall
+	$(MAKE) -C condor uninstall

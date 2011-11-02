@@ -6,3 +6,5 @@ install:
 	install -d $(DESTDIR)/$(moduledir)
 	install -m 0755 pbs.scheduler $(DESTDIR)/$(moduledir)/
 
+uninstall:
+	rm -f $(DESTDIR)/$(moduledir)/pbs.scheduler 

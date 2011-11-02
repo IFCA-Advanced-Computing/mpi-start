@@ -14,3 +14,13 @@ install:
 	install -m 0755 affinity.hook $(DESTDIR)/$(moduledir)
 	$(MAKE) -C file-dist install
 
+uninstall:
+	rm -f $(DESTDIR)/$(moduledir)/mpi-start.hooks
+	rm -f $(DESTDIR)/$(moduledir)/mpi-start.hooks.local
+	rm -f $(DESTDIR)/$(moduledir)/compiler.hook
+	rm -f $(DESTDIR)/$(moduledir)/marmot.hook
+	rm -f $(DESTDIR)/$(moduledir)/mpitrace.hook
+	rm -f $(DESTDIR)/$(moduledir)/openmp.hook
+	rm -f $(DESTDIR)/$(moduledir)/affinity.hook
+	$(MAKE) -C file-dist uninstall
+

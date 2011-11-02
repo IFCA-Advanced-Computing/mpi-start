@@ -9,3 +9,9 @@ install:
 	install -m 0755 mpi_mt.filedist $(DESTDIR)/$(moduledir)
 	install -m 0755 cptoshared.filedist $(DESTDIR)/$(moduledir)
 
+uninstall:
+	rm -f $(DESTDIR)/$(moduledir)/ssh.filedist 
+	rm -f $(DESTDIR)/$(moduledir)/mpiexec.filedist
+	rm -f $(DESTDIR)/$(moduledir)/mpi_mt.filedist
+	rm -f $(DESTDIR)/$(moduledir)/cptoshared.filedist
+

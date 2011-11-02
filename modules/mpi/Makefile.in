@@ -28,3 +28,15 @@ install:
 	$(MAKE) -C mpich install
 	$(MAKE) -C generic install
 	$(MAKE) -C dummy install
+
+uninstall:
+	rm -f $(DESTDIR)/$(moduledir)/generic_mpiexec.sh 
+	rm -f $(DESTDIR)/$(moduledir)/generic_mpi_start.sh 
+	rm -f $(DESTDIR)/$(moduledir)/common.sh 
+	$(MAKE) -C openmpi uninstall
+	$(MAKE) -C pacx uninstall
+	$(MAKE) -C mpich2 uninstall
+	$(MAKE) -C lam uninstall
+	$(MAKE) -C mpich uninstall
+	$(MAKE) -C generic uninstall
+	$(MAKE) -C dummy uninstall

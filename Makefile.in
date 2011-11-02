@@ -31,6 +31,15 @@ install: all
 	echo "setenv I2G_MPI_START $(bindir)/mpi-start" > \
 					$(DESTDIR)/$(sysconfdir)/profile.d/mpi_start.csh
 
+uninstall:
+	rm -f $(DESTDIR)/$(sysconfdir)/profile.d/mpi_start.sh $(DESTDIR)/$(sysconfdir)/profile.d/mpi_start.csh
+	$(MAKE) -C src uninstall
+	$(MAKE) -C modules uninstall
+	$(MAKE) -C templates uninstall
+	$(MAKE) -C docs uninstall
+	$(MAKE) -C tests uninstall 
+
+
 tarball: all
 	mkdir -p bin
 	mkdir -p etc

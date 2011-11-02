@@ -13,3 +13,9 @@ install:
 	$(MAKE) -C mpi install
 	$(MAKE) -C hooks install
 
+uninstall:
+	$(MAKE) -C schedulers uninstall
+	$(MAKE) -C mpi uninstall
+	$(MAKE) -C hooks uninstall
+	rmdir $(DESTDIR)/$(moduledir)
+

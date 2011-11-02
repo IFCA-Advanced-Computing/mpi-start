@@ -6,3 +6,6 @@ install:
 	install -d $(DESTDIR)/$(moduledir)
 	install -m 0755 lsf.scheduler $(DESTDIR)/$(moduledir)/
 
+
+uninstall:
+	rm -f $(DESTDIR)/$(moduledir)/lsf.scheduler

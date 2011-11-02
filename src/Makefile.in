@@ -10,3 +10,6 @@ install:
 	install -m 0755 mpi-start $(DESTDIR)/$(bindir)/
 #	install -m 0755 mpi-sh $(DESTDIR)/$(bindir)
 
+uninstall:
+	rm -f $(DESTDIR)/$(bindir)/mpi-start
+
