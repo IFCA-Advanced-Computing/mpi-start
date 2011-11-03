@@ -23,9 +23,6 @@ mpi_exec () {
         return $?
     fi
 
-    . $MPI_START_ETC/common.sh
-    mpi_start_search_mpiexec
-
     local machines_params=""
     if test "x$I2G_MPI_PER_NODE" = "x1" ; then
         machines_params="-machinefile $MPI_START_HOSTFILE -np $MPI_START_NP"

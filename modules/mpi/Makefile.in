@@ -20,7 +20,6 @@ install:
 	install -d $(DESTDIR)/$(moduledir)
 	install -m 0755 generic_mpiexec.sh $(DESTDIR)/$(moduledir)/
 	install -m 0755 generic_mpi_start.sh $(DESTDIR)/$(moduledir)/
-	install -m 0755 common.sh $(DESTDIR)/$(moduledir)/
 	$(MAKE) -C openmpi install
 	$(MAKE) -C pacx install
 	$(MAKE) -C mpich2 install
@@ -32,7 +31,6 @@ install:
 uninstall:
 	rm -f $(DESTDIR)/$(moduledir)/generic_mpiexec.sh 
 	rm -f $(DESTDIR)/$(moduledir)/generic_mpi_start.sh 
-	rm -f $(DESTDIR)/$(moduledir)/common.sh 
 	$(MAKE) -C openmpi uninstall
 	$(MAKE) -C pacx uninstall
 	$(MAKE) -C mpich2 uninstall

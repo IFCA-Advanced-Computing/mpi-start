@@ -20,9 +20,6 @@ mpi_start_activate_mpi $MPI_START_MPI_PREFIX "$MPI_START_MPI_MODULE"
 mpi_exec () {
 	debug_msg "found LAM-MPI, set machinefile and np parameters"
 
-    . $MPI_START_ETC/common.sh
-    mpi_start_search_mpiexec
-
     if test "x$MPI_MPIEXEC" != "x"; then
         MPIEXEC=$MPI_MPIEXEC
         MPI_GLOBAL_PARAMS=$MPI_SPECIFIC_MPIEXEC_PARAMS

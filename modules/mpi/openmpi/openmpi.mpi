@@ -61,9 +61,6 @@ fi
 # start an mpi job
 #
 mpi_exec () {
-    . $MPI_START_ETC/common.sh
-    mpi_start_search_mpiexec
-
     if test "x${MPI_MPIEXEC}" != "x"; then
         MPIEXEC="$MPI_MPIEXEC"
         MPI_GLOBAL_PARAMS="$MPI_SPECIFIC_MPIEXEC_PARAMS"
