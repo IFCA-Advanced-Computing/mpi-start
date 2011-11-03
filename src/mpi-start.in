@@ -89,7 +89,6 @@ info_msg () {
 
 #======================================================================
 # Dump environment.
-# $1 level
 #======================================================================
 dump_env () {
     if test "x$I2G_MPI_START_TRACE" = "x1"  ; then
@@ -123,6 +122,8 @@ mpi_start_find_mktemp () {
 
 #======================================================================
 # mpi-start mktemp 
+# Creates a new temporary file / directory
+# Name of file is returned in MPI_START_TEMP_FILE
 #======================================================================
 mpi_start_mktemp () {
     MPI_START_TEMP_FILE=`$MPI_START_MKTEMP $*`
@@ -130,6 +131,53 @@ mpi_start_mktemp () {
         error_msg "Unable to create temp file!"
     fi
     MPI_START_CLEANUP_FILES="$MPI_START_TEMP_FILE $MPI_START_CLEANUP_FILES"
+}
+
+#======================================================================
+# Look for the appropriate mpirun/mpiexec according to the loaded
+# MPI type
+#======================================================================
+mpi_start_search_mpiexec () {
+
+    MPI_SPECIFIC_PARAMS=""
+    MPI_MPIEXEC=""
+    MPI_MPIRUN=""
+
+    if test "x${I2G_MPI_TYPE}" == "x" ; then
+        debug_msg "no mpi type selected, no mpiexec/mpirun search!"
+        return 0
+    fi
+
+    MPI_TYPE=`echo $I2G_MPI_TYPE | tr "[:lower:]" "[:upper:]" | tr "-" "_"`
+
+    VALUE=`eval echo \\$MPI_${MPI_TYPE}_MPIEXEC`
+    if test ! -z "$VALUE" ; then
+        MPI_MPIEXEC=$VALUE
+        debug_msg "using user supplied mpiexec: '$MPI_MPIEXEC'"
+    else
+        VALUE=`eval echo \\$MPI_${MPI_TYPE}_MPIRUN`
+        if test ! -z "$VALUE" ; then
+            MPI_MPIRUN=$VALUE
+            debug_msg "using user supplied mpirun: '$MPI_MPIRUN'"
+        else
+            # define both 
+            MPI_MPIEXEC=`which mpiexec 2> /dev/null`
+            if test $? -eq 0 ; then
+                debug_msg "using system default mpiexec: '$MPI_MPIEXEC'"
+            fi
+            MPI_MPIRUN=`which mpirun 2> /dev/null`
+            if test $? -eq 0 ; then
+                debug_msg "using system default mpirun: '$MPI_MPIRUN'"
+            fi
+        fi
+    fi
+    if test "x$MPI_MPIEXEC" != "x"; then
+        MPI_SPECIFIC_MPIEXEC_PARAMS=`eval echo \\$MPI_${MPI_TYPE}_MPIEXEC_PARAMS`
+    elif test "x$MPI_MPIRUN" != "x"; then
+        MPI_SPECIFIC_MPIRUN_PARAMS=`eval echo \\$MPI_${MPI_TYPE}_MPIRUN_PARAMS`
+    else
+        debug_msg "no mpiexec/mpirun found!"
+    fi
 }
 
 #======================================================================
@@ -154,6 +202,7 @@ mpi_start_activate_mpi () {
             module load $mod
         done
     fi
+    mpi_start_search_mpiexec
 }
 
 #======================================================================
@@ -285,7 +334,7 @@ mpi_start_execute_wrapper() {
 #======================================================================
 # Create dummy scheduler environment with just the current host 
 #======================================================================
-dummy_scheduler() {
+mpi_start_dummy_scheduler() {
     info_msg "no scheduler found, using dummy environment with localhost"
     mpi_start_mktemp
     export MPI_START_MACHINEFILE=$MPI_START_TEMP_FILE
@@ -316,7 +365,7 @@ dummy_scheduler() {
 #======================================================================
 # Checks that mpi-start are correct and coherent
 #======================================================================
-check_options() {
+mpi_start_check_options() {
     # debug me 
     if test "x$I2G_MPI_START_DEBUG" = "x1" ; then 
         debug_msg "dump configuration"
@@ -462,7 +511,7 @@ mpi_start_scheduler_detector() {
     # check if we have a scheduler 
     if test $MPI_START_READY -ne 0  ; then 
         if test "x${MPI_START_DUMMY_SCHEDULER}" == "x1" ; then
-            dummy_scheduler
+            mpi_start_dummy_scheduler
         else
             error_msg "cannot find scheduler"
             dump_env
@@ -673,7 +722,7 @@ main() {
 
     debug_msg "Command line arguments: $*" 
 
-    check_options
+    mpi_start_check_options
     
     mpi_start_scheduler_detector
 
