@@ -6,17 +6,13 @@
 #           (c) 2009      Instituto de Fisica de Cantabria - CSIC. 
 #
 
-check_distribution_method(){
+check_distribution_method() {
 	result=255
 	if test "x$I2G_MPI_TYPE" = "xmpich" -o "x$I2G_MPI_TYPE" = "xmpich2"
 	then 	
         if test "x${MPI_START_SCHEDULER}" = "xpbs" ; then
-            # FIXME: this may not be true, the correct mpiexec
-            # should be selected by the mpi module, but that
-            # would require changing the way it is called right now
-            which mpiexec &> /dev/null
-            if test $? -eq 0 ; then
-                mpiexec 2>&1 | grep -e "-\<np\>" > /dev/null 2>&1
+            if test "x${MPI_MPIEXEC}" != "x" ; then
+                $MPI_MPIEXEC 2>&1 | grep -e "-\<np\>" > /dev/null 2>&1
                 status=$?
                 if test $status -ne 0 ; then
                     result=0
@@ -27,7 +23,7 @@ check_distribution_method(){
 	return $result
 }	
 
-copy(){
+copy() {
     debug_msg "distribute using mpiexec"
     # backup old values
     old_application=$I2G_MPI_APPLICATION
@@ -78,7 +74,6 @@ copy(){
     I2G_MPI_APPLICATION=$old_application
     I2G_MPI_APPLICATION_ARGS=$old_application_args
 	I2G_MPI_PRECOMMAND=$old_precommand
-    I2G_MPI_MPIEXEC_PARAMS=$old_mpiexec_params
     I2G_MPI_APPLICATION_STDIN=$old_stdin
     I2G_MPI_APPLICATION_STDOUT=$old_stdout
     I2G_MPI_PERNODE=$old_pernode
