@@ -5,7 +5,7 @@
 export I2G_MPI_START_ENABLE_TESTING="TEST"
 # source the mpi-start code to have all functions
 . $I2G_MPI_START
-check_options
+mpi_start_check_options
 # load hooks
 . $MPI_START_ETC/mpi-start.hooks
 

@@ -23,7 +23,7 @@ setUp () {
 
 testNoAffinity() {
     # load options, to get MPI_START_ETC
-    check_options
+    mpi_start_check_options
     # load hook file 
     . $MPI_START_ETC/affinity.hook
     MPI_USE_AFFINITY=0
@@ -40,7 +40,7 @@ testNoAffinity() {
 
 testAffinityNOOpenMPI() {
     # load options, to get MPI_START_ETC
-    check_options
+    mpi_start_check_options
     # load hook file 
     . $MPI_START_ETC/affinity.hook
     MPI_USE_AFFINITY=1
@@ -58,7 +58,7 @@ testAffinityNOOpenMPI() {
 
 testAffinityOpenMPI1Slot() {
     # load options, to get MPI_START_ETC
-    check_options
+    mpi_start_check_options
     # load flavour
     I2G_MPI_TYPE=openmpi
     mpi_start_load_execenv
@@ -78,7 +78,7 @@ testAffinityOpenMPI1Slot() {
 
 testAffinityOpenMPINOP() {
     # load options, to get MPI_START_ETC
-    check_options
+    mpi_start_check_options
     # load flavour
     I2G_MPI_TYPE=openmpi
     mpi_start_load_execenv
@@ -106,7 +106,7 @@ EOF
 
 testAffinityOpenMPINode() {
     # load options, to get MPI_START_ETC
-    check_options
+    mpi_start_check_options
     # load flavour
     I2G_MPI_TYPE=openmpi
     mpi_start_load_execenv
@@ -149,7 +149,7 @@ EOF
 
 testAffinityOpenMPINodeOversuscribe() {
     # load options, to get MPI_START_ETC
-    check_options
+    mpi_start_check_options
     # load flavour
     I2G_MPI_TYPE=openmpi
     mpi_start_load_execenv
@@ -198,7 +198,7 @@ EOF
 
 testAffinityOpenMPISocket() {
     # load options, to get MPI_START_ETC
-    check_options
+    mpi_start_check_options
     # load flavour
     I2G_MPI_TYPE=openmpi
     mpi_start_load_execenv
@@ -244,7 +244,7 @@ EOF
 
 testAffinityOpenMPISocketOversuscribe() {
     # load options, to get MPI_START_ETC
-    check_options
+    mpi_start_check_options
     # load flavour
     I2G_MPI_TYPE=openmpi
     mpi_start_load_execenv
@@ -302,7 +302,7 @@ EOF
 
 testAffinityOpenMPICore() {
     # load options, to get MPI_START_ETC
-    check_options
+    mpi_start_check_options
     # load flavour
     I2G_MPI_TYPE=openmpi
     mpi_start_load_execenv
@@ -368,7 +368,7 @@ EOF
 
 testAffinityOpenMPICoreOversuscribe() {
     # load options, to get MPI_START_ETC
-    check_options
+    mpi_start_check_options
     # load flavour
     I2G_MPI_TYPE=openmpi
     mpi_start_load_execenv

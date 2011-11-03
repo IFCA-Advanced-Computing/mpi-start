@@ -178,7 +178,7 @@ testExecuteWrapper () {
 
 testHookOrder() {
     # load options, to get MPI_START_ETC
-    check_options
+    mpi_start_check_options
     # load hooks
     . $MPI_START_ETC/mpi-start.hooks
     # change MPI_START_ETC to tmp, so I can define which hooks to load
