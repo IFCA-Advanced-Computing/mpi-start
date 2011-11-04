@@ -11,6 +11,18 @@ if test $? -ne 0 ; then
         exit 0
     fi
 fi
+mymktemp=`$MYMKTEMP`
+tempfiles=`$MYMKTEMP`
+cat > $mymktemp << EOF
+F=\`$MYMKTEMP \$*\`
+echo \$F >> $tempfiles
+echo \$F
+EOF
+chmod +x $mymktemp
+export MYMKTEMP=$mymktemp
+
+echo $mymktemp > $tempfiles
+
 rm -f $TMPFILE    
 
 DOWNLOAD_MY_SHUNIT=0
@@ -24,10 +36,10 @@ RUN_NP_TESTS=1
 RUN_SCH_TESTS=1
 RUN_FSDETECT_TESTS=1
 # if running these tests, ensure you have proper environment loaded!
-RUN_OMP_TESTS=1
+RUN_OMP_TESTS=0
 RUN_MPICH2_TESTS=0
 RUN_MPICH_TESTS=0
-RUN_OPENMPI_TESTS=0
+RUN_OPENMPI_TESTS=1
 RUN_AFFINITY_TESTS=0
 RUN_LAM_TESTS=0
 
@@ -148,7 +160,10 @@ if test "x${RUN_MPICH2_TESTS}" = "x1" ; then
     echo "   MPICH2 Tests"
     echo "********************"
     export I2G_MPI_TYPE=mpich2
+    # XXX this is for hydra 1.2.1p1 may change in other versions...
+    export HYDRA_BOOTSTRAP=fork
     ./test_mpi.sh || exitcode=1
+    ./test_50.sh || exitcode=1
 fi
 if test "x${RUN_MPICH_TESTS}" = "x1" ; then
     echo
@@ -183,9 +198,15 @@ if test "x${RUN_LAM_TESTS}" = "x1" ; then
     ./test_mpi.sh || exitcode=1
 fi
 
-
 if test $REMOVE_MY_SHUNIT -eq 1 ; then
     rm $SHUNIT2
 fi
+
+for f in `cat $tempfiles`; do
+    if [ -e $f ] ; then
+        rm -rf $f
+    fi
+done
+rm $tempfiles
 
 exit $exitcode 
