@@ -10,7 +10,7 @@
 # start an mpi job
 #
 mpi_exec () {
-    if test $MPI_START_SCHEDULER = "slurm" ; then
+    if test "$MPI_START_SCHEDULER" = "slurm" ; then
         slurm_mpiexec
         return $?
     fi
