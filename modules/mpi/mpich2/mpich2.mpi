@@ -27,9 +27,9 @@ mpich2_with_hydra () {
         done
     else
         # in the case of oversuscribing, hydra should know how to deal with it
-        cat $MPI_START_HOST_SLOTS_FILE | tr " " ":" > $MACHINES
+        cat "$MPI_START_HOST_SLOTS_FILE" | tr " " ":" > $MACHINES
     fi
-    MPI_GLOBAL_PARAMS="$MPICH2_PARAMS -f $MACHINES"
+    MPI_GLOBAL_PARAMS="$MPI_GLOBAL_PARAMS $MPICH2_PARAMS -f $MACHINES"
     if test "x$MPI_START_DISABLE_LRMS_INTEGRATION" != "xyes"; then
         if test "x${MPI_START_SCHEDULER}" = "xpbs" ; then
             MPI_GLOBAL_PARAMS="-rmk pbs $MPI_GLOBAL_PARAMS"
@@ -58,7 +58,6 @@ mpich2_with_hydra () {
     return $err
 }
 
-
 # start an mpi job with mpd
 mpich2_with_mpd () {
     debug_msg "assume it is safe to set the machinefile and number of processes"
@@ -66,7 +65,7 @@ mpich2_with_mpd () {
         debug_msg "Creating machine file for per node option"
         mpi_start_mktemp
         MACHINES=$MPI_START_TEMP_FILE
-        for host in `cat $MPI_START_HOSTFILE` ; do 
+        for host in `cat "$MPI_START_HOSTFILE"` ; do 
             for ((i=0; i < MPI_START_NPHOST; i++)) ; do
                 echo $host >> $MACHINES
             done
@@ -76,8 +75,8 @@ mpich2_with_mpd () {
             debug_msg "Creating machine file for starting more processes than available slots"
             mpi_start_mktemp
             MACHINES=$MPI_START_TEMP_FILE
-            while test `cat $MACHINES | wc -l` -lt $MPI_START_NP ; do
-                cat $MPI_START_MACHINEFILE >> $MACHINES
+            while test `cat "$MACHINES" | wc -l` -lt $MPI_START_NP ; do
+                cat "$MPI_START_MACHINEFILE" >> $MACHINES
             done
         else
             MACHINES=$MPI_START_MACHINEFILE
@@ -102,7 +101,7 @@ mpich2_with_mpd () {
 
     # Start MPICH2 daemon.
     mpdboot $MPDBOOT_PARAMS 
-    MPI_GLOBAL_PARAMS="$MPICH2_PARAMS $machines_params"
+    MPI_GLOBAL_PARAMS="$MPI_GLOBAL_PARAMS $MPICH2_PARAMS $machines_params"
 
     # set the environment variables
     if test "x${MPI_START_ENV_VARIABLES}" != "x" ; then
@@ -131,7 +130,7 @@ mpich2_with_mpd () {
 # start an mpi job
 #
 mpi_exec () {
-    if test $MPI_START_SCHEDULER = "slurm" ; then
+    if test "$MPI_START_SCHEDULER" = "slurm" ; then
         slurm_mpiexec
         return $?
     fi
@@ -160,7 +159,7 @@ mpi_exec () {
         else
             # try with mpiexec.hydra
             MPIEXEC=`which mpiexec.hydra 2> /dev/null`
-            if test $? -eq 0 ; then
+            if test $? -eq 0 -a "x$MPI_MPICH2_DISABLE_HYDRA" != "x1" ; then
                 mpich2_with_hydra
                 err=$?
             else
