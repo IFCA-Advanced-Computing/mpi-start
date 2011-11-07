@@ -76,6 +76,9 @@ rpm: dist
 	rpmbuild --define "_topdir `pwd`/rpms" -bs rpms/SPECS/$(name_prefix)mpi-start.spec
 	rpmbuild $(PACKAGER) --define "_topdir `pwd`/rpms" -bb rpms/SPECS/$(name_prefix)mpi-start.spec
 
+deb: 
+	dpkg-buildpackage -us -uc
+
 
 maintainer-clean: clean
 	rm -rf rpms 
