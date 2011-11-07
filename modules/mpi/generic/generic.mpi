@@ -29,14 +29,16 @@ mpi_exec () {
         exit 1
     fi
    
-    . $MPI_START_ETC/generic_mpiexec.sh
+    mpi_start_get_plugin "generic_mpiexec.sh" 1
+    . $MPI_START_PLUGIN_FILES
     generic_mpiexec
     return $?
 }
 
 
 mpi_start () {
-    . $MPI_START_ETC/generic_mpi_start.sh
+    mpi_start_get_plugin "generic_mpi_start.sh" 1
+    . $MPI_START_PLUGIN_FILES
     generic_mpi_start
     return $?
 }

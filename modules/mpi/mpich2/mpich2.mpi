@@ -51,7 +51,8 @@ mpich2_with_hydra () {
         done
         MPI_LOCAL_PARAMS="${MPI_LOCAL_PARAMS} ${envparam}"
     fi
-    . $MPI_START_ETC/generic_mpiexec.sh
+    mpi_start_get_plugin "generic_mpiexec.sh" 1
+    . $MPI_START_PLUGIN_FILES
     generic_mpiexec
     err=$?
 
@@ -117,7 +118,8 @@ mpich2_with_mpd () {
         done
         MPI_LOCAL_PARAMS="${MPI_LOCAL_PARAMS} ${envparam}"
     fi
-    . $MPI_START_ETC/generic_mpiexec.sh
+    mpi_start_get_plugin "generic_mpiexec.sh" 1
+    . $MPI_START_PLUGIN_FILES
     generic_mpiexec
     err=$?
 
@@ -153,7 +155,8 @@ mpi_exec () {
             elif test "x${I2G_MPI_PER_NODE}" != "x" ; then
                 warn_msg "Per node option ignored when using OSC mpiexec"
             fi
-            . $MPI_START_ETC/generic_mpiexec.sh
+            mpi_start_get_plugin "generic_mpiexec.sh" 1
+            . $MPI_START_PLUGIN_FILES
             generic_mpiexec
             err=$?
         else
@@ -183,7 +186,8 @@ mpi_exec () {
 
 
 mpi_start () {
-    . $MPI_START_ETC/generic_mpi_start.sh
+    mpi_start_get_plugin "generic_mpi_start.sh" 1
+    . $MPI_START_PLUGIN_FILES
     generic_mpi_start
     return $?
 }

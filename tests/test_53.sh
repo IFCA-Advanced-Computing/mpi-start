@@ -7,7 +7,8 @@ export I2G_MPI_START_ENABLE_TESTING="TEST"
 . $I2G_MPI_START
 mpi_start_check_options
 # load hooks
-. $MPI_START_ETC/mpi-start.hooks
+mpi_start_get_plugin "mpi-start.hooks" 1
+. $MPI_START_PLUGIN_FILES 
 
 setUp () {
     export I2G_MPI_START_DEBUG=1

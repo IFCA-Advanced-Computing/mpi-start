@@ -447,19 +447,51 @@ mpi_start_check_options() {
 
     # set global internal variables 
     MPI_START_PREFIX=`dirname "$I2G_MPI_START"`
-    # TODO! allow several configuration directories/files
-    MPI_START_ETC="$MPI_START_PREFIX/../etc/mpi-start"
-    if test ! -d "$MPI_START_ETC" ; then
-        MPI_START_ETC="/etc/mpi-start"
-        if test ! -d "$MPI_START_ETC" ; then
-            MPI_START_ETC="$MPI_START_PREFIX/../share/mpi-start"
-            if test ! -d "$MPI_START_ETC" ; then
-                error_msg "unable to find mpi-start modules"
-                dump_env
-                exit 2
+
+    CONFIG_DIRS="~/.mpi-start \
+                $MPI_START_PREFIX/../etc/mpi-start \
+                /etc/mpi-start \
+                $MPI_START_PREFIX/../share/mpi-start"
+
+    export MPI_START_ETC_LIST="$MPI_START_ETC"
+    for dir in $CONFIG_DIRS; do
+        if test -d $dir ; then
+            MPI_START_ETC_LIST="$MPI_START_ETC_LIST $dir"
+        fi
+    done
+    if test "x${MPI_START_ETC_LIST}" = "x" ; then
+        error_msg "unable to find mpi-start modules"
+        dump_env
+    fi
+}
+
+#======================================================================
+# Gets a file or list of files for plugins matching a certain pattern
+# $1 -> name of file (or pattern)
+# $2 -> if 1 then do not try to return for ALL plugin dirs
+#======================================================================
+mpi_start_get_plugin() {
+    PATTERN=$1
+    shift
+    if test "x$1" = "x1" ; then
+        BREAK_SEARCH=1
+    else
+        BREAK_SEARCH=0
+    fi
+    MPI_START_PLUGIN_FILES=""
+    for dir in $MPI_START_ETC_LIST ; do
+        local files=`ls $dir/$PATTERN 2> /dev/null`
+        if test "x${files}" != "x" ; then
+            MPI_START_PLUGIN_FILES="$MPI_START_PLUGIN_FILES $files"
+            if test $BREAK_SEARCH -eq 1 ; then
+                set -- foo $MPI_START_PLUGIN_FILES
+                shift
+                # make sure only one file goes back
+                MPI_START_PLUGIN_FILES=$1
+                break
             fi
         fi
-    fi
+    done
 }
 
 #======================================================================
@@ -468,7 +500,8 @@ mpi_start_check_options() {
 mpi_start_scheduler_detector() {
     # check for scheduling system and set environment variables
     info_msg "search for scheduler"
-    for i in $MPI_START_ETC/*.scheduler  ; do 
+    mpi_start_get_plugin "*.scheduler"
+    for i in $MPI_START_PLUGIN_FILES ; do
         # source the function definitions
         unset scheduler
         unset scheduler_available
@@ -638,7 +671,8 @@ mpi_start_load_execenv () {
     fi 
 
     # load the mpi plugin
-    MPI_PLUGIN_FILE=$MPI_START_ETC/$I2G_MPI_TYPE.mpi
+    mpi_start_get_plugin "$I2G_MPI_TYPE.mpi" 1
+    MPI_PLUGIN_FILE=$MPI_START_PLUGIN_FILES
     if test ! -e $MPI_PLUGIN_FILE  ; then 
         error_msg "failed to find requested MPI type : $I2G_MPI_TYPE"
         dump_env 

@@ -60,7 +60,8 @@ mpi_exec () {
     MPI_GLOBAL_PARAMS="$MPI_GLOBAL_PARAMS $LAM_PARAMS $machines_params"
 
     # With version 7.1.2 we don't need to start the daemons in advance.
-    . $MPI_START_ETC/generic_mpiexec.sh
+    mpi_start_get_plugin "generic_mpiexec.sh" 1
+    . $MPI_START_PLUGIN_FILES
     generic_mpiexec
     err=$?
 
@@ -71,7 +72,8 @@ mpi_exec () {
 }
 
 mpi_start () {
-    . $MPI_START_ETC/generic_mpi_start.sh
+    mpi_start_get_plugin "generic_mpi_start.sh" 1
+    . $MPI_START_PLUGIN_FILES
     generic_mpi_start
     return $?
 }

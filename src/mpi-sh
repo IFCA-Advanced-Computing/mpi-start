@@ -25,7 +25,7 @@ if [ ! -e $MPI_START_PREFIX/../etc/mpi-start/$I2G_MPI_TYPE.mpi ] ; then
 fi
 
 # source the config file and spawn a shell
-source  $MPI_START_PREFIX/../etc/mpi-start/$I2G_MPI_TYPE.mpi
+. $MPI_START_PREFIX/../etc/mpi-start/$I2G_MPI_TYPE.mpi
 unset mpi_start
 
 

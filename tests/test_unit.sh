@@ -81,6 +81,28 @@ testInfoEnabled () {
     assertEquals "test" $output
 }
 
+testPluginLoader() {
+    MPI_START_ETC=`$MYMKTEMP -d`
+    touch $MPI_START_ETC/1.hi
+    touch $MPI_START_ETC/2.hi
+    touch $MPI_START_ETC/3.hi
+    mpi_start_check_options
+    mpi_start_get_plugin "*.hi"
+    echo $MPI_START_PLUGIN_FILES  | grep 1.hi > /dev/null
+    assertEquals 0 $?
+    echo $MPI_START_PLUGIN_FILES  | grep 2.hi > /dev/null
+    assertEquals 0 $?
+    echo $MPI_START_PLUGIN_FILES  | grep 3.hi > /dev/null
+    assertEquals 0 $?
+    touch $MPI_START_ETC/openmpi.mpi
+    mpi_start_get_plugin "openmpi.mpi" 1
+    assertEquals $MPI_START_ETC/openmpi.mpi $MPI_START_PLUGIN_FILES
+    mpi_start_get_plugin "*.hi" 1
+    W=`echo $MPI_START_PLUGIN_FILES | wc -w`
+    assertEquals 1 $W
+    rm -rf $MPI_START_ETC
+}
+
 testActivateMPI () {
     export oldPATH="$PATH"
     export oldLDPATH="$LD_LIBRARY_PATH"
@@ -177,12 +199,17 @@ testExecuteWrapper () {
 }
 
 testHookOrder() {
-    # load options, to get MPI_START_ETC
-    mpi_start_check_options
-    # load hooks
-    . $MPI_START_ETC/mpi-start.hooks
-    # change MPI_START_ETC to tmp, so I can define which hooks to load
     MPI_START_ETC=`$MYMKTEMP -d`
+    # load options, to be able to load anything later
+    mpi_start_check_options
+    echo $MPI_START_ETC_LIST | grep $MPI_START_ETC > /dev/null
+    assertEquals 0 $?
+    # load hooks
+    mpi_start_get_plugin "mpi-start.hooks" 1
+    . $MPI_START_PLUGIN_FILES 
+    # change the dir to load hooks
+    MPI_START_ETC_LIST=$MPI_START_ETC
+    # change MPI_START_ETC to tmp, so I can define which hooks to load
     echo "echo -n 1" >> $MPI_START_ETC/1.hook
     echo "echo -n 2" >> $MPI_START_ETC/2.hook
     echo "echo -n 3" >> $MPI_START_ETC/mpi-start.hooks.local

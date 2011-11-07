@@ -22,7 +22,8 @@ MPI_START_DISABLE_LRMS_INTEGRATION="no"
 
 testBug38() {
     # load openmpi
-    . $MPI_START_ETC/openmpi.mpi
+    mpi_start_get_plugin "openmpi.mpi" 1
+    . $MPI_START_PLUGIN_FILES
     mpi_exec
     $MPI_OPENMPI_INFO --parseable | grep "pls:tm" &> /dev/null
     if test $? -eq 0 ; then

@@ -56,7 +56,8 @@ mpi_start () {
     info_msg "start program with mpirun"
 
     # source hook file
-    source $MPI_START_ETC/mpi-start.hooks
+    mpi_start_get_plugin "mpi-start.hooks" 1
+    . $MPI_START_PLUGIN_FILES
 
     # call pre run hook
     mpi_start_pre_run_hook

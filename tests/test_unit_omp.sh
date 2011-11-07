@@ -6,7 +6,8 @@ export I2G_MPI_START_ENABLE_TESTING="TEST"
 # source the mpi-start code to have all functions
 . $I2G_MPI_START
 mpi_start_check_options
-. $MPI_START_ETC/openmp.hook
+mpi_start_get_plugin "openmp.hook" 1
+. $MPI_START_PLUGIN_FILES 
 
 setUp () {
     unset I2G_MPI_NP

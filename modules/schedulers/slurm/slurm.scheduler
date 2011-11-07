@@ -76,7 +76,8 @@ scheduler_get_machinefile () {
 slurm_mpiexec() {
     MPIEXEC=srun
 
-    . $MPI_START_ETC/generic_mpiexec.sh
+    mpi_start_get_plugin "generic_mpiexec.sh" 1
+    . $MPI_START_PLUGIN_FILES
     generic_mpiexec
     err=$?
     return $err

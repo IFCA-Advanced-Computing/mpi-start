@@ -33,7 +33,8 @@ EOF
     MPI_START_DISABLE_LRMS_INTEGRATION="no"
     # load openmpi
     export I2G_MPI_TYPE=mpich
-    . $MPI_START_ETC/mpich.mpi
+    mpi_start_get_plugin "mpich.mpi" 1
+    . $MPI_START_PLUGIN_FILES
     mpi_start
     assertEquals "0" "$?"
     rm -f $MPI_MPICH_MPIRUN $I2G_MPI_PRE_RUN_HOOK

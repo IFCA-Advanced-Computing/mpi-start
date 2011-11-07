@@ -22,10 +22,11 @@ setUp () {
 }
 
 testNoAffinity() {
-    # load options, to get MPI_START_ETC
+    # load options, to get mpi_start_get_plugin
     mpi_start_check_options
     # load hook file 
-    . $MPI_START_ETC/affinity.hook
+    mpi_start_get_plugin "affinity.hook" 1
+    . $MPI_START_PLUGIN_FILES 
     MPI_USE_AFFINITY=0
     tmpdir=`$MYMKTEMP -d`
     env > $tmpdir/e1
@@ -39,10 +40,11 @@ testNoAffinity() {
 }
 
 testAffinityNOOpenMPI() {
-    # load options, to get MPI_START_ETC
+    # load options, to get mpi_start_get_plugin
     mpi_start_check_options
     # load hook file 
-    . $MPI_START_ETC/affinity.hook
+    mpi_start_get_plugin "affinity.hook" 1
+    . $MPI_START_PLUGIN_FILES 
     MPI_USE_AFFINITY=1
     I2G_MPI_TYPE=dummy
     tmpdir=`$MYMKTEMP -d`
@@ -57,13 +59,14 @@ testAffinityNOOpenMPI() {
 }
 
 testAffinityOpenMPI1Slot() {
-    # load options, to get MPI_START_ETC
+    # load options, to get mpi_start_get_plugin
     mpi_start_check_options
     # load flavour
     I2G_MPI_TYPE=openmpi
     mpi_start_load_execenv
     # load hook file 
-    . $MPI_START_ETC/affinity.hook
+    mpi_start_get_plugin "affinity.hook" 1
+    . $MPI_START_PLUGIN_FILES 
     MPI_USE_AFFINITY=1
     tmpdir=`$MYMKTEMP -d`
     env > $tmpdir/e1
@@ -77,13 +80,14 @@ testAffinityOpenMPI1Slot() {
 }
 
 testAffinityOpenMPINOP() {
-    # load options, to get MPI_START_ETC
+    # load options, to get mpi_start_get_plugin
     mpi_start_check_options
     # load flavour
     I2G_MPI_TYPE=openmpi
     mpi_start_load_execenv
     # load hook file 
-    . $MPI_START_ETC/affinity.hook
+    mpi_start_get_plugin "affinity.hook" 1
+    . $MPI_START_PLUGIN_FILES 
     MPI_USE_AFFINITY=1
     export MPI_START_SOCKETS=2
     export MPI_START_COREPERSOCKET=4
@@ -105,13 +109,14 @@ EOF
 }
 
 testAffinityOpenMPINode() {
-    # load options, to get MPI_START_ETC
+    # load options, to get mpi_start_get_plugin
     mpi_start_check_options
     # load flavour
     I2G_MPI_TYPE=openmpi
     mpi_start_load_execenv
     # load hook file 
-    . $MPI_START_ETC/affinity.hook
+    mpi_start_get_plugin "affinity.hook" 1
+    . $MPI_START_PLUGIN_FILES 
     MPI_USE_AFFINITY=1
     export MPI_START_SOCKETS=2
     export MPI_START_COREPERSOCKET=4
@@ -148,13 +153,14 @@ EOF
 }
 
 testAffinityOpenMPINodeOversuscribe() {
-    # load options, to get MPI_START_ETC
+    # load options, to get mpi_start_get_plugin
     mpi_start_check_options
     # load flavour
     I2G_MPI_TYPE=openmpi
     mpi_start_load_execenv
     # load hook file 
-    . $MPI_START_ETC/affinity.hook
+    mpi_start_get_plugin "affinity.hook" 1
+    . $MPI_START_PLUGIN_FILES 
     MPI_USE_AFFINITY=1
     export MPI_START_SOCKETS=2
     export MPI_START_COREPERSOCKET=4
@@ -197,13 +203,14 @@ EOF
 }
 
 testAffinityOpenMPISocket() {
-    # load options, to get MPI_START_ETC
+    # load options, to get mpi_start_get_plugin
     mpi_start_check_options
     # load flavour
     I2G_MPI_TYPE=openmpi
     mpi_start_load_execenv
     # load hook file 
-    . $MPI_START_ETC/affinity.hook
+    mpi_start_get_plugin "affinity.hook" 1
+    . $MPI_START_PLUGIN_FILES 
     MPI_USE_AFFINITY=1
     export MPI_START_SOCKETS=2
     export MPI_START_COREPERSOCKET=4
@@ -243,13 +250,14 @@ EOF
 }
 
 testAffinityOpenMPISocketOversuscribe() {
-    # load options, to get MPI_START_ETC
+    # load options, to get mpi_start_get_plugin
     mpi_start_check_options
     # load flavour
     I2G_MPI_TYPE=openmpi
     mpi_start_load_execenv
     # load hook file 
-    . $MPI_START_ETC/affinity.hook
+    mpi_start_get_plugin "affinity.hook" 1
+    . $MPI_START_PLUGIN_FILES 
     MPI_USE_AFFINITY=1
     export MPI_START_SOCKETS=2
     export MPI_START_COREPERSOCKET=4
@@ -301,13 +309,14 @@ EOF
 }
 
 testAffinityOpenMPICore() {
-    # load options, to get MPI_START_ETC
+    # load options, to get mpi_start_get_plugin
     mpi_start_check_options
     # load flavour
     I2G_MPI_TYPE=openmpi
     mpi_start_load_execenv
     # load hook file 
-    . $MPI_START_ETC/affinity.hook
+    mpi_start_get_plugin "affinity.hook" 1
+    . $MPI_START_PLUGIN_FILES 
     MPI_USE_AFFINITY=1
     export MPI_START_SOCKETS=2
     export MPI_START_COREPERSOCKET=4
@@ -367,13 +376,14 @@ EOF
 }
 
 testAffinityOpenMPICoreOversuscribe() {
-    # load options, to get MPI_START_ETC
+    # load options, to get mpi_start_get_plugin
     mpi_start_check_options
     # load flavour
     I2G_MPI_TYPE=openmpi
     mpi_start_load_execenv
     # load hook file 
-    . $MPI_START_ETC/affinity.hook
+    mpi_start_get_plugin "affinity.hook" 1
+    . $MPI_START_PLUGIN_FILES 
     MPI_USE_AFFINITY=1
     export MPI_START_SOCKETS=2
     export MPI_START_COREPERSOCKET=4
