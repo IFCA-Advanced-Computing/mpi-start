@@ -58,7 +58,7 @@ Makefile.in \
 README \
 VERSION
 
-dist:	
+dist:
 	rm -rf $(name_prefix)mpi-start-$(VERSION)
 	# what if hg is not here!
 	# hg archive $(name_prefix)mpi-start-$(VERSION)
