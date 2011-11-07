@@ -58,7 +58,7 @@ Makefile.in \
 README \
 VERSION
 
-dist:	
+dist:
 	rm -rf $(name_prefix)mpi-start-$(VERSION)
 	# what if hg is not here!
 	# hg archive $(name_prefix)mpi-start-$(VERSION)
@@ -75,6 +75,9 @@ rpm: dist
 		> rpms/SPECS/$(name_prefix)mpi-start.spec
 	rpmbuild --define "_topdir `pwd`/rpms" -bs rpms/SPECS/$(name_prefix)mpi-start.spec
 	rpmbuild $(PACKAGER) --define "_topdir `pwd`/rpms" -bb rpms/SPECS/$(name_prefix)mpi-start.spec
+
+deb: 
+	dpkg-buildpackage -us -uc
 
 
 maintainer-clean: clean
