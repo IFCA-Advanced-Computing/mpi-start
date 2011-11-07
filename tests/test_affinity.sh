@@ -21,6 +21,12 @@ setUp () {
     unset I2G_MPI_PER_CORE
 }
 
+tearDown() {
+    for file in $MPI_START_CLEANUP_FILES; do
+        [ -f $file ] && rm -f $file
+    done
+}
+
 testNoAffinity() {
     # load options, to get mpi_start_get_plugin
     mpi_start_check_options

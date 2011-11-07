@@ -18,6 +18,9 @@ setUp () {
 }
 
 tearDown() {
+    for file in $MPI_START_CLEANUP_FILES; do
+        [ -f $file ] && rm -f $file
+    done
     rm -rf "$MYTMPDIR"
 }
 

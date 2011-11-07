@@ -19,6 +19,11 @@ chmod +x $MPI_OPENMPI_MPIEXEC
 MPI_START_SCHEDULER="pbs"
 MPI_START_DISABLE_LRMS_INTEGRATION="no"
 
+tearDown() {
+    for file in $MPI_START_CLEANUP_FILES; do
+        [ -f $file ] && rm -f $file
+    done
+}
 
 testBug38() {
     # load openmpi

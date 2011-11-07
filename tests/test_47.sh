@@ -9,6 +9,13 @@ export I2G_MPI_START_ENABLE_TESTING="TEST"
 . $I2G_MPI_START
 mpi_start_check_options
 
+tearDown() {
+    for file in $MPI_START_CLEANUP_FILES; do
+        [ -f $file ] && rm -f $file
+    done
+}
+
+
 testBug47() {
     export MPI_MPICH_MPIRUN=`$MYMKTEMP`
     cat > $MPI_MPICH_MPIRUN << EOF

@@ -31,6 +31,12 @@ setUp () {
     export MPI_START_DUMMY_SCHEDULER=1
 }
 
+tearDown() {
+    for file in $MPI_START_CLEANUP_FILES; do
+        [ -f $file ] && rm -f $file
+    done
+}
+
 testPnodeSingle() {
     export I2G_MPI_PER_NODE=1
     mpi_start_np_setup

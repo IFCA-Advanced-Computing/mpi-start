@@ -15,6 +15,13 @@ setUp () {
     unset I2G_MPI_SINGLE_PROCESS
 }
 
+tearDown() {
+    for file in $MPI_START_CLEANUP_FILES; do
+        [ -f $file ] && rm -f $file
+    done
+}
+
+
 testWarningDisabled () {
     export I2G_MPI_START_VERBOSE=0
     output=`warn_msg "test" 2>&1`

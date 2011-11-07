@@ -27,6 +27,12 @@ setUp () {
     export MPI_START_NSLOTS_PER_HOST=5
 }
 
+tearDown() {
+    for file in $MPI_START_CLEANUP_FILES; do
+        [ -f $file ] && rm -f $file
+    done
+}
+
 testDefaultEnabled() {
     pre_run_hook
     echo $MPI_START_ENV_VARIABLES | grep 'OMP_NUM_THREADS' >& /dev/null

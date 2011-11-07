@@ -37,12 +37,12 @@ int main (int argc, char *argv[]) {
             char *env = getenv(argv[i]);
             if (!env) {
                 fprintf(stderr, "%s not defined!\n", argv[i]);
-                err=1;
+                err=51;
             } else {
                 if (i + 1 >= argc) continue;
                 if (strcmp(env, argv[i + 1])) {
                     fprintf(stderr, "%s value is not %s!\n", argv[i], argv[i+1]);
-                    err=1;
+                    err=51;
                 }
             }
         }
@@ -80,9 +80,13 @@ testMPISource() {
     ERR=`$MYMKTEMP`
     OUTPUT=`$I2G_MPI_START -x FOOBARVAR=foo -np 2 -e $ERR -pre $myhook`
     st=$?
-    assertEquals 0 $st
-    assertEquals "NP = 2" "$OUTPUT"
-    assertNull "`cat $ERR`"
+    if [ $I2G_MPI_TYPE = "mpich" ] ; then
+        assertEquals "NP = 2" "$OUTPUT"
+    else
+        assertEquals 0 $st
+        assertEquals "NP = 2" "$OUTPUT"
+        assertNull "`cat $ERR`"
+    fi
     rm -rf $ERR
 }
 
@@ -93,9 +97,13 @@ testMPIBinary () {
     ERR=`$MYMKTEMP`
     OUTPUT=`$I2G_MPI_START -x FOOBARVAR=foo -np 2 -e $ERR $MPI_TEST_DIR/app`
     st=$?
-    assertEquals 0 $st
-    assertEquals "NP = 2" "$OUTPUT"
-    assertNull "`cat $ERR`"
+    if [ $I2G_MPI_TYPE = "mpich" ] ; then
+        assertEquals "NP = 2" "$OUTPUT"
+    else
+        assertEquals 0 $st
+        assertEquals "NP = 2" "$OUTPUT"
+        assertNull "`cat $ERR`"
+    fi
     rm -rf $ERR
 }
 
