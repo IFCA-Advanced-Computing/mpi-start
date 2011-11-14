@@ -42,7 +42,7 @@ testCopyAndCleanCall() {
     export MPI_SHARED_HOME_PATH=$MYDIR
     mkdir -p one/two
     touch one/two/1
-    export I2G_MPI_APPLICATION=`$MYMKTEMP`
+    export I2G_MPI_APPLICATION="mpiapp"
     cat > $I2G_MPI_APPLICATION << EOF
 #!/bin/sh
 echo "\${SHARED_BASE_PATH}"
@@ -52,7 +52,8 @@ EOF
     assertEquals "0" "$?"
     # the directory should not exist
     ls $SHARED_DIR 2> /dev/null
-    assertNotEquals "0" "$?"
+    st=$?
+    assertNotEquals "0" "$st"
 }
 
 . $SHUNIT2
