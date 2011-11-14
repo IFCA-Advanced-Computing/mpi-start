@@ -138,7 +138,6 @@ mpi_start_mktemp () {
 # MPI type
 #======================================================================
 mpi_start_search_mpiexec () {
-
     export MPI_SPECIFIC_PARAMS=""
     export MPI_MPIEXEC=""
     export MPI_MPIRUN=""

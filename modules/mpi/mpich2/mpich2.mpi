@@ -12,8 +12,27 @@ if test "x$MPI_START_MPI_PREFIX" = "x"  ; then
     debug_msg "use default mpi path: $MPI_START_MPI_PREFIX"
 fi
 
+export OSC_MPIEXEC=0
+export HYDRA_MPIEXEC=0
+
 # activate MPI
 mpi_start_activate_mpi $MPI_START_MPI_PREFIX "$MPI_START_MPI_MODULE"
+# further determine if the mpiexec is OSC or hydra or whatever
+if test "x$MPI_MPIEXEC" != "x"; then
+    $MPI_MPIEXEC 2>&1 | grep -e "-\<np\>" > /dev/null 2>&1
+    st=$?
+    if test $st -ne 0 ; then
+        export OSC_MPIEXEC=1
+    else
+        # try with mpiexec.hydra
+        MPIEXEC=`which mpiexec.hydra 2> /dev/null`
+        if test $? -eq 0 -a "x$MPI_MPICH2_DISABLE_HYDRA" != "x1" ; then
+            export HYDRA_MPIEXEC=1
+            MPI_MPIEXEC=$MPIEXEC
+        fi
+    fi
+fi
+
 
 # start an mpi job with hydra
 mpich2_with_hydra () {
@@ -141,10 +160,7 @@ mpi_exec () {
         MPIEXEC=$MPI_MPIEXEC
         MPI_GLOBAL_PARAMS=$MPI_SPECIFIC_MPIEXEC_PARAMS
 
-        # how to test if the mpiexec needs the -np and -machinefile args??
-        $MPIEXEC 2>&1 | grep -e "-\<np\>" > /dev/null 2>&1
-        status=$?
-        if test $status -ne 0 ; then
+        if test ${OSC_MPIEXEC} -eq  1 ; then
             # OSC mpiexec! 
             # if a comm method has already been requested don't set
             if `echo $MPI_GLOBAL_PARAMS | grep -vq "comm=" 2> /dev/null`; then
@@ -159,17 +175,12 @@ mpi_exec () {
             . $MPI_START_PLUGIN_FILES
             generic_mpiexec
             err=$?
+        elif test ${HYDRA_MPIEXEC} -eq 1 ; then
+            mpich2_with_hydra
+            err=$?
         else
-            # try with mpiexec.hydra
-            MPIEXEC=`which mpiexec.hydra 2> /dev/null`
-            if test $? -eq 0 -a "x$MPI_MPICH2_DISABLE_HYDRA" != "x1" ; then
-                mpich2_with_hydra
-                err=$?
-            else
-                MPIEXEC=$MPI_MPIEXEC
-                mpich2_with_mpd
-                err=$?
-            fi
+            mpich2_with_mpd
+            err=$?
         fi
     elif test "x$MPI_MPIRUN" != "x"; then
         MPIEXEC=$MPI_MPIRUN
