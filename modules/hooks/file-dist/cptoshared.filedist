@@ -50,8 +50,10 @@ copy() {
                     export I2G_MPI_APPLICATION=${SHARED_BASE_PATH}/${MYDIR}/`basename ${APP_CANONIC}`
                 fi
             else
-                # XXX FIX THIS
-                echo "BREAKS"
+                APP_DIR=`dirname ${I2G_MPI_APPLICATION}`
+                if test "${APP_DIR}" = "${MYDIR}"; then
+                    export I2G_MPI_APPLICATION=${SHARED_BASE_PATH}/${MYDIR}/`basename ${I2G_MPI_APPLICATION}`
+                fi
             fi
         fi
     fi
