@@ -199,9 +199,14 @@ mpi_start_pre_run_hook_copy () {
         MYDIR=`dirname $EDG_WL_RB_BROKERINFO`
     fi
 
+    # XXX find a way to deal with this with bsd tar
     HIDDEN_FILES="$PWD/.[a-zA-Z0-9]*"
 
-    TARCMD="tar czf $TARBALL --ignore-failed-read $MYDIR $X509_USER_PROXY $HIDDEN_FILES"
+    EXTRATAROPTS=""
+    if test "x${MPI_START_UNAME}" = "xlinux" ; then
+        EXTRATAROPTS="--ignore-failed-read $PWD/.[a-zA-Z0-9]*"
+    fi
+    TARCMD="tar czf $TARBALL $EXTRATAROPTS $MYDIR $X509_USER_PROXY"
     if test "x$I2G_MPI_START_DEBUG" = "x1" ; then 
         $TARCMD
         st=$?
@@ -210,7 +215,7 @@ mpi_start_pre_run_hook_copy () {
         st=$?
     fi
     
-    if test $? -ne 0 ; then
+    if test $st -ne 0 ; then
         error_msg "Unable to create tarball for file distribution, aborting"
         dump_env
         exit 1
