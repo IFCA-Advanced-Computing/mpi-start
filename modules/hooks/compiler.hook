@@ -4,6 +4,8 @@
 # Copyright (c) 2009-2010  Instituto de Fisica de Cantabria - CSIC. 
 #                          All rights reserved.
 
+MPI_COMPILER_HOOK=1
+
 #
 # determine if the compiler is 64 bit (x86_64) or not.
 #
@@ -14,7 +16,7 @@ compiler_hook_is64bit () {
         $MPI_OPENMPI_INFO --parseable --arch | grep "x86_64" &> /dev/null
         return $?
     elif test "x$I2G_MPI_TYPE" = "xmpich" -o "x$I2G_MPI_TYPE" = "xmpich2" ; then 
-        machine=`mpicc -dumpmachine`
+        machine=`$MPI_MPICC -dumpmachine`
         if test $? -eq 0 ; then
             echo $machine | grep "x86_64" &> /dev/null
             return $?
@@ -57,7 +59,7 @@ compiler_hook_check_compiler_flags() {
 #include <mpi.h>
 int main(int argc, char **argv) { MPI_Init(&argc, &argv); return 0; }
 EOF
-    mpicc $MPI_MPICC_OPTS $wdir/test.c -o $wdir/test &> /dev/null
+    $MPI_MPICC $MPI_MPICC_OPTS $wdir/test.c -o $wdir/test &> /dev/null
     status=$?
     # we can refine this, by trying to look for "skipping incompatible" in the output
     rm -rf $wdir
@@ -68,12 +70,54 @@ EOF
 # hook for setting compiler configuration
 #
 pre_run_hook () {
+    if test "x${MPI_COMPILER_HOOK}" != "x1" ; then
+        return 0
+    fi
+
     debug_msg "compiler_hooks"
 
-    which mpicc &> /dev/null
+    debug_msg "determining default compilers"
+
+    MPICC_COMP="$MPICC mpicc"
+    MPIF90_COMP="$MPIF90 mpif90"
+    MPIF77_COMP="$MPIF77 mpif77"
+    MPICXX_COMP="$MPICXX mpicxx mpic++ mpiCC"
+    # First try to find the compilers
+    MPI_TYPE=`echo $I2G_MPI_TYPE | tr "[:lower:]" "[:upper:]" | tr "-" "_"`
+    for compiler in MPICC MPICXX MPIF90 MPIF77; do
+        var=MPI_${compiler}
+        VALUE=`eval echo \\$MPI_${MPI_TYPE}_${compiler}`
+        if test "x${VALUE}" != "x" ; then
+            eval export ${var}="\${VALUE}"
+        fi
+        which "`eval echo \\$${var}`" &> /dev/null
+        st=$?
+        if test $st -ne 0 ; then
+            # try suffixing the compilers
+            for c in `eval echo \\${${compiler}_COMP}` ; do
+                eval export ${var}="\${c}.${I2G_MPI_TYPE}"
+                which "`eval echo \\$${var}`" &> /dev/null
+                st=$?
+                if test $st -ne 0 ; then
+                    eval export ${var}="\${c}"
+                    which "`eval echo \\$${var}`" &> /dev/null
+                    st=$?
+                    if test $st -ne 0 ; then
+                        eval export ${var}="\${c}"
+                    else
+                        break
+                    fi
+                else
+                    break
+                fi
+            done
+        fi
+    done
+
+    which $MPI_MPICC &> /dev/null
     st=$?
     if test $st -ne 0 ; then
-        debug_msg "compiler not found, ignoring hook"
+        debug_msg "compiler not found, will not continue with hook"
         return 0
     fi
 
