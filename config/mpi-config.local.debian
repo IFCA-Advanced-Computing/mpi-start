@@ -1,0 +1,12 @@
+#!/bin/bash
+# Variables for typical Debian/Ubuntu installations
+# Change these values to fit your local installation
+#
+MPI_MPICH_PATH=${MPI_MPICH_PATH:-/usr/lib/mpich}
+MPI_MPICH_MPIRUN=${MPI_MPICH_MPIRUN:-mpirun.mpich}
+MPI_OPENMPI_PATH=${MPI_OPENMPI_PATH:-/usr}
+MPI_OPENMPI_MPIEXEC=${MPI_OPENMPI_MPIEXEC:-mpiexec.openmpi}
+MPI_MPICH2_PATH=${MPI_MPICH2_PATH:-/usr}
+MPI_MPICH2_MPIEXEC=${MPI_MPICH2_MPIEXEC:-mpiexec.hydra}
+MPI_LAM_PATH=${MPI_LAM_PATH:-/usr}
+MPI_LAM_MPIRUN=${MPI_LAM_MPIRUN:-mpirun.lam}

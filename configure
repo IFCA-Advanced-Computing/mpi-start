@@ -112,6 +112,7 @@ src/Makefile
 docs/Makefile
 templates/Makefile
 tests/Makefile
+config/Makefile
 modules/Makefile
 modules/hooks/Makefile
 modules/hooks/file-dist/Makefile
@@ -130,7 +131,7 @@ modules/schedulers/pbs/Makefile
 modules/schedulers/sge/Makefile
 modules/schedulers/slurm/Makefile'
 
-maintainerclean_files="$files"
+maintainerclean_files="$files config/mpi-config.local"
 
 for f in $files ; do
     cat > $f << EOF
@@ -145,3 +146,64 @@ EOF
     done
     cat $f.in >> $f
 done
+
+
+################### DEFAULT CONFIG FILE FOR MPI ########################
+DEBIAN=0
+SL5_64=0
+SL5_32=0
+SL6_64=0
+SL6_32=0
+
+os=`uname`
+if [ $os = 'Linux' ]; then
+    # determine the Distro
+    which lsb_release > /dev/null
+    if [ $? -eq 0 ] ; then
+        ISSUE=`lsb_release -a 2> /dev/null`
+    else
+        ISSUE=`cat /etc/issue`
+    fi
+    echo $ISSUE | egrep -i "debian|ubuntu" > /dev/null
+    if [ $? -eq 0 ] ; then
+        DEBIAN=1
+    else
+        # lets assume SciLinux (or RH EL!)
+        VERSION=`echo $ISSUE | grep -i "release" | sed -e 's/.*[Rr]elease \([0-9.]*\).*/\1/'`
+        echo $VERSION | grep "^5\." > /dev/null
+        if [ $? -eq 0 ] ; then
+            machine=`uname -m`
+            if [ $machine = 'x86_64' ] ; then
+                SL5_64=1
+            else
+                SL5_32=1
+            fi
+        else
+            echo $VERSION | grep "^6\." > /dev/null
+            if [ $? -eq 0 ] ; then
+                machine=`uname -m`
+                if [ $machine = 'x86_64' ] ; then
+                    SL6_64=1
+                else
+                    SL6_32=1
+                fi
+            fi
+        fi
+    fi
+fi
+
+if [ $DEBIAN -eq 1 ] ; then
+    cp config/mpi-config.local.debian config/mpi-config.local
+elif [ $SL5_32 -eq 1 ] ; then
+    cp config/mpi-config.local.el5-i386 config/mpi-config.local
+elif [ $SL5_64 -eq 1 ] ; then
+    cp config/mpi-config.local.el5-x86_64 config/mpi-config.local
+elif [ $SL6_32 -eq 1 ] ; then
+    cp config/mpi-config.local.el6-i386 config/mpi-config.local
+elif [ $SL6_64 -eq 1 ] ; then
+    cp config/mpi-config.local.el6-x86_64 config/mpi-config.local
+fi
+
+########################################################################
+
+

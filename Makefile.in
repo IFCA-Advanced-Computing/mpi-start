@@ -6,6 +6,7 @@ all:
 	$(MAKE) -C templates all
 	$(MAKE) -C docs all
 	$(MAKE) -C tests all 
+	$(MAKE) -C config all 
 
 clean:
 	rm -f *.tar.gz
@@ -15,6 +16,7 @@ clean:
 	$(MAKE) -C templates clean
 	$(MAKE) -C docs clean
 	$(MAKE) -C tests clean
+	$(MAKE) -C config clean
 
 distclean:clean
 
@@ -25,20 +27,23 @@ install: all
 	$(MAKE) -C templates install
 	$(MAKE) -C docs install
 	$(MAKE) -C tests install 
-	install -d $(DESTDIR)/$(sysconfdir)/profile.d
-	echo "export I2G_MPI_START=$(bindir)/mpi-start" > \
-					$(DESTDIR)/$(sysconfdir)/profile.d/mpi_start.sh
-	echo "setenv I2G_MPI_START $(bindir)/mpi-start" > \
-					$(DESTDIR)/$(sysconfdir)/profile.d/mpi_start.csh
+	$(MAKE) -C config install 
+
+# REMOVED the creation of profiles since they are not that useful anymore
+	#install -d $(DESTDIR)/$(sysconfdir)/profile.d
+	#echo "export I2G_MPI_START=$(bindir)/mpi-start" > \
+	#				$(DESTDIR)/$(sysconfdir)/profile.d/mpi_start.sh
+	#echo "setenv I2G_MPI_START $(bindir)/mpi-start" > \
+	#				$(DESTDIR)/$(sysconfdir)/profile.d/mpi_start.csh
 
 uninstall:
-	rm -f $(DESTDIR)/$(sysconfdir)/profile.d/mpi_start.sh $(DESTDIR)/$(sysconfdir)/profile.d/mpi_start.csh
 	$(MAKE) -C src uninstall
 	$(MAKE) -C modules uninstall
 	$(MAKE) -C templates uninstall
 	$(MAKE) -C docs uninstall
 	$(MAKE) -C tests uninstall 
-
+	$(MAKE) -C config uninstall 
+	# rm -f $(DESTDIR)/$(sysconfdir)/profile.d/mpi_start.sh $(DESTDIR)/$(sysconfdir)/profile.d/mpi_start.csh
 
 tarball: all
 	mkdir -p bin
@@ -52,6 +57,7 @@ modules\
 docs\
 templates \
 tests \
+config \
 configure \
 ChangeLog \
 Makefile.in \

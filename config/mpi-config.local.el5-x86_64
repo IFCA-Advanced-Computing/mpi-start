@@ -1,0 +1,8 @@
+#!/bin/bash
+# Variables for typical RH EL5 / SciLi 5 installations (x86_64)
+# Change these values to fit your local installation
+#
+MPI_MPICH_PATH=${MPI_MPICH_PATH:-/opt/mpich-1.2.7}
+MPI_OPENMPI_PATH=${MPI_OPENMPI_PATH:-/usr/lib64/openmpi/1.4-gcc/bin}
+MPI_MPICH2_PATH=${MPI_MPICH2_PATH:-/usr/lib64/mpich2}
+MPI_LAM_PATH=${MPI_LAM_PATH:-/usr/lib64/lam}

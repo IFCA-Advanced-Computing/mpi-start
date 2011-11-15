@@ -38,13 +38,16 @@ rm -rf $RPM_BUILD_ROOT
 %files
 %defattr(-,root,root,-)
 %{_bindir}/mpi-start
-%{_sysconfdir}/mpi-start/
+%config(noreplace) %{_sysconfdir}/mpi-start/
 %{_mandir}/man1/*
-%config(noreplace) %{_sysconfdir}/profile.d/mpi_start.sh
-%config(noreplace) %{_sysconfdir}/profile.d/mpi_start.csh
 %doc docs/AUTHORS docs/COPYING docs/LICENSE README ChangeLog
 
 %changelog
+* Tue Nov 15 2011 Enol Fernandez <enolfc _AT_ ifca.unican.es> - 1.1.1-1%{?dist}
+- Fixed bugs: #53, #30, #32, #47, #48, #50, #51, and #44
+- Better handling of config files, and compilers
+- Improved affinity hook (now it includes MPICH2 support)
+
 * Mon Oct 17 2011 Enol Fernandez <enolfc _AT_ ifca.unican.es> - 1.1.0-2%{?dist}
 - Better EPEL compliance
 

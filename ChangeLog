@@ -1,3 +1,12 @@
+2011-11-15 Enol Fernández  <enolfc _AT_ ifca.unican.es> - 1.1.0
+	* Fixed: #53, #30, #32, #47, #48, #50, #51, #44
+	* Better handling of configuration, now files can be in more
+	  than one location, including a user config file
+	* Better handling of compilers
+	* Support for affinity in MPICH2 using Hydra startup
+	* Default location of implementations for Debian and SL5/SL6
+	* New Debian package 
+
 2011-09-19 Enol Fernández <enolfc _AT_ ifca.unican.es> - 1.1.0
 	* Fixed: #27, #41, #35, #38, #31
 	* Improved documentation 

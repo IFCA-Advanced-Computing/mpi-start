@@ -1,0 +1,7 @@
+#!/bin/bash
+# Change these values to fit your local installation
+#
+#MPI_MPICH2_PATH=${MPI_MPICH2_PATH:-/usr/lib/mpich}
+#MPI_MPICH2_MPIEXEC=${MPI_MPICH2_MPIEXEC:-mpiexec.mpich2}
+#MPI_OPENMPI_PATH=${MPI_OPENMPI_PATH:-/usr}
+#MPI_OPENMPI_MPIEXEC=${MPI_OPENMPI_MPIEXEC:-mpiexec.openmpi}
