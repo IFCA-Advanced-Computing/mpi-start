@@ -5,12 +5,6 @@
 #
 
 oneTimeSetUp () {
-    TYPE=`echo $I2G_MPI_TYPE | tr '[:lower:]' '[:upper:]'`
-    eval cc="\${MPI_${TYPE}_MPICC}"
-    if test "x$cc" != "x" ; then
-        export MPICC=$cc
-    fi
-    echo "Using $MPICC as compiler!"
     export MPI_TEST_DIR=`$MYMKTEMP -d`
     export MPI_SRC_CODE=$MPI_TEST_DIR/test.c
     cat > $MPI_SRC_CODE << EOF
@@ -55,7 +49,7 @@ EOF
     cat > $myhook << EOF
 pre_run_hook () {
     export I2G_MPI_APPLICATION=\$MPI_TEST_DIR/app
-    \$MPICC \$MPICC_OPTS -x c \$MPI_SRC_CODE -o \$I2G_MPI_APPLICATION
+    \$MPI_MPICC \$MPICC_OPTS -x c \$MPI_SRC_CODE -o \$I2G_MPI_APPLICATION
 }
 EOF
 }
@@ -71,8 +65,25 @@ setUp () {
     unset I2G_MPI_START_VERBOSE
     unset I2G_MPI_START_TRACE
     unset I2G_MPI_SINGLE_PROCESS
+    unset I2G_MPI_APPLICATION_ARGS
     export MPI_START_SHARED_FS=1
 }
+
+testMPICompiler() {
+    otherhook=$MPI_TEST_DIR/otherhook.sh
+    cat > $otherhook << EOF
+pre_run_hook () {
+    echo \$MPI_MPICC
+    return 1
+}
+EOF
+    OUTPUT=`$I2G_MPI_START -pre $otherhook 2> /dev/null`
+    st=$?
+    assertNotNull "$OUTPUT"
+    assertEquals 1 $st
+    echo "Using $OUTPUT for compiling the application"
+}
+
 
 testMPISource() {
     unset FOOBARVAR
