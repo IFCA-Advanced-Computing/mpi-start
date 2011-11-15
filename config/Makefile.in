@@ -1,0 +1,13 @@
+all: mpi-config.local
+
+mpi-config.local:
+	cp mpi-config.local.template mpi-config.local	
+
+clean:
+
+install:
+	install -d $(DESTDIR)/$(moduledir)
+	install -m 0755 mpi-config.local  $(DESTDIR)/$(moduledir)/
+
+uninstall:
+	rm -f $(DESTDIR)/$(moduledir)/mpi-config.local
