@@ -69,6 +69,22 @@ setUp () {
     export MPI_START_SHARED_FS=1
 }
 
+testMPILocation() {
+    otherhook=$MPI_TEST_DIR/otherhook.sh
+    cat > $otherhook << EOF
+pre_run_hook () {
+    echo \$MPI_START_MPI_PREFIX
+    return 1
+}
+EOF
+    OUTPUT=`$I2G_MPI_START -pre $otherhook 2> /dev/null`
+    st=$?
+    assertNotNull "$OUTPUT"
+    assertEquals 1 $st
+    echo "Using $OUTPUT as MPI prefix"
+}
+
+
 testMPICompiler() {
     otherhook=$MPI_TEST_DIR/otherhook.sh
     cat > $otherhook << EOF

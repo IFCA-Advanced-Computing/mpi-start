@@ -43,14 +43,6 @@ RUN_OPENMPI_TESTS=0
 RUN_AFFINITY_TESTS=0
 RUN_LAM_TESTS=0
 
-
-# Non SL5 installation of mpi (ubuntu)
-# paths
-export MPI_MPICH_PATH=/usr/lib/mpich
-export MPI_MPICH_MPIRUN=mpirun.mpich
-export MPI_OPENMPI_MPIEXEC=mpiexec.openmpi
-export MPI_LAM_MPIRUN=mpirun.lam
-
 #
 # Check environment variables
 #
