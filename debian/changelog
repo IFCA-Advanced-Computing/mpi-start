@@ -1,3 +1,9 @@
+mpi-start (1.1.1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Enol Fernandez <enolfc@ifca.unican.es>  Wed, 16 Nov 2011 10:06:30 +0100
+
 mpi-start (1.1.0) unstable; urgency=low
 
   * Initial Release.
