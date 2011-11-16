@@ -3,6 +3,6 @@
 # Change these values to fit your local installation
 #
 MPI_MPICH_PATH=${MPI_MPICH_PATH:-/opt/mpich-1.2.7}
-MPI_OPENMPI_PATH=${MPI_OPENMPI_PATH:-/usr/lib/openmpi/1.4-gcc/bin}
+MPI_OPENMPI_PATH=${MPI_OPENMPI_PATH:-/usr/lib/openmpi}
 MPI_MPICH2_PATH=${MPI_MPICH2_PATH:-/usr/lib/mpich2}
 MPI_LAM_PATH=${MPI_LAM_PATH:-/usr/lib/lam}
