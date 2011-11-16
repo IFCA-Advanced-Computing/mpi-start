@@ -36,7 +36,7 @@ tearDown () {
     rm -rf $MYDIR
 }
 
-testCopyAndCleanCall() {
+testAppMoved() {
     cd $MYDIR
     export I2G_MPI_FILE_DIST=cptoshared
     export MPI_SHARED_HOME_PATH=$MYDIR
