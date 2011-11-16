@@ -40,7 +40,7 @@ testCommandLineHelp () {
     assertEquals 0 $st
 }
 
-testCommandLineVersion() {
+testCommandLineVersion () {
     version=`$I2G_MPI_START -V 2>&1`
     st=$?
     assertEquals 0 $st
@@ -49,7 +49,7 @@ testCommandLineVersion() {
     assertEquals 0 $st
 }
 
-testCommandLineTypeAndApp() {
+testCommandLineTypeAndApp () {
     unset I2G_MPI_TYPE
     myapp=`$MYMKTEMP`
     cat > $myapp << EOF
@@ -64,7 +64,7 @@ EOF
     rm -f $myapp
 }
 
-testCommandLineVerbose() {
+testCommandLineVerbose () {
     output=`$I2G_MPI_START -v true 2>&1`
     st=$?
     assertEquals 0 $st
@@ -73,7 +73,7 @@ testCommandLineVerbose() {
     assertEquals 0 $st
 }
 
-testCommandLineDebug() {
+testCommandLineDebug () {
     output=`$I2G_MPI_START -vv true 2>&1`
     st=$?
     assertEquals 0 $st
@@ -82,7 +82,7 @@ testCommandLineDebug() {
     assertEquals 0 $st
 }
 
-testCommandLineTrace() {
+testCommandLineTrace () {
     myapp=`$MYMKTEMP`
     cat > $myapp << EOF
 #!/bin/bash
@@ -96,7 +96,7 @@ EOF
     rm -f $myapp
 }
 
-testCommandLineHook() {
+testCommandLineHook () {
     myapp=`$MYMKTEMP`
     cat > $myapp << EOF
 #!/bin/bash
@@ -114,7 +114,7 @@ EOF
     rm -f $myapp
 }
 
-testInputFile() {
+testInputFile () {
     myapp=`$MYMKTEMP`
     cat > $myapp << EOF
 #!/bin/bash
@@ -134,7 +134,7 @@ EOF
     rm -f $myin
 }
 
-testOutputFile() {
+testOutputFile () {
     myapp=`$MYMKTEMP`
     cat > $myapp << EOF
 #!/bin/bash
@@ -152,7 +152,7 @@ EOF
     rm -rf $myout
 }
 
-testErrorFile() {
+testErrorFile () {
     myapp=`$MYMKTEMP`
     cat > $myapp << EOF
 #!/bin/bash
@@ -171,7 +171,7 @@ EOF
     rm -rf $myerr
 }
 
-testInOutputErrorFile() {
+testInOutputErrorFile () {
     myapp=`$MYMKTEMP`
     cat > $myapp << EOF
 #!/bin/bash
@@ -198,7 +198,7 @@ EOF
     rm -f $myout
 }
 
-testChmodApp() {
+testChmodApp () {
     unset I2G_MPI_TYPE
     myapp=`$MYMKTEMP`
     cat > $myapp << EOF
@@ -210,5 +210,27 @@ EOF
     assertEquals "dummy" "$output"
     assertEquals 0 $st
     rm -f $myapp
+}
+
+testCleanUp () {
+    unset I2G_MPI_TYPE
+    myhook=`$MYMKTEMP`
+    cat > $myhook << EOF
+#!/bin/bash
+
+pre_run_hook() {
+    mpi_start_mktemp
+    ls -l \$MPI_START_TEMP_FILE > /dev/null
+    st=\$?
+    echo \$MPI_START_TEMP_FILE
+    return \$st
+}
+EOF
+    output=`$I2G_MPI_START -pre $myhook -t dummy -- /bin/true`
+    st=$?
+    assertEquals 0 $st
+    ls $output 2> /dev/null
+    assertNotEquals 0 $?
+    rm -f $myhook
 }
 . $SHUNIT2

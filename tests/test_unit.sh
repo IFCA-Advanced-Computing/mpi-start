@@ -15,12 +15,11 @@ setUp () {
     unset I2G_MPI_SINGLE_PROCESS
 }
 
-tearDown() {
+tearDown () {
     for file in $MPI_START_CLEANUP_FILES; do
         [ -f $file ] && rm -f $file
     done
 }
-
 
 testWarningDisabled () {
     export I2G_MPI_START_VERBOSE=0
@@ -31,7 +30,7 @@ testWarningDisabled () {
     assertEquals "test" "$output"
 }
 
-testWarningEnabled () {
+testWarningEnabled() {
     export I2G_MPI_START_VERBOSE=1
     output=`warn_msg "test" 2>&1`
     output=`echo $output | cut -f2 -d':' | tr -d " "`
@@ -40,7 +39,7 @@ testWarningEnabled () {
     assertEquals "test" "$output"
 }
 
-testDebugDisabled () {
+testDebugDisabled() {
     export I2G_MPI_START_VERBOSE=0
     export I2G_MPI_START_DEBUG=0
     output=`debug_msg "test" 2>&1`
@@ -133,6 +132,28 @@ testActivateMPI () {
     assertEquals 0 $st
     assertEquals "$PWD/bin:1" $newPATH
     assertEquals "$PWD/lib:2" $newLDPATH
+}
+
+testSearchMpiexec() {
+    export I2G_MPI_TYPE=tester
+    export MPI_TESTER_MPIEXEC=testexec
+    export MPI_TESTER_MPIRUN=testrun
+    export MPI_TESTER_MPIEXEC_PARAMS=123
+    export MPI_TESTER_MPIRUN_PARAMS=123
+    mpi_start_search_mpiexec
+    assertEquals 0 $?
+    assertEquals $MPI_TESTER_MPIEXEC $MPI_MPIEXEC
+    assertEquals $MPI_TESTER_MPIEXEC_PARAMS $MPI_SPECIFIC_MPIEXEC_PARAMS
+    assertEquals "" "$MPI_MPIRUN"
+    assertEquals "" "$MPI_SPCECIFIC_MPIRUN_PARAMS"
+    unset MPI_TESTER_MPIEXEC
+    unset MPI_TESTER_MPIEXEC_PARAMS
+    mpi_start_search_mpiexec
+    assertEquals 0 $?
+    assertEquals $MPI_TESTER_MPIRUN $MPI_MPIRUN
+    assertEquals $MPI_TESTER_MPIRUN_PARAMS $MPI_SPECIFIC_MPIRUN_PARAMS
+    assertEquals "" "$MPI_MPIEXEC"
+    assertEquals "" "$MPI_SPECIFIC_MPIEXEC_PARAMS"
 }
 
 testMktempFile () {
@@ -230,7 +251,6 @@ testHookOrder() {
     assertEquals "1234" "$output"
     rm -rf $mydir
 }
-
 
 . $SHUNIT2
 
