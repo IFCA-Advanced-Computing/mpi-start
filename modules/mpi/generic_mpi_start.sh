@@ -10,7 +10,7 @@ generic_mpi_start () {
     info_msg "start program with mpirun"
 
     # source hook file
-    mpi_start_get_plugin "mpi-start.hooks" 1
+    mpi_start_get_plugin "mpi-start-hooks.sh" 1
     . $MPI_START_PLUGIN_FILES
 
     # call pre run hook

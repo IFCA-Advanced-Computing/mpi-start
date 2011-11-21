@@ -233,7 +233,7 @@ testHookOrder() {
     echo $MPI_START_ETC_LIST | grep $MPI_START_ETC > /dev/null
     assertEquals 0 $?
     # load hooks
-    mpi_start_get_plugin "mpi-start.hooks" 1
+    mpi_start_get_plugin "mpi-start-hooks.sh" 1
     . $MPI_START_PLUGIN_FILES 
     # change the dir to load hooks
     MPI_START_ETC_LIST=$MPI_START_ETC

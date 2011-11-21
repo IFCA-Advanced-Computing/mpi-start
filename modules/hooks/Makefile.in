@@ -5,7 +5,7 @@ clean:
 
 install:
 	install -d $(DESTDIR)/$(moduledir)
-	install -m 0755 mpi-start.hooks $(DESTDIR)/$(moduledir)
+	install -m 0755 mpi-start-hooks.sh $(DESTDIR)/$(moduledir)
 	install -m 0755 mpi-start.hooks.local $(DESTDIR)/$(moduledir)
 	install -m 0755 compiler.hook $(DESTDIR)/$(moduledir)
 	install -m 0755 marmot.hook $(DESTDIR)/$(moduledir)
@@ -15,7 +15,7 @@ install:
 	$(MAKE) -C file-dist install
 
 uninstall:
-	rm -f $(DESTDIR)/$(moduledir)/mpi-start.hooks
+	rm -f $(DESTDIR)/$(moduledir)/mpi-start-hooks.sh
 	rm -f $(DESTDIR)/$(moduledir)/mpi-start.hooks.local
 	rm -f $(DESTDIR)/$(moduledir)/compiler.hook
 	rm -f $(DESTDIR)/$(moduledir)/marmot.hook
