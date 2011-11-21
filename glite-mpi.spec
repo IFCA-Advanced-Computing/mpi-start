@@ -9,7 +9,7 @@ Release: 1%{?dist}
 License: GPLv2
 Group: Development/Tools
 URL: http://devel.ifca.es/mpi-start/
-Source: glite-mpi-%{version}.src.tar.gz
+Source: glite-mpi-%{version}.tar.gz
 BuildArch: noarch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n) 
 # dependencies
