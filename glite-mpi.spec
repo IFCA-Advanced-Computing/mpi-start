@@ -2,7 +2,7 @@
 # Spec for glite-mpi metapackage, just contains dependencies
 # to other packages.
 #
-Summary: glite Metapackage for MPI tools (mpi-start and yaim)
+Summary: A glite metapackage for MPI tools (mpi-start and yaim)
 Name: glite-mpi
 Version: 1.0.1
 Release: 1%{?dist}
