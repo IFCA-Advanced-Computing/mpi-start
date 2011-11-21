@@ -116,6 +116,7 @@ if test "x${RUN_FSDETECT_TESTS}" = "x1" ; then
     ./test_fsdetect.sh || exitcode=1
     ./test_53.sh || exitcode=1
     ./test_32.sh || exitcode=1
+    ./test_44.sh || exitcode=1
 fi
 if test "x${RUN_SCH_TESTS}" = "x1" ; then
     echo
