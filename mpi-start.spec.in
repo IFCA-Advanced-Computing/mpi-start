@@ -7,7 +7,7 @@
 Summary: MPI startup mechanism abstraction layer 
 Name: @NAME_PREFIX@mpi-start
 Version: @VERSION@
-Release: 2%{?dist}
+Release: 1%{?dist}
 License: GPLv2
 Group: Development/Tools
 Source: https://devel.ifca.es/mpi-start/downloads/mpi-start-%{version}.tar.gz
