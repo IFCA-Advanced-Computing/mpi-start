@@ -36,7 +36,7 @@ MPI_START_DUMMY_SCHEDULER=${MPI_START_DUMMY_SCHEDULER:-1}
 #======================================================================
 # Cleans up temporary files upon finishing execution 
 #======================================================================
-clean_up () {
+clean_up() {
     if test "x$I2G_MPI_START_KEEP_FILES" == "x1"; then
         exit
     fi
@@ -52,7 +52,7 @@ trap clean_up EXIT
 #======================================================================
 # Displays a warning message
 #======================================================================
-warn_msg () {
+warn_msg() {
     #if test "x$I2G_MPI_START_VERBOSE" = "x1" ; then 
     echo "mpi-start [WARNING]:" "$@" 1>&2
     #fi
@@ -61,7 +61,7 @@ warn_msg () {
 #======================================================================
 # Displays a warning message
 #======================================================================
-error_msg () {
+error_msg() {
     echo "mpi-start [ERROR  ]:" "$@" 1>&2
 }
 
@@ -69,7 +69,7 @@ error_msg () {
 # Display a debug message in the case that I2G_MPI_START_DEBUG
 # is 1.
 #======================================================================
-debug_msg () {
+debug_msg() {
     if test "x$I2G_MPI_START_VERBOSE" = "x1" ; then 
         if test "x$I2G_MPI_START_DEBUG" = "x1"  ; then
             echo "mpi-start [DEBUG  ]: $@" 1>&2
@@ -81,7 +81,7 @@ debug_msg () {
 # Display a debug message in the case that I2G_MPI_START_DEBUG
 # is 1.
 #======================================================================
-info_msg () {
+info_msg() {
     if test "x$I2G_MPI_START_VERBOSE" = "x1" ; then 
         echo "mpi-start [INFO   ]: $@" 1>&2
     fi
@@ -90,7 +90,7 @@ info_msg () {
 #======================================================================
 # Dump environment.
 #======================================================================
-dump_env () {
+dump_env() {
     if test "x$I2G_MPI_START_TRACE" = "x1"  ; then
         set +x
     fi
@@ -104,7 +104,7 @@ dump_env () {
 #======================================================================
 # Find the correct parameter for the mktemp program.
 #======================================================================
-mpi_start_find_mktemp () {
+mpi_start_find_mktemp() {
     MPI_START_MKTEMP=mktemp
     local tempfile=`$MPI_START_MKTEMP 2> /dev/null`
     if test $? -ne 0 -o -z "$tempfile"  ; then
@@ -125,7 +125,7 @@ mpi_start_find_mktemp () {
 # Creates a new temporary file / directory
 # Name of file is returned in MPI_START_TEMP_FILE
 #======================================================================
-mpi_start_mktemp () {
+mpi_start_mktemp() {
     MPI_START_TEMP_FILE=`$MPI_START_MKTEMP $*`
     if test $? -ne 0 ; then
         error_msg "Unable to create temp file!"
@@ -137,8 +137,10 @@ mpi_start_mktemp () {
 # Look for the appropriate mpirun/mpiexec according to the loaded
 # MPI type
 #======================================================================
-mpi_start_search_mpiexec () {
+mpi_start_search_mpiexec() {
     export MPI_SPECIFIC_PARAMS=""
+    export MPI_SPECIFIC_MPIEXEC_PARAMS=""
+    export MPI_SPECIFIC_MPIRUN_PARAMS=""
     export MPI_MPIEXEC=""
     export MPI_MPIRUN=""
 
@@ -187,7 +189,7 @@ mpi_start_search_mpiexec () {
 # $1 the MPI prefix path (mandatory)
 # $2 the MPI module string (optional)
 #======================================================================
-mpi_start_activate_mpi () {
+mpi_start_activate_mpi() {
     if test "x$2" = "x" ; then
         debug_msg "activate MPI via manually update"
         if test -d "$1" ; then
@@ -233,7 +235,7 @@ EOF
 # $1 the name of the variable
 # rest of parameters: variable value 
 #======================================================================
-mpi_start_export_variable () {
+mpi_start_export_variable() {
     local var_name
     if [[ $1 == *=* ]] ; then
         var_name=`echo $1 | cut -f1 -d"="`
@@ -626,7 +628,7 @@ mpi_start_core_detector() {
 #======================================================================
 # Sets up the number of processes to start 
 #======================================================================
-mpi_start_np_setup () {
+mpi_start_np_setup() {
     debug_msg "dump hosts:"
     for i in `cat "$MPI_START_HOSTFILE" 2> /dev/null` ; do
         debug_msg "=> $i"
@@ -659,7 +661,7 @@ mpi_start_np_setup () {
 #======================================================================
 # Load execution environment  
 #======================================================================
-mpi_start_load_execenv () {
+mpi_start_load_execenv() {
     debug_msg "Loading execution environment"
 
     # check if we should should use default MPI falvour
@@ -790,7 +792,7 @@ main() {
 #======================================================================
 #  Print command line usage.
 #======================================================================
-print_usage () {
+print_usage() {
     echo "mpi-start [-h] [-t mpi_type] [-v] [-vv] [-vvv]" 1>&2
     echo "    [-pre hook] [-post hook] [-pcmd cmd]" 1>&2
     echo "    [-np n]" 1>&2
@@ -833,7 +835,7 @@ print_usage () {
 #======================================================================
 #  Print version.
 #======================================================================
-print_version () {
+print_version() {
     echo "mpi-start v@VERSION@" 
 }
 

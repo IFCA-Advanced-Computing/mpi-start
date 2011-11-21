@@ -19,8 +19,8 @@ setUp () {
     export MPI_START_NHOSTS=3
     unset I2G_MPI_APPLICATION
     unset MPI_START_NPHOST
-    export I2G_MPI_START_DEBUG=1
-    export I2G_MPI_START_VERBOSE=1
+    export I2G_MPI_START_DEBUG=0
+    export I2G_MPI_START_VERBOSE=0
     unset I2G_MPI_START_TRACE
     unset I2G_MPI_SINGLE_PROCESS
     unset I2G_MPI_NP

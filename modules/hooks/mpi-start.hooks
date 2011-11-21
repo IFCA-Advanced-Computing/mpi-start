@@ -21,7 +21,7 @@
 #
 # $1 name of the callback function or host
 #======================================================================
-mpi_start_foreach_host() {
+mpi_start_foreach_host () {
     if test "x$1" = "x"  ; then
         error_msg "mpi_start_foreach called without callback function paramater."
         return 1
@@ -41,7 +41,7 @@ mpi_start_foreach_host() {
 # Function to query if we are on a shared filesystem 
 # or not. Will set MPI_START_SHARED_FS to 0 or 1
 #======================================================================
-mpi_start_detect_shared_fs() {
+mpi_start_detect_shared_fs () {
     if test "x$MPI_START_SHARED_FS" = "x" ; then
         debug_msg "detect shared filesystem"
 
@@ -239,7 +239,7 @@ mpi_start_pre_run_hook_copy () {
 #======================================================================
 # Run the pre hook defined in the file passed as parameter
 #======================================================================
-mpi_start_run_pre_hook() {
+mpi_start_run_pre_hook () {
     debug_msg "mpi_start_run_pre_hook"
 
     if test "x$1" == "x" ; then
@@ -337,7 +337,7 @@ mpi_start_pre_run_hook_generic () {
 #======================================================================
 # Run the post hook defined in the file passed as parameter
 #======================================================================
-mpi_start_run_post_hook() {
+mpi_start_run_post_hook () {
     debug_msg "mpi_start_run_post_hook"
 
     if test "x$1" == "x" ; then
