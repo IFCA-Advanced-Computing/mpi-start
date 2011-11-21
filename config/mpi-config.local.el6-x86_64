@@ -1,4 +1,3 @@
-#!/bin/bash
 # Variables for typical RH EL6 / SciLi 6 installations (x86_64)
 # Change these values to fit your local installation
 #
