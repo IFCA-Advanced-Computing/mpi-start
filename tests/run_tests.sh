@@ -35,12 +35,12 @@ RUN_HOOK_TESTS=1
 RUN_NP_TESTS=1
 RUN_SCH_TESTS=1
 RUN_FSDETECT_TESTS=1
+RUN_AFFINITY_TESTS=1
 # if running these tests, ensure you have proper environment loaded!
 RUN_OMP_TESTS=0
 RUN_MPICH2_TESTS=0
 RUN_MPICH_TESTS=0
 RUN_OPENMPI_TESTS=0
-RUN_AFFINITY_TESTS=0
 RUN_LAM_TESTS=0
 
 #
@@ -167,6 +167,10 @@ if test "x${RUN_MPICH2_TESTS}" = "x1" ; then
     ./test_mpi.sh || exitcode=1
     echo "* RFC #50"
     ./test_50.sh || exitcode=1
+    if test "x${RUN_AFFINITY_TESTS}" = "x1" ; then
+        echo "* RFC #48"
+        ./test_affinity_48.sh || exitcode=1
+    fi
     echo "***************************"
 fi
 if test "x${RUN_MPICH_TESTS}" = "x1" ; then
@@ -186,14 +190,10 @@ if test "x${RUN_OPENMPI_TESTS}" = "x1" ; then
     # test for bug 38
     echo "* RFC #38"
     ./test_38.sh || exitcode=1
-    echo "***************************"
-fi
-if test "x${RUN_AFFINITY_TESTS}" = "x1" -a "x${RUN_OPENMPI_TESTS}" = "x1" ; then
-    echo
-    echo "***************************"
-    echo "* Affinity Tests"
-    echo "* RFC #27 #48"
-    ./test_affinity.sh || exitcode=1
+    if test "x${RUN_AFFINITY_TESTS}" = "x1" ; then
+        echo "* RFC #27"
+        ./test_affinity_27.sh || exitcode=1
+    fi
     echo "***************************"
 fi
 if test "x${RUN_LAM_TESTS}" = "x1" ; then

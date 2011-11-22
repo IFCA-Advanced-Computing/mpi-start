@@ -25,10 +25,6 @@ openmpi_affinity() {
 
     # this should work with all Open MPI 1.3/4/5.x versions
     local slots=`expr $MPI_START_SOCKETS \* $MPI_START_COREPERSOCKET`
-    if test $slots -eq 1 ; then
-        info_msg "Not setting affinity, only one core available"
-        return 0
-    fi
 
     # create a rank file
     mpi_start_mktemp
@@ -87,6 +83,7 @@ mpich2_affinity() {
         info_msg "Processor affinity is only supported for MPICH 2 Hydra launcher"
         return 0
     fi
+
     if test "x${I2G_MPI_PER_NODE}" != "x" ; then
         # XXX no binding here?
         export MPICH2_PARAMS="$MPICH2_PARAMS"
@@ -110,6 +107,12 @@ pre_run_hook () {
         return 0
     fi
     debug_msg "Setting processor affinity."
+
+    local slots=`expr $MPI_START_SOCKETS \* $MPI_START_COREPERSOCKET`
+    if test $slots -eq 1 ; then
+        info_msg "Not setting affinity, only one core available"
+        return 0
+    fi
 
     if test "x${I2G_MPI_TYPE}" = "xopenmpi" ; then
         openmpi_affinity
