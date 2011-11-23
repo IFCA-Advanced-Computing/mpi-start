@@ -48,6 +48,10 @@ rm -rf $RPM_BUILD_ROOT
 %doc docs/AUTHORS docs/COPYING docs/LICENSE README ChangeLog
 
 %changelog
+* Wed Nov 23 2011 Enol Fernandez <enolfc _AT_ ifca.unican.es> - 1.2.0-1%{?dist}
+- Fixed #49. 
+- Minor fixes after testing in Torque.
+
 * Tue Nov 15 2011 Enol Fernandez <enolfc _AT_ ifca.unican.es> - 1.1.1-1%{?dist}
 - Fixed bugs: #53, #30, #32, #47, #48, #50, #51, and #44
 - Better handling of config files, and compilers
