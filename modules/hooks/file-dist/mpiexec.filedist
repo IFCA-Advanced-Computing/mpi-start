@@ -7,9 +7,8 @@
 #
 
 check_distribution_method() {
-	result=255
-	if test "x$I2G_MPI_TYPE" = "xmpich" -o "x$I2G_MPI_TYPE" = "xmpich2"
-	then 	
+    result=255
+    if test "x$I2G_MPI_TYPE" = "xmpich" -o "x$I2G_MPI_TYPE" = "xmpich2"; then 	
         if test "x${MPI_START_SCHEDULER}" = "xpbs" ; then
             if test "x${MPI_MPIEXEC}" != "x" ; then
                 $MPI_MPIEXEC 2>&1 | grep -e "-\<np\>" > /dev/null 2>&1
@@ -19,8 +18,8 @@ check_distribution_method() {
                 fi
             fi
         fi
-	fi
-	return $result
+    fi
+    return $result
 }	
 
 copy() {
@@ -28,11 +27,11 @@ copy() {
     # backup old values
     old_application=$I2G_MPI_APPLICATION
     old_application_args=$I2G_MPI_APPLICATION_ARGS
-	old_precommand=$I2G_MPI_PRECOMMAND
-    old_mpiexec_params=$I2G_MPI_MPIEXEC_PARAMS
+    old_precommand=$I2G_MPI_PRECOMMAND
+    old_mpiexec_params=$MPI_SPECIFIC_MPIEXEC_PARAMS
     old_stdin=$I2G_MPI_APPLICATION_STDIN
     old_stdout=$I2G_MPI_APPLICATION_STDOUT
-    old_pernode=$I2G_MPI_PERNODE
+    old_pernode=$MPI_START_NPHOST
 
     # set to tmp. values
     MPI_START_DO_NOT_USE_WRAPPER=1
@@ -40,8 +39,8 @@ copy() {
     I2G_MPI_APPLICATION_STDIN="${TARBALL}"
     I2G_MPI_APPLICATION_STDOUT="${TARBALL}_out"
     I2G_MPI_APPLICATION_ARGS=
-    I2G_MPI_MPIEXEC_PARAMS="--allstdin --comm=none"
-    I2G_MPI_PERNODE=1
+    MPI_SPECIFIC_MPIEXEC_PARAMS="--allstdin --comm=none"
+    MPI_START_NPHOST=1
     I2G_MPI_PRECOMMAND=
 
     # launch the mpi job
@@ -58,7 +57,7 @@ copy() {
     I2G_MPI_APPLICATION_ARGS="xzf ${TARBALL}_out -C /"
     I2G_MPI_APPLICATION_STDIN=
     I2G_MPI_APPLICATION_STDOUT=
-    I2G_MPI_MPIEXEC_PARAMS="--nolocal --comm=none"
+    MPI_SPECIFIC_MPIEXEC_PARAMS="--nolocal --comm=none"
     I2G_MPI_PRECOMMAND=
 	
     # launch the mpi job
@@ -73,10 +72,11 @@ copy() {
     # restore old values
     I2G_MPI_APPLICATION=$old_application
     I2G_MPI_APPLICATION_ARGS=$old_application_args
-	I2G_MPI_PRECOMMAND=$old_precommand
+    I2G_MPI_PRECOMMAND=$old_precommand
     I2G_MPI_APPLICATION_STDIN=$old_stdin
     I2G_MPI_APPLICATION_STDOUT=$old_stdout
-    I2G_MPI_PERNODE=$old_pernode
+    MPI_SPECIFIC_MPIEXEC_PARAMS=$old_mpiexec_params
+    MPI_START_NPHOST=$old_pernode
     unset MPI_START_DO_NOT_USE_WRAPPER
 
     return $result
@@ -87,11 +87,11 @@ clean(){
     # backup old values
     old_application=$I2G_MPI_APPLICATION
     old_application_args=$I2G_MPI_APPLICATION_ARGS
-	old_precommand=$I2G_MPI_PRECOMMAND
-    old_mpiexec_params=$I2G_MPI_MPIEXEC_PARAMS
+    old_precommand=$I2G_MPI_PRECOMMAND
+    old_mpiexec_params=$MPI_SPECIFIC_MPIEXEC_PARAMS
     old_stdin=$I2G_MPI_APPLICATION_STDIN
     old_stdout=$I2G_MPI_APPLICATION_STDOUT
-    old_pernode=$I2G_MPI_PERNODE
+    old_pernode=$MPI_START_NPHOST
 
     # set to tmp. values
     MPI_START_DO_NOT_USE_WRAPPER=1
@@ -99,8 +99,8 @@ clean(){
     I2G_MPI_APPLICATION_ARGS="-rf `pwd`"
     I2G_MPI_APPLICATION_STDIN=
     I2G_MPI_APPLICATION_STDOUT=
-    I2G_MPI_MPIEXEC_PARAMS="--nolocal --comm=none"
-    I2G_MPI_PERNODE=1
+    MPI_SPECIFIC_MPIEXEC_PARAMS="--nolocal --comm=none"
+    MPI_START_NPHOST=1
     I2G_MPI_PRECOMMAND=
 
     mpi_exec
@@ -114,11 +114,11 @@ clean(){
     # restore old values
     I2G_MPI_APPLICATION=$old_application
     I2G_MPI_APPLICATION_ARGS=$old_application_args
-	I2G_MPI_PRECOMMAND=$old_precommand
-    I2G_MPI_MPIEXEC_PARAMS=$old_mpiexec_params
+    I2G_MPI_PRECOMMAND=$old_precommand
     I2G_MPI_APPLICATION_STDIN=$old_stdin
     I2G_MPI_APPLICATION_STDOUT=$old_stdout
-    I2G_MPI_PERNODE=$old_pernode
+    MPI_SPECIFIC_MPIEXEC_PARAMS=$old_mpiexec_params
+    MPI_START_NPHOST=$old_pernode
     unset MPI_START_DO_NOT_USE_WRAPPER
 
     return $result
