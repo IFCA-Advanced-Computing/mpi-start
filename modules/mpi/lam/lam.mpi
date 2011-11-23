@@ -38,7 +38,11 @@ mpi_exec () {
     if test "x${I2G_MPI_START_DEBUG}" = "x1" ; then
         LAM_OPT="-v"
     fi
-    lamboot $LAM_OPT $MPI_START_HOSTFILE
+    local PREFIX=""
+    if test "x${MPI_START_MPI_PREFIX}" != "x" ; then
+        PREFIX="-prefix ${MPI_START_MPI_PREFIX}"
+    fi
+    lamboot $LAM_OPT $PREFIX $MPI_START_HOSTFILE
     status=$?
     if test $status -ne 0 ; then
         error_msg "Unable to boot lam"
