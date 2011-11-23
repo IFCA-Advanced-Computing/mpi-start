@@ -105,6 +105,14 @@ mpich2_with_mpd () {
     local machines_params="-machinefile $MACHINES -np $MPI_START_NP"
     MPDBOOT_PARAMS="-n $MPI_START_NHOSTS -f $MPI_START_HOSTFILE"
 
+    local SSH_AGENT=ssh
+    if test "x$MPI_START_SSH_AGENT" != "x"; then
+        # we are not using default start methods, setting specific ssh 
+        debug_msg "setting specific ssh agent"
+        MPDBOOT_PARAMS="$MPDBOOT_PARAMS --rsh=$MPI_START_SSH_AGENT"
+        SSH_AGENT="$MPI_START_SSH_AGENT"
+    fi
+
     # take care that the ".mpd.conf" file is available
     # make sure that we have a home, of not use pwd
     if test "x$HOME" == "x" ; then
@@ -113,14 +121,25 @@ mpich2_with_mpd () {
     echo "MPD_SECRETWORD=" > $HOME/.mpd.conf
     chmod 0600 $HOME/.mpd.conf
 
-    if test "x$MPI_START_SSH_AGENT" != "x"; then
-        # we are not using default start methods, setting specific ssh 
-        debug_msg "setting specific ssh agent"
-        MPDBOOT_PARAMS="$MPDBOOT_PARAMS --rsh=$MPI_START_SSH_AGENT"
-    fi
+    # Assure that .mpd.conf is present at remote nodes
+    # use provided ssh agent
+    for MPI_START_REMOTE_NODE in `cat $MPI_START_HOSTFILE`; do
+        if test $MPI_START_REMOTE_NODE = `hostname` -o $MPI_START_REMOTE_NODE = `hostname -f` -o $MPI_START_REMOTE_NODE = "localhost" ; then
+            continue
+        fi
+        $SSH_AGENT $MPI_START_REMOTE_NODE "mkdir -p $HOME 2>&1 > /dev/null"
+        cat $HOME/.mpd.conf | $SSH_AGENT $MPI_START_REMOTE_NODE cat ">" $HOME/.mpd.conf 
+    done
 
     # Start MPICH2 daemon.
     mpdboot $MPDBOOT_PARAMS 
+    st=$?
+    if test $st -ne 0 ; then
+	error_msg "Unable to start MPD, aborting execution"
+        dump_env
+        exit 1
+    fi
+
     MPI_GLOBAL_PARAMS="$MPI_GLOBAL_PARAMS $MPICH2_PARAMS $machines_params"
 
     # set the environment variables
