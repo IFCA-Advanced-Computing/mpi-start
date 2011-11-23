@@ -37,11 +37,11 @@ RUN_SCH_TESTS=1
 RUN_FSDETECT_TESTS=1
 RUN_AFFINITY_TESTS=1
 # if running these tests, ensure you have proper environment loaded!
-RUN_OMP_TESTS=0
-RUN_MPICH2_TESTS=0
-RUN_MPICH_TESTS=0
-RUN_OPENMPI_TESTS=0
-RUN_LAM_TESTS=0
+RUN_OMP_TESTS=1
+RUN_MPICH2_TESTS=1
+RUN_MPICH_TESTS=1
+RUN_OPENMPI_TESTS=1
+RUN_LAM_TESTS=1
 
 #
 # Check environment variables
@@ -204,6 +204,8 @@ if test "x${RUN_LAM_TESTS}" = "x1" ; then
     ./test_mpi.sh || exitcode=1
     echo "***************************"
 fi
+
+echo
 
 if test $REMOVE_MY_SHUNIT -eq 1 ; then
     rm $SHUNIT2

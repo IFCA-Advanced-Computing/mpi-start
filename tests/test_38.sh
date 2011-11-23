@@ -30,7 +30,7 @@ testBug38() {
     mpi_start_get_plugin "openmpi.mpi" 1
     . $MPI_START_PLUGIN_FILES
     mpi_exec
-    $MPI_OPENMPI_INFO --parseable | grep "pls:tm" &> /dev/null
+    $MPI_OPENMPI_INFO --parseable | grep "plm:tm" &> /dev/null
     if test $? -eq 0 ; then
         out=`echo $MPI_GLOBAL_PARAMS | grep -v "machinefile"`
     else
