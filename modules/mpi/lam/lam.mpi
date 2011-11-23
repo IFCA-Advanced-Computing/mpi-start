@@ -13,12 +13,13 @@ fi
 
 # activate MPI
 mpi_start_activate_mpi $MPI_START_MPI_PREFIX "$MPI_START_MPI_MODULE"
+mpi_start_export_variable LD_LIBRARY_PATH
 
 #
 # start an mpi job
 #
 mpi_exec () {
-	debug_msg "found LAM-MPI, set machinefile and np parameters"
+    debug_msg "found LAM-MPI, set machinefile and np parameters"
 
     if test "x$MPI_MPIEXEC" != "x"; then
         MPIEXEC=$MPI_MPIEXEC
@@ -47,14 +48,24 @@ mpi_exec () {
 
     local machines_params=""
     if test "x$I2G_MPI_PER_NODE" = "x1"; then
-	    export machines_params="N"
+        export machines_params="N"
     else 
-	    export machines_params="-np $MPI_START_NP"
+        export machines_params="-np $MPI_START_NP"
     fi
 
-    for var in $MPI_START_ENV_VARIABLES; do
-        MPI_GLOBAL_PARAMS="$MPI_GLOBAL_PARAMS -x $var"
-    done
+    if test "x${MPI_START_ENV_VARIABLES}" != "x" ; then
+        local envparam=""
+        local first=1
+        for var in ${MPI_START_ENV_VARIABLES}; do
+            if test $first -eq 0 ; then
+                envparam="${envparam},${var}"
+            else
+                envparam="-x $var"
+                first=0
+            fi
+        done
+        MPI_GLOBAL_PARAMS="$MPI_GLOBAL_PARAMS ${envparam}"
+    fi
 
     # check for user supplied mpiexec 
     MPI_GLOBAL_PARAMS="$MPI_GLOBAL_PARAMS $LAM_PARAMS $machines_params"
