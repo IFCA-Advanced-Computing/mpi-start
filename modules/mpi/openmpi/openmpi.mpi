@@ -45,7 +45,7 @@ if test "x$MPI_START_DISABLE_LRMS_INTEGRATION" == "xyes"; then
     # we are not the primary MPI 
     # fall back to save settings that should work always
     debug_msg "disable PBS, SGE"
-    OPENMPI_PARAMS="-mca pls ^tm,gridengine -mca ras ^tm,gridengine  "
+    OPENMPI_PARAMS="-mca plm ^tm,gridengine -mca ras ^tm,gridengine  "
 fi
 
 if test "x$MPI_START_SSH_AGENT" != "x"; then
@@ -53,7 +53,7 @@ if test "x$MPI_START_SSH_AGENT" != "x"; then
     debug_msg "setting specific ssh agent"
     # plm_rsh_agent is deprecated in newer versions of Open MPI 
     # need to check version and set the appropriate parameter
-    OPENMPI_PARAMS="-mca pls ^tm,gridengine -mca ras ^tm,gridengine -mca plm_rsh_agent $MPI_START_SSH_AGENT"
+    OPENMPI_PARAMS="-mca plm ^tm,gridengine -mca ras ^tm,gridengine -mca plm_rsh_agent $MPI_START_SSH_AGENT"
     export MPI_START_DISABLE_LRMS_INTEGRATION="yes"
 fi
 
@@ -77,7 +77,7 @@ mpi_exec () {
 
     local machines_params=""
     if test "x${MPI_START_SCHEDULER}" = "xpbs" -a "x${MPI_START_DISABLE_LRMS_INTEGRATION}" != "xyes" ; then
-        $MPI_OPENMPI_INFO --parseable | grep "pls:tm" &> /dev/null
+        $MPI_OPENMPI_INFO --parseable | grep "plm:tm" &> /dev/null
         if test $? -eq 0 -a "${OPENMPI_VERSION_MAJOR}.${OPENMPI_VERSION_MINOR}" = "1.2" ; then
             debug_msg "found openmpi 1.2 and PBS (with pbs support enabled), don't set machinefile"
         else
