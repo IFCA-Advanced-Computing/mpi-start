@@ -128,6 +128,10 @@ mpich2_with_mpd () {
             continue
         fi
         $SSH_AGENT $MPI_START_REMOTE_NODE "mkdir -p $HOME 2>&1 > /dev/null"
+        if test $? -ne 0 ; then
+            warn_msg "Unable to create $HOME at remote node, proably job will not start"
+            continue
+        fi
         cat $HOME/.mpd.conf | $SSH_AGENT $MPI_START_REMOTE_NODE cat ">" $HOME/.mpd.conf 
     done
 
@@ -135,7 +139,7 @@ mpich2_with_mpd () {
     mpdboot $MPDBOOT_PARAMS 
     st=$?
     if test $st -ne 0 ; then
-	error_msg "Unable to start MPD, aborting execution"
+        error_msg "Unable to start MPD, aborting execution"
         dump_env
         exit 1
     fi
