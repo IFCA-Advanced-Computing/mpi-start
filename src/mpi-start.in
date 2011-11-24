@@ -31,6 +31,7 @@ MPI_GLOBAL_PARAMS=""
 MPI_LOCAL_PARAMS=""
 declare -a MPI_START_JOB_ENV
 MPI_START_DUMMY_SCHEDULER=${MPI_START_DUMMY_SCHEDULER:-1}
+I2G_MPI_START_KEEP_FILES=${I2G_MPI_START_KEEP_FILES:-0}
 
 
 #======================================================================
@@ -480,8 +481,7 @@ mpi_start_check_options() {
 
     CONFIG_DIRS="~/.mpi-start \
                 $MPI_START_PREFIX/../etc/mpi-start \
-                /etc/mpi-start \
-                $MPI_START_PREFIX/../share/mpi-start"
+                /etc/mpi-start"
 
     export MPI_START_ETC_LIST="$MPI_START_ETC"
     for dir in $CONFIG_DIRS; do
