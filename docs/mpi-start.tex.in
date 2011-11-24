@@ -5,7 +5,7 @@
 
 \title{mpi-start and MPI-Utils}
 \author{E. Fernández}
-\DocVersion{1.0.2}
+\DocVersion{1.0.3}
 \EMICompVersion{@VERSION@}
 \Date{\today}
 
@@ -52,7 +52,6 @@ Source code is available at mpi-start mercurial repository (\url{https://devel.i
 schedulers.
 \end{itemize}
 
-
 \subsection{MPI-Utils}
 \subsubsection{Description}
 MPI-utils is a metapackge (glite-mpi) that depends on mpi-start and a yaim plugin for easy configuration of the MPI support in grid sites.
@@ -64,7 +63,6 @@ MPI-Utils contains a yaim plugin, therefore it needs yaim-core installation avai
 The source code of the yaim plugin is available at glite CVS (\url{http://jra1mw.cvs.cern.ch/cgi-bin/jra1mw.cgi/org.glite.yaim.mpi}) under org.glite.yaim.mpi module. Released versions are tagged with tags in the form \texttt{glite-yaim-mpi\_R\_X\_Y\_Z\_r},   where X.Y.Z is the plugin version and r the revision number for that version.
 
 \newpage
-
 \section{User Guide}
 \subsection{Installation}
 
@@ -130,7 +128,6 @@ For example, the following command line would start /bin/hostname 3 times for av
 $ mpi-start -t openmpi -npnode 3 -- /bin/hostname
 \end{verbatim}
 \end{small}
-
 
 \subsection{Environment Variables}
 
@@ -305,11 +302,11 @@ distribution. The following hooks are available:
 \item [Affinity] The Affinity hook is enabled by setting the
 \texttt{MPI\_USE\_AFFINITY} variable to \texttt{1}. When enabled (and the
 execution environment supports it), it will define the appropriate options for
-setting the processor affinity.
+setting the processor affinity under the selected MPI implementation.
 \item [OpenMP] The OpenMP hook is enabled by setting the \texttt{MPI\_USE\_OMP} variable to \texttt{1}. When enabled it will define the \texttt{OMP\_NUM\_THREADS} environment variable to the number of processors available per mpi process. 
 \item [MPItrace] MPItrace is enabled by setting the \texttt{I2G\_USE\_MPITRACE} variable to \texttt{1}. It adds to the execution the mpitrace utility, assuming it is installed at \texttt{MPITRACE\_INSTALLATION}. Once the execution is finished, it gathers and creates the output files at the first host.
 \item [MARMOT] Marmot is a tool for analysing and checking MPI programs. This hook enables the use of the tool if the variable \texttt{I2G\_USE\_MARMOT} is set to \texttt{1}. It also copies the analysis output to the first host.
-\item [Compiler flags] Sites that do have various compilers and support various architectures may not have proper compiler flags (\texttt{MPI\_MPIxx\_OPTS}) for all the possible combination. This plugin tries to avoid compilation errors by checking the current compiler options and change them to the default architecture of the compiler if the binaries are not generated.
+\item [Compiler] This hook sets environment variables \texttt{MPI\_MPI<COMPILER>}, where \texttt{COMPILER} is one of \texttt{CC}, \texttt{F90}, \texttt{F77}, \texttt{CXX}, for C, FORTRAN 90, FORTRAN 77 and C++ compilers respectively. This variables should point to valid compilers for the current MPI implementation. The hook also fixes compiler flags (\texttt{MPI\_MPIxx\_OPTS}) to avoid problems with bad flag for the current processor architecture. This hook can be disabled by setting the environment variable \texttt{MPI\_COMPILER\_HOOK} to \texttt{0}.
 \end{description}
 
 These hooks can be completely removed by deleting the affinity.hook, openmp.hook,
@@ -318,12 +315,19 @@ directory.
 
 \subsection{Local Site Hooks}
 
-Site admins can define their own hooks by creating \texttt{.hook} files in the configuration directory of mpi-start (by default /etc/mpi-start). The file must contain one of the following functions:
+Site admins can define their own hooks by:
 \begin{itemize}
+\item Creating new \texttt{.hook} files in the configuration directory, or
+\item modifying the \texttt{mpi-start.hooks.local} file.
+\end{itemize}
 
+The \texttt{.hook} files are executed in alphabetical order and the \texttt{mpi-start.hooks.local} will be executed after any other hook in the system are executed and the shared file system detection is performed.
+Each hook file contains the following functions:
+\begin{itemize}
 \item \texttt{pre\_run\_hook ()}: it will be executed before the user hooks and the user application gets executed.
 \item \texttt{post\_run\_hook ()}: it will be executed after the user application gets executed.
 \end{itemize}
+If any of these functions is not available, the hook will be ignored.
 
 \subsection{Developing User Hooks}
 Users can also customize the mpi-start behavior defining their own hooks by
@@ -341,7 +345,7 @@ containing the post-hook, in this file a function called \texttt{post\_run\_hook
 Both pre and post hooks can be in the same file. Next sections contain some hook examples
 
 \subsubsection{Compilation}
-Pre-run hook can be used for generating the binaries of the application that will be run by mpi-start. The following sample shows a hook that compiles an application using \texttt{mpicc}. It assumes that the source code is called like the application binary, but with a \texttt{.c} extension. Use of complex compilation commands like configure, make, etc is also possible. This code is only executed in the first host. The results of the compilation will be available to all hosts thanks to the file distribution mechanisms.
+Pre-run hook can be used for generating the binaries of the application that will be run by mpi-start. The following sample shows a hook that compiles an application using the C MPI compiler, as defined by the compiler hook in the \texttt{MPI\_MPICC} variable. It assumes that the source code is called like the application binary, but with a \texttt{.c} extension. Use of complex compilation commands like configure, make, etc is also possible. This code is only executed in the first host. The results of the compilation will be available to all hosts thanks to the file distribution mechanisms.
 
 \begin{small}
 \begin{verbatim}
@@ -352,7 +356,7 @@ pre_run_hook () {
 
   # Compile the program.
   echo "Compiling ${I2G_MPI_APPLICATION}"
-  mpicc $MPI_MPICC_OPTS -o ${I2G_MPI_APPLICATION} ${I2G_MPI_APPLICATION}.c
+  $MPI_MPICC $MPI_MPICC_OPTS -o ${I2G_MPI_APPLICATION} ${I2G_MPI_APPLICATION}.c
   if [ ! $? -eq 0 ]; then
     echo "Error compiling program.  Exiting..."
     return 1
@@ -364,7 +368,7 @@ pre_run_hook () {
 \end{small}
 
 \subsubsection{Input Preprocessing}
-Some applications require some input preprocessing before the application gets executed. For example, gromacs has a \texttt{grompp} tool that prepares the input for the actual \texttt{mdrun} application. In the following example the \texttt{grompp} tool prepares the input for gromacs:
+Some applications require some input preprocessing before the application gets executed. For example, gromacs has a \texttt{grompp} tool that prepares the input for the actual \texttt{mdrun} application. In the following example the \texttt{grompp} tool prepares the input for gromacs: 
 
 \begin{small}
 \begin{verbatim}
@@ -376,12 +380,14 @@ pre_run_hook()
 
    # Here comes the pre-mpirun actions of gromacs
    export PATH=$PATH:/$VO_COMPCHEM_SW_DIR/gromacs-3.3/bin
-   grompp -v -f full -o full -c after_pr -p speptide -np 4
+   grompp -v -f full -o full -c after_pr -p speptide -np $MPI_START_NP
 
    return 0
 }
 \end{verbatim}
 \end{small}
+
+Note the use of the \texttt{MPI\_START\_NP} variable to get the number of processors. See the developer section for a list of internal mpi-start variables. 
 
 \subsubsection{Output Gathering}
 Applications that write output files in each of the hosts involved in the
@@ -443,6 +449,8 @@ MPItrace & \texttt{I2G\_USE\_MPITRACE} & If set to $1$, enable MPItrace hook.\\
 \hline
 Marmot & \texttt{I2G\_USE\_MARMOT} & If set to $1$, enable Marmot hook.\\
 \hline
+Compiler & \texttt{MPI\_COMPILER\_HOOK} & If set to $0$, disable compiler hook.\\
+\hline
 \end{tabularx} 
 \end{center}
 
@@ -498,7 +506,7 @@ if you want to support the compilation of MPI applications.
 
 Source can be retrieved from the mercurial repository.
 
-Installation is as easy as "make install". The default installation prefix is "/usr", by default it also creates files in /etc/profile.d. If a non default installation wants to be done, use the PREFIX variable in make install
+Installation is as easy as "make install". The default installation prefix is "/usr". If a non default installation wants to be done, use the PREFIX variable in make install
 
 \begin{small}
 \begin{verbatim}
@@ -514,17 +522,25 @@ $ export I2G_MPI_START=/opt/mpi-start/bin/mpi-start
 \end{verbatim}
 \end{small}
 
-\subsection{mpi-start Manual Configuration}
+\subsection{Configuration}
 
 mpi-start is designed to auto detect most of the site configurations without any administrator intervention. The default installation will automatically detect:
 \begin{itemize}
 \item the batch scheduler at the site: currently PBS/Torque, SGE, LSF, Condor and Slurm are supported.
 \item existence of shared file system in the job running directory
-\item availability of OSC mpiexec for PBS/Torque systems
-\item default mpi installations for SLC5.
 \end{itemize}
 
-If the automatic detection fails for any of these, the administrator can set the following configuration variables:
+mpi-start uses a set of files to configure its behavior. There are several paths where the files can be located. All of them will be checked when looking for hooks, execution environments or scheduler plugins. These are the paths (and the order) used by default in mpi-start:
+\begin{itemize}
+\item Any path pointed by environment variable \texttt{MPI\_START\_ETC}.
+\item A \texttt{.mpi-start} directory at current user's home.
+\item The \texttt{etc/mpi-start} under mpi-start installation path. On default installations 
+      that would be \texttt{/}.
+\end{itemize}
+
+The first file that mpi-start checks is the \texttt{mpi-config.local} file. This should contain the appropriate location of your local MPI installations and any other modifications you want to introduce in the default behavior. mpi-start includes such file with the default configuration for your system in RHEL/SL 5, RHEL/SL 6 and Ubuntu. 
+
+Typical variables that the administrator can set in this file are:
 
 \begin{center}
 \begin{tabularx}{\textwidth}{lX}
@@ -536,6 +552,7 @@ If the automatic detection fails for any of these, the administrator can set the
 \texttt{MPI\_<flavour>\_MPIEXEC\_PARAMS} & Parameters for the MPIEXEC of the flavour \\ \hline
 \texttt{MPI\_<flavour>\_MPIRUN} & Path of the MPIRUN binary for the specific flavour \\ \hline
 \texttt{MPI\_<flavour>\_MPIRUN\_PARAMS} & Parameters for the MPIRUN of the flavour \\ \hline
+\texttt{MPI\_<flavour>\_MPI<compiler>} & Location of the compiler for the flavour. Compiler may be one of \texttt{CC}, \texttt{F90}, \texttt{F77} or \texttt{CXX}. \\ \hline
 \texttt{I2G\_<flavour>\_PREFIX} & Path of the MPI installation for the MPI flavour \\ \hline
 \end{tabularx} 
 \end{center}
@@ -667,6 +684,7 @@ The complete list of configuration variables for the CE is shown in the next tab
 \textbf{Variable}     & \textbf{Mandatory} & \textbf{Description}        \\ \hline
 \texttt{MPI\_<FLAVOUR>\_ENABLE}    & YES & set to \texttt{"yes"} if you want to enable the <flavour> \\ \hline
 \texttt{MPI\_<FLAVOUR>\_VERSION}   & YES & set to the supported version of the <flavour>, usually is automatically detected \\ \hline
+\texttt{MPI\_START\_VERSION}       & NO  & set to the available mpi-start version. If not set, the yaim plugin will try to figure out the version by checking if mpi-start is installed. \\ \hline
 \texttt{MPI\_SHARED\_HOME}         & NO  & set this to \texttt{"yes"} if you have a shared home area between WNs. \\ \hline
 \texttt{MPI\_SUBMIT\_FILTER}       & NO  & Set this to \texttt{"yes"} to configure the submit filter for torque batch system that enables the submission of parallel jobs. The configuration assumes that torque path is \texttt{/var/torque} or \texttt{TORQUE\_VAR\_DIR} variable if defined. \\ \hline
 \end{tabularx}
@@ -688,6 +706,7 @@ Check the documentation of your batch system for any further details.
 be the first in the yaim configuration, otherwise the Glue variables will not
 be properly defined. This restriction may be removed in future versions.
 
+\textbf{mpi-start version}: The yaim plugin will publish in the tags the mpi-start version if mpi-start is installed at the CE. If not installed you should define the \texttt{MPI\_START\_VERSION} with the version available at the WNs.
 
 \subsubsection{Example configuration}
 
@@ -1017,5 +1036,63 @@ Requirements  = member("MPI-START", other.GlueHostApplicationSoftwareRunTimeEnvi
 Environment   = {"I2G_MPI_PRE_RUN_HOOK=hooks.sh", "I2G_MPI_POST_RUN_HOOK=hooks.sh"};
 \end{verbatim}
 \end{small}
+
+\newpage
+\section{mpi-start Internals}
+
+This section documents the internal variables of mpi-start. They might be used for development of hooks or configuration of mpi-start. As the documentation improves, these will be moved to other sections of the document.
+
+\subsection{Global Configuration Variables}
+\begin{center}
+\begin{tabularx}{\textwidth}{llX}
+\textbf{Variable}     & \textbf{Default} & \textbf{Description}        \\ \hline
+\texttt{MPI\_START\_DUMMY\_SCHEDULER} & 1 & Enables or disables the dummy scheduler. \\ \hline
+\texttt{I2G\_MPI\_START\_KEEP\_FILES} & 0 & 
+       Enables or disables the removal of temporary files at the end of execution.\\ \hline
+\texttt{I2G\_MPI\_START\_FULL\_TRACE} & - & 
+       Enables or disables full trace of mpi-start. \\ \hline
+\texttt{MPI\_START\_DO\_NOT\_USE\_WRAPPER} & - &
+       Enables or disables the use of a wrapper for the executable \\ \hline
+\texttt{MPI\_START\_SOCKETS} & - & 
+       Number of sockets in the host (if not defined, mpi-start tries to detect them). \\ \hline
+\texttt{MPI\_START\_COREPERSOCKET} & - & 
+       Number of cores per socket in the host (if not defined, mpi-start tries to detect them). \\ \hline
+\texttt{MPI\_START\_COREPERSOCKET} & - & 
+       Number of cores per socket in the host (if not defined, mpi-start tries to detect them). \\ \hline
+\texttt{I2G\_MPI\_START\_ENABLE\_TESTING} & - &
+      If equal to \texttt{"TEST"}, then do not call the main function. Used for sourcing the mpi-start file.  \\ \hline
+\end{tabularx}
+\end{center}
+
+\subsection{Scheduler plugin variables}
+\begin{center}
+\begin{tabularx}{\textwidth}{lX}
+\textbf{Variable}     & \textbf{Description}        \\ \hline
+\texttt{MPI\_START\_SCHEDULER} & Name of the scheduler. \\ \hline
+\texttt{MPI\_START\_HOSTFILE} & File containing one line per slot available. \\ \hline
+\texttt{MPI\_START\_MACHINEFILE} & File containing one line per host available. \\ \hline
+\texttt{MPI\_START\_HOST\_SLOTS\_FILE} & File containing one line with a name of host, and the number of slots available in that host. \\ \hline
+\texttt{MPI\_START\_NP} & Total number of processors to use. \\ \hline
+\texttt{MPI\_START\_NPHOST} & Number of processes per host, may be undefined if slot allocation is used. \\  \hline.
+\end{tabularx}
+\end{center}
+
+\subsection{MPI Execution Variables}
+\begin{center}
+\begin{tabularx}{\textwidth}{lX}
+\textbf{Variable}            & \textbf{Description}        \\ \hline
+\texttt{MPIEXEC}             & Defined by each flavour, mpiexec executable \\ \hline
+\texttt{MPI\_GLOBAL\_PARAMS} & Global parameters for mpiexec \\ \hline
+\texttt{MPI\_LOCAL\_PARAMS}  & Local parameters for mpiexec \\ \hline
+\texttt{MPI\_START\_SSH\_AGENT} & User (or system) specified ssh agent (used mostly by condor). \\ \hline
+\texttt{MPI\_START\_DISABLE\_LRMS\_INTEGRATION} & If set to \texttt{"yes"}, do not use any LRMS integration available in the MPI flavour. \\ \hline
+\texttt{MPI\_MPICH2\_DISABLE\_HYDRA} & If set to \texttt{1}, disable the use of hydra launcher for mpich2. \\  \hline
+\texttt{OSC\_MPIEXEC} & Set to \texttt{1} if OSC mpiexec is found. \\ \hline
+\texttt{HYDRA\_MPIEXEC} & Set to \texttt{1} if hydra mpiexec is found. \\ \hline
+\texttt{OPENMPI\_VERSION\_MAJOR} & Set to Open MPI major version. \\ \hline
+\texttt{OPENMPI\_VERSION\_MINOR} & Set to Open MPI minor version. \\ \hline
+\texttt{OPENMPI\_VERSION\_RELEASE} & Set to Open MPI release version. \\ \hline
+\end{tabularx}
+\end{center}
 
 \end{document}
