@@ -40,7 +40,9 @@ mpi_exec () {
     fi
     local PREFIX=""
     if test "x${MPI_START_MPI_PREFIX}" != "x" ; then
-        PREFIX="-prefix ${MPI_START_MPI_PREFIX}"
+        if test -f ${MPI_START_MPI_PREFIX}/etc/lam-conf.lamd ; then
+            PREFIX="-prefix ${MPI_START_MPI_PREFIX}"
+        fi
     fi
     lamboot $LAM_OPT $PREFIX $MPI_START_HOSTFILE
     status=$?

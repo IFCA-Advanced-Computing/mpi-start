@@ -4,7 +4,7 @@
 # Copyright (c) 2009-2010  Instituto de Fisica de Cantabria - CSIC. 
 #                          All rights reserved.
 
-MPI_COMPILER_HOOK=1
+MPI_COMPILER_HOOK=${MPI_COMPILER_HOOK:-1}
 
 #
 # determine if the compiler is 64 bit (x86_64) or not.
