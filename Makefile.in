@@ -28,13 +28,11 @@ install: all
 	$(MAKE) -C docs install
 	$(MAKE) -C tests install 
 	$(MAKE) -C config install 
-
-# REMOVED the creation of profiles since they are not that useful anymore
-	#install -d $(DESTDIR)/$(sysconfdir)/profile.d
-	#echo "export I2G_MPI_START=$(bindir)/mpi-start" > \
-	#				$(DESTDIR)/$(sysconfdir)/profile.d/mpi_start.sh
-	#echo "setenv I2G_MPI_START $(bindir)/mpi-start" > \
-	#				$(DESTDIR)/$(sysconfdir)/profile.d/mpi_start.csh
+	install -d $(DESTDIR)/$(sysconfdir)/profile.d
+	echo "export I2G_MPI_START=$(bindir)/mpi-start" > \
+					$(DESTDIR)/$(sysconfdir)/profile.d/mpi_start.sh
+	echo "setenv I2G_MPI_START $(bindir)/mpi-start" > \
+					$(DESTDIR)/$(sysconfdir)/profile.d/mpi_start.csh
 
 uninstall:
 	$(MAKE) -C src uninstall
@@ -43,7 +41,7 @@ uninstall:
 	$(MAKE) -C docs uninstall
 	$(MAKE) -C tests uninstall 
 	$(MAKE) -C config uninstall 
-	# rm -f $(DESTDIR)/$(sysconfdir)/profile.d/mpi_start.sh $(DESTDIR)/$(sysconfdir)/profile.d/mpi_start.csh
+	rm -f $(DESTDIR)/$(sysconfdir)/profile.d/mpi_start.sh $(DESTDIR)/$(sysconfdir)/profile.d/mpi_start.csh
 
 tarball: all
 	mkdir -p bin
