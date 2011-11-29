@@ -479,9 +479,13 @@ mpi_start_check_options() {
     # set global internal variables 
     MPI_START_PREFIX=`dirname "$I2G_MPI_START"`
 
-    CONFIG_DIRS="~/.mpi-start \
-                $MPI_START_PREFIX/../etc/mpi-start \
-                /etc/mpi-start"
+    CONFIG_DIRS="~/.mpi-start"
+    
+    if test -d $MPI_START_PREFIX/../etc/mpi-start ; then
+        CONFIG_DIRS="$CONFIG_DIRS $MPI_START_PREFIX/../etc/mpi-start"
+    else
+        CONFIG_DIRS="$CONFIG_DIRS /etc/mpi-start"
+    fi
 
     export MPI_START_ETC_LIST="$MPI_START_ETC"
     for dir in $CONFIG_DIRS; do
