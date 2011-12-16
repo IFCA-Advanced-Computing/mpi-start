@@ -65,7 +65,7 @@ if test "x${SHUNIT2}" = "x" ; then
 fi
 
 if test "x${I2G_MPI_START}" = "x" ; then
-    type mpi-start &> /dev/null
+    which mpi-start &> /dev/null
     if test $? -ne 0 ; then
         echo "I2G_MPI_START environment variable not defined!"
         echo "Please set it to the location of MPI-Start binary"
