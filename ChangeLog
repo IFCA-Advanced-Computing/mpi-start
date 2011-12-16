@@ -1,3 +1,6 @@
+2011-12-16 Enol Fernández  <enolfc _AT_ ifca.unican.es> - 1.3.0
+	* XXX TODO XXX FIll changelog 
+
 2011-11-23 Enol Fernández  <enolfc _AT_ ifca.unican.es> - 1.2.0
 	* Complete testing of MPICH2, LAM and OpenMPI in Torque/PBS
 	* Fixed #49.
