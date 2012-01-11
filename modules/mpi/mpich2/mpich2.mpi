@@ -133,6 +133,9 @@ mpich2_with_mpd () {
             continue
         fi
         cat $HOME/.mpd.conf | $SSH_AGENT $MPI_START_REMOTE_NODE cat ">" $HOME/.mpd.conf 
+        if test $? -ne 0 ; then
+            warn_msg "Unable to copy .mpd.conf to remote node, proably job will not start"
+        fi
     done
 
     # Start MPICH2 daemon.
