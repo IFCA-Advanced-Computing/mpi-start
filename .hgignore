@@ -13,5 +13,7 @@ Makefile
 rpms/*
 debian/mpi-start
 debian/files
+debian/mpi-start.debhelper.log
+debian/mpi-start.substvars
 config/mpi-config.local
 .DS_Store

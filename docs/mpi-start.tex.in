@@ -5,7 +5,7 @@
 
 \title{mpi-start and MPI-Utils}
 \author{E. Fernández}
-\DocVersion{1.0.3}
+\DocVersion{1.0.4}
 \EMICompVersion{@VERSION@}
 \Date{\today}
 
@@ -1094,5 +1094,308 @@ This section documents the internal variables of mpi-start. They might be used f
 \texttt{OPENMPI\_VERSION\_RELEASE} & Set to Open MPI release version. \\ \hline
 \end{tabularx}
 \end{center}
+
+\newpage
+\appendix
+\section{Configuration of batch system}
+
+The batch system must be ready to execute parallel jobs (i.e. more than one slot is requested for a single job).
+Each batch system has its own specific ways of configuring such support. 
+
+Here you can find the instructions to manually configure different batch systems to execute MPI jobs. 
+
+\subsection{Torque/PBS}
+
+Torque/PBS can be configured with the yaim module as described in previous sections. In order to configure manually you will need to edit (create it if it does not exist) your torque configuration file (\texttt{/var/torque/torque.cfg} or \texttt{/var/spool/pbs/torque.cfg}) and add a line containing:
+
+\begin{verbatim}
+SUBMITFILTER /var/torque/submit_filter.pl
+\end{verbatim}
+
+Then download the \texttt{submit\_filter.pl} from \url
+{http://devel.ifca.es/rep/submit\_filter.pl} and put it in the above location.
+
+This filter modifies the script coming from the submission, rewriting the \texttt{-l nodes=XX} option with specific requests, based on the information given by \texttt{pbsnodes} command.
+
+The submit filter is crucial. Failing to use the submit filter translates in the job being submitted to only one node, where all the MPI processes are allocated too, instead of distributing the job across several nodes.
+
+\textbf{Warning: glite updates tend to rewrite torque.cfg. Check that the submit filter line is still there after performing an update}
+
+\subsubsection{Maui}
+
+Edit your configuration file (usually under \texttt{/var/spool/maui/maui.cfg}) and check that it contains the following lines:
+
+\begin{verbatim}
+ENABLEMULTINODEJOBS TRUE
+ 
+ENABLEMULTIREQJOBS TRUE
+\end{verbatim}
+
+These parameter allows a job to span to more than one node and to specify multiple independent resource requests.
+
+The maui version provided as third party in EMI/UMD (maui-3.2.6p21-snap.1234905291.5.el5) has a bug that prevents the use of more than one WN when submitting a parallel job. See \url{https://ggus.eu/ws/ticket\_info.php?ticket=57828} for details. It is recommended to use newer versions of maui that do not have this problem.
+
+
+%=== Testing your configuration ===
+%
+%To be written
+%
+
+\subsection{SGE}
+
+Support for parallel jobs under SGE is enabled using \emph{Parallel Environments}. You will need to configure at least one parallel environment in order to execute the jobs. Check the Parallel Environment documentation for more information. The CREAM Blah scripts will automatically use the available parallel environment if a job that requires more than one CPU is submitted.
+
+In the following example a PE configuration is shown:
+\begin{verbatim}
+[root@ce ~]# qconf -sp mpi
+pe_name            mpi
+slots              4    
+user_lists         NONE
+xuser_lists        NONE
+start_proc_args    /bin/true
+stop_proc_args     /bin/true
+allocation_rule    $fill_up
+control_slaves     TRUE   
+job_is_first_task  FALSE
+\end{verbatim}
+
+%=== Testing your configuration ===
+%
+%''To be written''
+%
+%== Other batch systems ==
+%
+%''To be written''
+%
+
+\subsection{Passwordless ssh (hostbased authentication)}
+
+Depending on the MPI implementation used and if the site does not have a shared file system, passwordless ssh between the nodes may be required between the WN. If that's the case, make sure that any pool account can login from one WN to any other using ssh without showing any password prompt.
+
+\section{Installation of MPI implementation}
+
+In order to execute MPI jobs, the site must support one of the multiple MPI implementations available. Most extended are Open MPI and MPICH2. OS distributions provide ready to use packages that fit most use cases. SL5 provides the following packages:
+\begin{itemize}
+\item \texttt{openmpi} and \texttt{openmpi-devel} for Open MPI.
+\item \texttt{mpich2} and \texttt{mpich2-devel} for MPICH2.
+\item \texttt{lam} and \texttt{lam-devel} for LAM
+\end{itemize}
+
+Installation of devel packages for the MPI implementation is recommended, since this will allow users to compile their applications at the site. Moreover the Nagios probes will try to compile a binary, thus not having a working compiler will make them fail. Note that the compiler may not be specified as dependencies of the \texttt{-devel} packages. Make sure that \texttt{gcc} and related packages are available.
+
+Note also that not all the implementations support tight integration with the batch system. \textbf{Tight integration is required for proper accounting numbers.}
+
+\subsection{Open MPI}
+
+Open MPI support tight integration with several batch system, including Torque/PBS and SGE, that may require recompilation of the packages in order to get it. Tight integration allows proper accounting of resources used (CPU time) and better control of the jobs by the system, thus avoiding zombie processes if something goes wrong with the application. The following sections describe the SGE and PBS/Torque cases:
+
+\subsubsection{SGE}
+
+The SGE tight scheduler integration allows Open MPI to start the processes in the worker nodes using the native batch system utilities, thus providing better process control and accounting. SL5 packages already include support for SGE with the \texttt{openmpi} and \texttt{openmpi-devel} rpms. After Open MPI is installed, you should see one component named gridengine in the ompi\_info output:
+
+\begin{verbatim}
+$ ompi_info | grep gridengine
+                MCA ras: gridengine (MCA v2.0, API v2.0, Component v1.4)
+\end{verbatim}
+
+Check the Open MPI FAQ at \url{http://www.open-mpi.org/faq/?category=building#build-rte-sge} for more information.
+
+\subsubsection{Torque/PBS}
+
+In the case of Torque/PBS in SL5 you will need to compile the packages for your site. The Open MPI FAQ (\url{http://www.open-mpi.org/faq/?category=building#build-rte-tm}) includes instructions for doing so. You can adapt the SL5 packages to support Torque/PBS following these steps:
+
+\begin{itemize}
+\item Download and install Open MPI source rpm: \url{http://ftp2.scientificlinux.org/linux/scientific/5x/SRPMS/vendor/openmpi-1.4-4.el5.src.rpm}
+\begin{small}
+\begin{verbatim}
+$ rpm -Uvh http://ftp2.scientificlinux.org/linux/scientific/5x/SRPMS/vendor/openmpi-1.4-4.el5.src.rpm
+Retrieving http://ftp2.scientificlinux.org/linux/scientific/5x/SRPMS/vendor/openmpi-1.4-4.el5.src.rpm
+warning: /var/tmp/rpm-xfer.DAMscP: Header V3 DSA signature: NOKEY, key ID 192a7d7d
+   1:openmpi                warning: user mockbuild does not exist - using root
+warning: group mockbuild does not exist - using root
+########################################### [100%]
+warning: user mockbuild does not exist - using root
+warning: group mockbuild does not exist - using root
+warning: user mockbuild does not exist - using root
+warning: group mockbuild does not exist - using root
+warning: user mockbuild does not exist - using root
+warning: group mockbuild does not exist - using root
+warning: user mockbuild does not exist - using root
+warning: group mockbuild does not exist - using root
+warning: user mockbuild does not exist - using root
+warning: group mockbuild does not exist - using root
+warning: user mockbuild does not exist - using root
+warning: group mockbuild does not exist - using root
+\end{verbatim}
+\end{small}
+
+
+\item Modify the spec file to include Torque/PBS support:
+\begin{small}
+\begin{verbatim}
+--- openmpi.spec        2010-03-31 23:18:20.000000000 +0200
++++ openmpi.spec        2011-03-07 18:37:11.000000000 +0100
+@@ -114,6 +114,7 @@
+ ./configure --prefix=%{_libdir}/%{mpidir} --with-libnuma=/usr \
+        --with-openib=/usr --enable-mpirun-prefix-by-default \
+        --mandir=%{_libdir}/%{mpidir}/man %{?with_valgrind} \
++        --with-tm \
+        --enable-openib-ibcm --with-sge \
+        CC=%{opt_cc} CXX=%{opt_cxx} \
+        LDFLAGS='-Wl,-z,noexecstack' \
+\end{verbatim}
+\end{small}
+
+\item Install Torque/PBS development libraries:
+\begin{small}
+\begin{verbatim}
+$ yum install libtorque-devel
+\end{verbatim}
+\end{small}
+
+\item Build the RPMs
+\begin{small}
+\begin{verbatim}
+$ rpmbuild -ba /usr/src/redhat/SPECS/openmpi.spec
+\end{verbatim}
+\end{small}
+
+\item Install the resulting RPMs:
+\begin{small}
+\begin{verbatim}
+$ yum localinstall -nogpgcheck /usr/src/redhat/RPMS/x86_64/openmpi-*
+\end{verbatim}
+\end{small}
+
+\item Check that the support for Torque/PBS is enabled:
+\begin{small}
+\begin{verbatim}
+$ /usr/lib64/openmpi/1.4-gcc/bin/ompi_info | grep tm
+              MCA memory: ptmalloc2 (MCA v2.0, API v2.0, Component v1.4)
+                 MCA ras: tm (MCA v2.0, API v2.0, Component v1.4)
+                 MCA plm: tm (MCA v2.0, API v2.0, Component v1.4)
+\end{verbatim}
+\end{small}
+
+\end{itemize}
+
+\subsubsection{Open MPI without tight integration}
+
+Open MPI can use rsh/ssh for starting the jobs if no tight integration is available. Jobs will run if you have passwordless ssh enabled between the WN, but the accounting figures will be incorrect.
+
+\subsection{MPICH2}
+
+MPICH2 can use several launchers for starting the processes:
+\begin{itemize}
+\item MPD, which uses rsh/ssh for starting the processes, so it will not produce correct accounting numbers. 
+\item Hydra, which also uses rsh/ssh and should support tight integration with some batch systems.
+\item For PBS/Torque, OSC Mpiexec \url{http://www.osc.edu/~djohnson/mpiexec/index.php} which includes tight integration.
+\end{itemize}
+
+mpi-start is able to select the most appropriate one if found (Hydra is prefered over MPD)
+
+\subsubsection{MPD}
+
+MPD is available in all versions of MPICH2 and uses rsh/ssh to start the processes. It was the default starter for versions < 1.3. It uses a .mpd.conf file at the home directory, so it is necessary to provide a way to access the home directory from the WN (usual case)
+
+\subsubsection{Hydra}
+
+Hydra is the new starter of MPICH2 and the default since version 1.3. It is designed to natively work with multiple daemons such as ssh, rsh, pbs, slurm and sge. Notice that not all versions support all the daemons!. The version included with SL5 \textbf{does NOT support pbs or sge}, therefore passwordless rsh/ssh between the nodes is mandatory.
+
+sge support is included since version 1.3b1. pbs is included in version 1.5a1. If you want to have tight integration (i.e. accounting) with MPICH2 and one of these systems you may need to download and compile the packages at your site.
+
+\subsubsection{OSC Mpiexec}
+
+OSC Mpiexec provides tight integration for PBS/Torque system. In order to use itwith mpi-start you will need to define the variable \texttt{MPI\_MPICH2\_MPIEXEC} pointing to its location.
+%
+%''OSC mpiexec installation: to be written''
+%
+
+\section{Distribution of binaries}
+
+The MPI binaries that users want to run need to be accessible on every node involved in an MPI computation (it is a parallel job after all). There are three main approaches:
+
+\subsection{Shared home/other shared area}
+
+By far the best option is to provide user homes hosted on a shared filesystem. This could either be a network filesystem (e.g. NFS) or a cluster filesystem (e.g. GPFS or Lustre). Then the MPI binary you transfer in the Sandbox (or compile up) on the first MPI node will automatically be available on all nodes. This is the normal mode of operation for MPI, and what MPI users will probably expect.
+
+mpi-start checks if the working directory of the job is in a shared filesystem (nfs, gfs, afs, smb, gpfs and lustre are detected) and considers that if the filesystem is shared the binaries will be available without any further action in all the nodes involved in the execution. 
+
+In some cases, there is an available shared filesystem but the job does not start its execution there. Site admins can force mpi-start to use one directory as shared for transferring the job files to all nodes as described in the hooks section.
+
+\subsubsection{Passwordless ssh between WNs}
+
+If you configure host-based authentication between worker nodes, then mpi-start can automatically replicate your binary to nodes involved in the computation. All the files in the working directory will be replicated, however, other needed files (e.g. data) may not be replicated, so this would have to be done manually (and would be slow for large data sets). Also it could open up the potential for users to subvert the normal resource management mechanisms by directly executing commands on nodes not allocated to them.
+
+\subsubsection{Use OSC mpiexec to distribute files}
+
+This option is for sites with neither a shared filesystem nor passwordless ssh between WNs. If you have an mpiexec that can spawn the remote jobs using the LRMS native interface, you can use it to distribute the files. See \url{http://www.osc.edu/~djohnson/mpiexec/index.php#Cute\_mpiexec\_hacks} for the basic idea.
+
+\section{Information System}
+
+Sites may install different implementations (or flavours) of MPI. It is important therefore that users can use the information system to locate sites with the software they require. You should publish some values to let the world know which flavour of MPI you are supporting, as well as the interconnect and some other things. Everything related with MPI should be published as GlueHostApplicationSoftwareRunTimeEnvironment in the corresponding sections.
+
+\subsection{MPI-start support}
+
+May include the version.
+
+\begin{verbatim}
+GlueHostApplicationSoftwareRunTimeEnvironment: MPI-START
+GlueHostApplicationSoftwareRunTimeEnvironment: MPI-START-1.3.0
+\end{verbatim}
+
+\subsection{MPI flavour(s)}
+
+<MPI flavour>
+
+This is the most basic variable and one should be advertised for each MPI flavour that has been installed and tested. Currently supported flavours are MPICH, MPICH2, LAM and OPENMPI.
+
+Example:
+\begin{verbatim}
+GlueHostApplicationSoftwareRunTimeEnvironment: MPICH
+GlueHostApplicationSoftwareRunTimeEnvironment: MPICH2
+GlueHostApplicationSoftwareRunTimeEnvironment: LAM
+GlueHostApplicationSoftwareRunTimeEnvironment: OPENMPI
+\end{verbatim}
+
+\subsection{MPI version(s)}
+
+<MPI flavour>-<MPI version>
+
+This should be published to allow users with special requirements to locate specific versions of MPI software.
+
+Examples:
+\begin{verbatim}
+GlueHostApplicationSoftwareRunTimeEnvironment: OPENMPI-1.0.2
+GlueHostApplicationSoftwareRunTimeEnvironment: MPICH-1.2.7
+GlueHostApplicationSoftwareRunTimeEnvironment: MPICH-G2-1.2.7
+GlueHostApplicationSoftwareRunTimeEnvironment: OPENMPI-1.0.2-ICC
+\end{verbatim}
+
+\subsection{MPI compiler(s) -- optional}
+
+<MPI flavour>-<MPI version>-<Compiler>
+
+If <Compiler> is not published, then gcc suite is assumed.
+
+\subsection{Interconnects -- optional}
+
+MPI-<interconnect>
+
+Interconnects: Ethernet, Infiniband, SCI, Myrinet
+
+Example:
+\begin{verbatim}
+GlueHostApplicationSoftwareRunTimeEnvironment: MPI-Infiniband
+\end{verbatim}
+
+\subsection{Shared homes}
+
+If a site has a shared filesystem for home directories it should publish the variable \texttt{MPI\_SHARED\_HOME}.
+
+\begin{verbatim}
+GlueHostApplicationSoftwareRunTimeEnvironment: MPI_SHARED_HOME
+\end{verbatim}
+
 
 \end{document}
