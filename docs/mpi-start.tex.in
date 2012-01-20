@@ -699,8 +699,31 @@ The profile for configuring the CE is MPI\_CE.
 
 \textbf{Batch system and MPI}: The batch system may need extra configuration for the submission of MPI jobs.
 In PBS, you may use the automatic creation of the submit filter with the
-\texttt{MPI\_SUBMIT\_FILTER} variable. In the case of SGE you need to configure a parallel environment.
+\texttt{MPI\_SUBMIT\_FILTER} variable. \textbf{Note:} any changes to the submit filter will be overwritten if yaim is re-run.
+In the case of SGE you need to configure a parallel environment.
 Check the documentation of your batch system for any further details.
+
+For glite-yaim-mpi versions <= 1.1.11, the submit filter assumes that the pbsnodes -a output has the \texttt{ncpus=} field in the status line correctly set. If not, please change the submit filter like shown in this diff:
+
+\begin{small}
+\begin{verbatim}
+--- submit_filter       2012-01-20 11:19:48.000000000 +0100
++++ submit_filter.new   2012-01-20 11:19:21.000000000 +0100
+@@ -68,8 +68,8 @@
+         if (m/^\s*state\s*=\s*(\w+)/) {
+             $state = ($1 eq "offline") ? 0 : 1;
+         # This may be changed to fit your nodes description
+-        # } elsif (m/^\s*np\s*=\s*(\d+)/) {
+-        } elsif (m/^\s*status\s*=\s*.*ncpus=(\d+),/) {
++        } elsif (m/^\s*np\s*=\s*(\d+)/) {
++        # } elsif (m/^\s*status\s*=\s*.*ncpus=(\d+),/) {
+             my $ncpus = $1;
+             if ($state) {
+                 if (defined($machines{$ncpus})) {
+\end{verbatim}
+\end{small}
+
+The default behaviour of the submit filter has changed in version 1.1.11 to use the "np=xx" parameter of the pbsnodes command output. Check the patch shown previously for the changes applied. 
 
 \textbf{MPI\_CE and other yaim profiles}: The \texttt{MPI\_CE} profile should
 be the first in the yaim configuration, otherwise the Glue variables will not
