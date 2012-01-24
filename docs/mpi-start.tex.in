@@ -1146,15 +1146,13 @@ The submit filter is crucial. Failing to use the submit filter translates in the
 
 \subsubsection{Maui}
 
-Edit your configuration file (usually under \texttt{/var/spool/maui/maui.cfg}) and check that it contains the following lines:
+Edit your configuration file (usually under \texttt{/var/spool/maui/maui.cfg}) and check that it contains the following line:
 
 \begin{verbatim}
-ENABLEMULTINODEJOBS TRUE
- 
 ENABLEMULTIREQJOBS TRUE
 \end{verbatim}
 
-These parameter allows a job to span to more than one node and to specify multiple independent resource requests.
+The \texttt{ENABLEMULTINODEJOBS} parameter must not be set to FALSE (if not specified is TRUE by default). These parameters allow a job to span to more than one node and to specify multiple independent resource requests.
 
 The maui version provided as third party in EMI/UMD (maui-3.2.6p21-snap.1234905291.5.el5) has a bug that prevents the use of more than one WN when submitting a parallel job. See \url{https://ggus.eu/ws/ticket\_info.php?ticket=57828} for details. It is recommended to use newer versions of maui that do not have this problem.
 
