@@ -68,7 +68,7 @@ copy(){
 	return 0
 }
 
-clean(){
+clean() {
     debug_msg "mpi_start_post_run_hook_generic"
 
     for MPI_START_REMOTE_NODE in `cat $MPI_START_HOSTFILE`; do

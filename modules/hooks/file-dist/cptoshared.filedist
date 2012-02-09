@@ -23,8 +23,12 @@ copy() {
     # do not use mpi_start_mktemp
     local pattern=${MPI_SHARED_HOME_PATH}/mpistart_`hostname`_XXXXX
     export SHARED_BASE_PATH=`mktemp -d ${pattern}`
-    #export SHARED_BASE_PATH=${MPI_SHARED_HOME_PATH}/`hostname`.${$}
-    #mkdir ${SHARED_BASE_PATH}
+    st=$?
+    if test $st -ne 0 ; then
+        error_msg "Unable to create temporary directory for file distribution, aborting"
+        dump_env
+        exit 1
+    fi
 
     tar xzf ${TARBALL} -C ${SHARED_BASE_PATH} 
     # change the permissions of the "prefix" to allow
