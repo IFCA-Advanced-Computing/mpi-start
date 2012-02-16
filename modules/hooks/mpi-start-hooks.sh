@@ -190,10 +190,9 @@ mpi_start_pre_run_hook_copy () {
         exit 1
     fi
     TARBALL_BASENAME=`basename $TARBALL`
-    # add tarball to files that must be cleaned
    
     # try and get the whole job directory
-    if [ "x$EDG_WL_RB_BROKERINFO" = "x" ]; then
+    if test "x$EDG_WL_RB_BROKERINFO" = "x" ; then
         MYDIR=`pwd`
     else
         MYDIR=`dirname $EDG_WL_RB_BROKERINFO`
@@ -206,7 +205,7 @@ mpi_start_pre_run_hook_copy () {
     if test "x${MPI_START_UNAME}" = "xlinux" ; then
         EXTRATAROPTS="--ignore-failed-read $PWD/.[a-zA-Z0-9]*"
     fi
-    TARCMD="tar czf $TARBALL $EXTRATAROPTS $MYDIR $X509_USER_PROXY"
+    TARCMD="tar czf $TARBALL $EXTRATAROPTS $MYDIR"
     if test "x$I2G_MPI_START_DEBUG" = "x1" ; then 
         $TARCMD
         st=$?
@@ -214,13 +213,12 @@ mpi_start_pre_run_hook_copy () {
         $TARCMD &> /dev/null
         st=$?
     fi
-    
     if test $st -ne 0 ; then
         error_msg "Unable to create tarball for file distribution, aborting"
         dump_env
         exit 1
     fi
- 
+
     unset copy
     . $chosenDistrMethod &> /dev/null
     if test $? -ne 0 ; then
