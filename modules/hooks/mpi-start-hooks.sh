@@ -199,13 +199,13 @@ mpi_start_pre_run_hook_copy () {
     fi
 
     # XXX find a way to deal with this with bsd tar
-    HIDDEN_FILES="$PWD/.[a-zA-Z0-9]*"
+    #HIDDEN_FILES="$PWD/.[a-zA-Z0-9]*"
 
-    EXTRATAROPTS=""
-    if test "x${MPI_START_UNAME}" = "xlinux" ; then
-        EXTRATAROPTS="--ignore-failed-read $PWD/.[a-zA-Z0-9]*"
-    fi
-    TARCMD="tar czf $TARBALL $EXTRATAROPTS $MYDIR"
+    #EXTRATAROPTS=""
+    #if test "x${MPI_START_UNAME}" = "xlinux" ; then
+    #    EXTRATAROPTS="--ignore-failed-read $PWD/.[a-zA-Z0-9]*"
+    #fi
+    TARCMD="tar czf $TARBALL $MYDIR"
     if test "x$I2G_MPI_START_DEBUG" = "x1" ; then 
         $TARCMD
         st=$?
