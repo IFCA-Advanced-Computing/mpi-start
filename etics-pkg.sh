@@ -63,7 +63,7 @@ if [ $? -eq 0 ] ; then
         DEBIAN=1
     fi
 else
-    cat /etc/issue | grep -i "debian|ubuntu" > /dev/null 
+    cat /etc/issue | egrep -i "debian|ubuntu" > /dev/null 
     if [ $? -eq 0 ] ; then
         DEBIAN=1
     fi
