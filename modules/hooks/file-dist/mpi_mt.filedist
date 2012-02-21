@@ -49,15 +49,17 @@ copy() {
     mpi_exec
 
     # handle X509 proxy
-    if test "x${X509_USER_PROXY}" != "x" -a -f ${X509_USER_PROXY} ; then
-        I2G_MPI_APPLICATION=$I2G_MPI_MT
-        I2G_MPI_APPLICATION_ARGS="cp $X509_USER_PROXY $X509_USER_PROXY"
-        I2G_MPI_PRECOMMAND=
-        MPI_START_PERNODE=1
-        MPI_START_DO_NOT_USE_WRAPPER=1
-	
-        # launch the mpi job
-        mpi_exec
+    if test "x${X509_USER_PROXY}" != "x" ; then
+        if test -a -f ${X509_USER_PROXY} ; then
+            I2G_MPI_APPLICATION=$I2G_MPI_MT
+            I2G_MPI_APPLICATION_ARGS="cp $X509_USER_PROXY $X509_USER_PROXY"
+            I2G_MPI_PRECOMMAND=
+            MPI_START_PERNODE=1
+            MPI_START_DO_NOT_USE_WRAPPER=1
+
+            # launch the mpi job
+            mpi_exec
+        fi
     fi 
 
     # reset to original values

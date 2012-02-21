@@ -70,23 +70,25 @@ copy() {
     fi
 
     # finally copy the user proxy
-    if test "x${X509_USER_PROXY}" != "x" -a -f ${X509_USER_PROXY} ; then
-        I2G_MPI_APPLICATION="cat"
-        I2G_MPI_APPLICATION_STDIN="${X509_USER_PROXY}"
-        I2G_MPI_APPLICATION_STDOUT="${X509_USER_PROXY}_out"
-        I2G_MPI_APPLICATION_ARGS=
-        MPI_SPECIFIC_MPIEXEC_PARAMS="--allstdin --comm=none"
-        MPI_START_NPHOST=1
-        I2G_MPI_PRECOMMAND=
-        # launch the mpi job
-        mpi_exec
-        result=$?
-        if test $result -ne 0 ; then
-            error_msg "error while trying to distribute files"
-            dump_env
-            exit $result
+    if test "x${X509_USER_PROXY}" != "x" ; then
+        if test -a -f ${X509_USER_PROXY} ; then
+            I2G_MPI_APPLICATION="cat"
+            I2G_MPI_APPLICATION_STDIN="${X509_USER_PROXY}"
+            I2G_MPI_APPLICATION_STDOUT="${X509_USER_PROXY}_out"
+            I2G_MPI_APPLICATION_ARGS=
+            MPI_SPECIFIC_MPIEXEC_PARAMS="--allstdin --comm=none"
+            MPI_START_NPHOST=1
+            I2G_MPI_PRECOMMAND=
+            # launch the mpi job
+            mpi_exec
+            result=$?
+            if test $result -ne 0 ; then
+                error_msg "error while trying to distribute files"
+                dump_env
+                exit $result
+            fi
+            export X509_USER_PROXY="${X509_USER_PROXY}_out"
         fi
-        export X509_USER_PROXY="${X509_USER_PROXY}_out"
     fi
 
     # restore old values
