@@ -44,7 +44,6 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/mpi-start/*.mpi
 %{_sysconfdir}/mpi-start/*.scheduler
 %{_sysconfdir}/mpi-start/*.sh
-%{_sysconfdir}/profile.d/*
 %{_mandir}/man1/*
 %doc docs/AUTHORS docs/COPYING docs/LICENSE README ChangeLog
 
