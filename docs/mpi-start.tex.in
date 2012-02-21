@@ -5,7 +5,7 @@
 
 \title{mpi-start and MPI-Utils}
 \author{E. Fernández}
-\DocVersion{1.0.4}
+\DocVersion{1.0.5}
 \EMICompVersion{@VERSION@}
 \Date{\today}
 
@@ -46,15 +46,9 @@ mpi-start only requires bash compatible shell for working. mpi-start uses severa
 \subsubsection{Source Code}
 Source code is available at mpi-start mercurial repository (\url{https://devel.ifca.es/hg/mpi-start}). Released versions are tagged as \texttt{mpi-start\_R\_X\_Y\_Z-r}, where X.Y.Z is the mpi-start version and r the revision number for that version.
 
-\subsubsection{Known Issues}
-\begin{itemize}
-\item Fine grained process mapping is not supported with Slurm or Condor
-schedulers.
-\end{itemize}
-
 \subsection{MPI-Utils}
 \subsubsection{Description}
-MPI-utils is a metapackge (glite-mpi) that depends on mpi-start and a yaim plugin for easy configuration of the MPI support in grid sites.
+MPI-utils is a metapackge (emi-mpi) that depends on mpi-start and a yaim plugin for easy configuration of the MPI support in grid sites.
 
 \subsubsection{Requirements}
 MPI-Utils contains a yaim plugin, therefore it needs yaim-core installation available. The plugin does not use any non-standard tools. 
@@ -478,11 +472,11 @@ apt-get install mpi-start
 \end{verbatim}
 \end{small}
 
-If you are running a gLite site, you may prefer to install the glite-mpi
+If you are running a site with CREAM and WN, you may prefer to install the emi-mpi
 meta-package that includes the yaim plugin for configuraton:
 \begin{small}
 \begin{verbatim}
-yum install glite-mpi
+yum install emi-mpi
 \end{verbatim}
 \end{small}
 
@@ -780,7 +774,7 @@ MPI_DEFAULT_FLAVOUR=OPENMPI
 #---
 # Example for using an already installed version of MPI.
 # Setting "_PATH" and "_VERSION" variables will prevent YAIM
-# from downloading and installing the gLite-provided packages.
+# from using the default OS packages.
 # Just fill in the path to its current installation (e.g. "/usr")
 # and which version it is (e.g. "6.5.9").
 # DO NOT USE UNLESS A NON DEFAULT LOCATION IS USED
@@ -904,9 +898,9 @@ $I2G_MPI_START
 \end{verbatim}
 \end{small}
 
-\subsection{Using mpi-start with gLite}
+\subsection{Using mpi-start with WMS}
 
-gLite uses the WMS software for submitting jobs to the different available resources. The WMS gets a job description in the JDL language and performs the selection and actual submission of the job into the resources on behalf of the user. The following sections describe how to submit a job using the WMS.
+EMI provides the WMS software for submitting jobs to the different available resources. The WMS gets a job description in the JDL language and performs the selection and actual submission of the job into the resources on behalf of the user. The following sections describe how to submit a job using the WMS.
 
 \subsubsection{Basic Job Submission}
 Jobs are described with the JDL language. Most relevant attributes for parallel job submission are:
@@ -966,7 +960,7 @@ $I2G_MPI_START
 \end{verbatim}
 \end{small}
 
-User needs to include this wrapper in the \texttt{InputSandbox} of the JDL (\texttt{starter.sh}) and set it as the \texttt{Executable} of the job. Submission is performed as any other gLite job:
+User needs to include this wrapper in the \texttt{InputSandbox} of the JDL (\texttt{starter.sh}) and set it as the \texttt{Executable} of the job. Submission is performed as any other job:
 
 \begin{small}
 \begin{verbatim}
@@ -1060,10 +1054,17 @@ Environment   = {"I2G_MPI_PRE_RUN_HOOK=hooks.sh", "I2G_MPI_POST_RUN_HOOK=hooks.s
 \end{verbatim}
 \end{small}
 
+%\newpage
+%\section{Known Issues}
+%This sections contains any known issues in the software and possible solutions.
+%\begin{itemize}
+%\item Fine grained process mapping is not supported with Slurm or Condor schedulers.
+%\end{itemize}
+
 \newpage
 \section{mpi-start Internals}
 
-This section documents the internal variables of mpi-start. They might be used for development of hooks or configuration of mpi-start. As the documentation improves, these will be moved to other sections of the document.
+This section documents the internal variables of mpi-start. They might be used for development of hooks or configuration of mpi-start. As the documentation improves, these may be moved to other sections of the document.
 
 \subsection{Global Configuration Variables}
 \begin{center}
@@ -1142,7 +1143,7 @@ This filter modifies the script coming from the submission, rewriting the \textt
 
 The submit filter is crucial. Failing to use the submit filter translates in the job being submitted to only one node, where all the MPI processes are allocated too, instead of distributing the job across several nodes.
 
-\textbf{Warning: glite updates tend to rewrite torque.cfg. Check that the submit filter line is still there after performing an update}
+\textbf{Warning: updates tend to rewrite torque.cfg. Check that the submit filter line is still there after performing an update}
 
 \subsubsection{Maui}
 
@@ -1195,7 +1196,7 @@ Depending on the MPI implementation used and if the site does not have a shared 
 
 \section{Installation of MPI implementation}
 
-In order to execute MPI jobs, the site must support one of the multiple MPI implementations available. Most extended are Open MPI and MPICH2. OS distributions provide ready to use packages that fit most use cases. SL5 provides the following packages:
+In order to execute MPI jobs, the site must support one of the multiple MPI implementations available. Most extended are Open MPI and MPICH2. OS distributions provide ready to use packages that fit most use cases. SL provides the following packages:
 \begin{itemize}
 \item \texttt{openmpi} and \texttt{openmpi-devel} for Open MPI.
 \item \texttt{mpich2} and \texttt{mpich2-devel} for MPICH2.
@@ -1205,6 +1206,8 @@ In order to execute MPI jobs, the site must support one of the multiple MPI impl
 Installation of devel packages for the MPI implementation is recommended, since this will allow users to compile their applications at the site. Moreover the Nagios probes will try to compile a binary, thus not having a working compiler will make them fail. Note that the compiler may not be specified as dependencies of the \texttt{-devel} packages. Make sure that \texttt{gcc} and related packages are available.
 
 Note also that not all the implementations support tight integration with the batch system. \textbf{Tight integration is required for proper accounting numbers.}
+
+The MPI packages must be installed at the nodes that will execute the jobs (WN).
 
 \subsection{Open MPI}
 
