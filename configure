@@ -158,7 +158,7 @@ SL6_32=0
 os=`uname`
 if [ $os = 'Linux' ]; then
     # determine the Distro
-    which lsb_release 2> /dev/null
+    which lsb_release > /dev/null 2> /dev/null
     if [ $? -eq 0 ] ; then
         ISSUE=`lsb_release -a 2> /dev/null`
     else
