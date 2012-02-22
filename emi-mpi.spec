@@ -4,7 +4,7 @@
 #
 Summary: A EMI metapackage for MPI tools (mpi-start and yaim) 
 Name: emi-mpi
-Version: 1.0.0
+Version: 1.0.2
 Release: 1%{?dist}
 License: GPLv2
 Group: Development/Tools
@@ -12,6 +12,10 @@ URL: http://devel.ifca.es/mpi-start/
 #Source: glite-mpi-%{version}.tar.gz
 BuildArch: noarch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n) 
+
+# Name change fields
+Provides: glite-mpi = %{version}-%{release} 
+Obsoletes: glite-mpi < 1.0.1 
 
 # metapackage
 # dependencies
@@ -38,5 +42,5 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root)
 
 %changelog
-* Tue Feb 21 2012 Enol Fernandez <enolfc _AT_ ifca.unican.es> - 1.0.0-1%{?dist}
-- Spec created to avoid rpmlint warnings.
+* Tue Feb 21 2012 Enol Fernandez <enolfc _AT_ ifca.unican.es> - 1.0.2-1%{?dist}
+- New emi-mpi metapackage, obsoletes glite-mpi metapackage.
