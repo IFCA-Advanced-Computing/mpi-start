@@ -9,17 +9,16 @@ Release: 1%{?dist}
 License: GPLv2
 Group: Development/Tools
 URL: http://devel.ifca.es/mpi-start/
+# No source, since this is a metapackage
 #Source: glite-mpi-%{version}.tar.gz
 BuildArch: noarch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n) 
 
-# Name change fields
+# Fields for transition from glite-mpi to emi-mpi 
 Provides: glite-mpi = %{version}-%{release} 
 Obsoletes: glite-mpi
-# < 1.0.1-0%{?dist}  
 
-# metapackage
-# dependencies
+# metapackage dependencies
 Requires: glite-yaim-mpi
 Requires: mpi-start
 AutoReqProv: yes
