@@ -246,7 +246,7 @@ their own hooks for compilation.
 
 \subsection{File Distribution Hooks}
 
-File distribution hooks are responsible for providing a common set of files prior to the execution of the application in all the hosts involved in that execution. Two steps are taken for file distribution:
+File distribution hooks are responsible for providing a common set of files prior to the execution of the application in all the hosts involved in that execution. Three steps are taken for file distribution:
 \begin{itemize}
 \item Detection of shared filesystem: mpi-start will try to detect if the
 current working directory is in a network file system (currently considered as
@@ -260,9 +260,15 @@ host to the other hosts involved in the execution. It uses the most suitable
 of the available distribution methods. Distribution methods are plugins that
 are detected at runtime by checking all the files with \texttt{.filedist}
 extension in the mpi-start \texttt{etc} directory.
+
+\item Clean-up: once the job is finished, mpi-start will try to clean-up in the remote hosts
+the files that were copied previously using the same distribution method as in the previous step.
+\textbf{Clean-up removes entire directories, so it should not be used when running from
+important paths (e.g. home directory)!}. The clean-up step can be deactivated by
+setting \texttt{MPI\_START\_DISABLE\_CLEANUP} to \texttt{yes}.
 \end{itemize}
 
-The file distribution method can be fixed by using the \texttt{I2G\_MPI\_FILE\_DIST} variable.
+The file distribution method can be enforced by using the \texttt{I2G\_MPI\_FILE\_DIST} variable.
 
 \subsubsection{Distribution Method Plugins}
 A file distribution plugin must contain the following functions:
@@ -433,6 +439,9 @@ application. \\
 \hline
 File Distribution & \texttt{MPI\_SHARED\_HOME\_PATH} &
 Path to a shared directory. \\
+\hline
+File Distribution & \texttt{MPI\_START\_DISABLE\_CLEANUP} &
+If set to \texttt{"yes"}, mpi-start will not try to cleanup files after job execution. \\
 \hline
 Affinity & \texttt{MPI\_USE\_AFFINITY} & If set to $1$, enable processor
 affinity hook. \\
