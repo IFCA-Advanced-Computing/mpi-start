@@ -15,7 +15,7 @@ BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 # Name change fields
 Provides: glite-mpi = %{version}-%{release} 
-Obsoletes: glite-mpi < 1.0.1 
+Obsoletes: glite-mpi < 1.0.1-0%{?dist}  
 
 # metapackage
 # dependencies
