@@ -16,6 +16,7 @@ setUp () {
     unset I2G_MPI_PER_NODE
     export MPI_START_SHARED_FS=0
     export MPI_START_DUMMY_SCHEDULER=0
+    export MPI_START_DISABLE_CLEANUP="no"
     export PBS_NODEFILE=`$MYMKTEMP`
     cat > $PBS_NODEFILE << EOF
 host1
@@ -46,13 +47,15 @@ testCopyAndCleanCall() {
     cat > $I2G_MPI_APPLICATION << EOF
 #!/bin/sh
 echo "\${SHARED_BASE_PATH}"
-/bin/ls \${SHARED_BASE_PATH} > /dev/null
+/bin/ls one/two/1 > /dev/null && /bin/ls \${SHARED_BASE_PATH} > /dev/null
 EOF
     SHARED_DIR=`$I2G_MPI_START`
-    assertEquals "0" "$?"
+    st=$?
+    assertEquals "0" "$st"
     # the directory should not exist
     ls $SHARED_DIR 2> /dev/null
     st=$?
+    echo $st
     assertNotEquals "0" "$st"
 }
 
