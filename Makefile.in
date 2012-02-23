@@ -28,11 +28,11 @@ install: all
 	$(MAKE) -C docs install
 	$(MAKE) -C tests install 
 	$(MAKE) -C config install 
-	install -d $(DESTDIR)/$(sysconfdir)/profile.d
-	echo "export I2G_MPI_START=$(bindir)/mpi-start" > \
-					$(DESTDIR)/$(sysconfdir)/profile.d/mpi_start.sh
-	echo "setenv I2G_MPI_START $(bindir)/mpi-start" > \
-					$(DESTDIR)/$(sysconfdir)/profile.d/mpi_start.csh
+	#install -d $(DESTDIR)/$(sysconfdir)/profile.d
+	#echo "export I2G_MPI_START=$(bindir)/mpi-start" > \
+	#				$(DESTDIR)/$(sysconfdir)/profile.d/mpi_start.sh
+	#echo "setenv I2G_MPI_START $(bindir)/mpi-start" > \
+	#				$(DESTDIR)/$(sysconfdir)/profile.d/mpi_start.csh
 
 uninstall:
 	$(MAKE) -C src uninstall

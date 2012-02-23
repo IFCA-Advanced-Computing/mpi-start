@@ -1,0 +1,79 @@
+#!/bin/bash
+#
+# PBS script for a mpich2 job using MPD
+#PBS -S /bin/bash
+# change this expression to fit your site
+#PBS -l nodes=2:ppn=1
+
+D=`mktemp -d`
+
+cd $D
+
+cat > mytest.c << EOF
+#include "mpi.h"
+#include <stdio.h>
+
+
+int main (int argc, char *argv[])
+{
+    int myid, numprocs, ecode = 0;
+    int namelen;
+    char processor_name[MPI_MAX_PROCESSOR_NAME];
+
+    MPI_Init(&argc,&argv);
+    MPI_Comm_size(MPI_COMM_WORLD,&numprocs);
+    MPI_Comm_rank(MPI_COMM_WORLD,&myid);
+    MPI_Get_processor_name(processor_name,&namelen);
+
+
+    printf("Process %d (of %d) on %s\n", myid, numprocs, processor_name);
+
+    if (numprocs <= 1)
+    {
+        ecode = 1;
+    }
+
+    if (myid == 0)
+    {
+        printf("Running on %d processors\n", numprocs);
+        printf("Exit code: %d\n", ecode);
+    } 
+
+    MPI_Finalize();
+    return ecode;
+}
+EOF
+
+cat > compile.sh << EOF
+#!/bin/bash
+
+pre_run_hook () {
+  # Actually compile the program.
+  rm -f \${I2G_MPI_APPLICATION}
+  cmd="\${MPI_MPICC} \${MPI_MPICC_OPTS} -o \${I2G_MPI_APPLICATION} \${I2G_MPI_APPLICATION}.c"
+  \$cmd
+  if [ ! \$? -eq 0 ]; then
+    echo "Error compiling program.  Exiting..."
+    return 1
+  fi
+
+  return 0
+}
+EOF
+
+echo "Using `mpi-start -V`"
+
+echo "MPICH2 (mpd):"
+export MPI_MPICH2_DISABLE_HYDRA=1
+# -pnode will force to use one processor per node,
+# therefore if just one node is avaiable the job will 
+# exit with return code != 0
+mpi-start -pnode -t mpich2 -pre compile.sh -- mytest
+st=$?
+
+echo "EXIT CODE: $st"
+
+cd
+rm -rf $D
+
+exit $st

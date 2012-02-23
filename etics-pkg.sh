@@ -56,14 +56,14 @@ rpm_package() {
 }
 
 DEBIAN=0
-which lsb_release > /dev/null
+which lsb_release 2> /dev/null
 if [ $? -eq 0 ] ; then
     lsb_release -a | egrep -i "debian|ubuntu" > /dev/null
     if [ $? -eq 0 ] ; then
         DEBIAN=1
     fi
 else
-    cat /etc/issue | grep -i "debian|ubuntu" > /dev/null 
+    cat /etc/issue | egrep -i "debian|ubuntu" > /dev/null 
     if [ $? -eq 0 ] ; then
         DEBIAN=1
     fi

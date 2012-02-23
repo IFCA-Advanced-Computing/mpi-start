@@ -1,0 +1,138 @@
+#!/bin/bash
+#PBS -S /bin/bash
+# Adapt to local infrastructure!
+#PBS -l nodes=2:ppn=2
+
+D=`mktemp -d`
+cd $D
+
+cat > hybrid.c << EOF
+#include "mpi.h"
+#include <stdio.h>
+#include <math.h>
+
+double f( double );
+double f( double a )
+{
+    return (4.0 / (1.0 + a*a));
+}
+
+int main( int argc, char *argv[])
+{
+   int n_intervals = 16384;
+
+   int done = 0, n, myid, numprocs, i, j;
+   double PI25DT = 3.141592653589793238462643;
+   double mypi, pi, h, sum, x, x1, sum1, mypi2;
+   double startwtime = 0.0, endwtime;
+   int  namelen;
+   char processor_name[MPI_MAX_PROCESSOR_NAME];
+
+   MPI_Init(&argc,&argv);
+   MPI_Comm_size(MPI_COMM_WORLD,&numprocs);
+   MPI_Comm_rank(MPI_COMM_WORLD,&myid);
+   MPI_Get_processor_name(processor_name,&namelen);
+
+   printf("Process %d (of %d) on %s: n=%d\n",myid, numprocs, processor_name,n);
+   if( myid == 0 ) printf("Using %d intervals\n",n_intervals);
+
+   n = 0;
+   if (myid == 0) {
+       startwtime = MPI_Wtime(); 
+   }
+
+   if( n == 0  ) n = n_intervals; else n = 0;
+   MPI_Bcast(&n, 1, MPI_INT, 0, MPI_COMM_WORLD);
+   sum = 0.0;
+   int nthreads, tid; 
+   #pragma omp parallel shared(nthreads) private(i,tid)
+   {
+       tid = omp_get_thread_num();
+       if (tid == 0)
+       {
+           nthreads = omp_get_num_threads();
+           printf("Process %d, Number of threads = %d\n", myid, nthreads);
+       }
+       printf("Thread %d.%d starting...\n", myid, tid);
+
+       h = 1.0 / (double) n;
+       #pragma omp for reduction(+:sum)  
+       for (i = myid + 1; i <= n; i += numprocs)
+       {
+           x = h * ((double)i - 0.5);
+           sum += f(x);
+       }
+       mypi = h * sum;
+   }  /* end of parallel section */
+
+   fflush(stdout);
+   MPI_Reduce(&mypi, &pi, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+
+   if (myid == 0)
+   {
+       printf("pi is approximately %.16f, Error is %.16f\n",
+               pi, fabs(pi - PI25DT));
+       endwtime = MPI_Wtime();
+       printf("wall clock time = %f\n",
+               endwtime-startwtime);          
+   } 
+   MPI_Finalize();
+
+   return 0;
+}
+EOF
+
+cat > compile.sh << EOF
+#!/bin/bash
+
+pre_run_hook () {
+  # Actually compile the program.
+  rm -f \${I2G_MPI_APPLICATION}
+  cmd="\${MPI_MPICC} -fopenmp \${MPI_MPICC_OPTS} -o \${I2G_MPI_APPLICATION} \${I2G_MPI_APPLICATION}.c"
+  \$cmd
+  if [ ! \$? -eq 0 ]; then
+    echo "Error compiling program.  Exiting..."
+    return 1
+  fi
+
+  # Everything's OK.
+  echo "Successfully compiled \${I2G_MPI_APPLICATION}"
+
+  return 0
+}
+EOF
+
+echo "ENVIRONMENT"
+printenv
+echo "*************************"
+
+export MPI_START_SOCKETS=2
+export MPI_START_COREPERSOCKET=1
+
+echo "Using: `mpi-start -V`"
+echo "OpenMPI:"
+mpi-start -pnode -pcmd time -t openmpi -pre compile.sh -- hybrid
+
+echo "OpenMPI (without torque integration)":
+export MPI_START_DISABLE_LRMS_INTEGRATION="yes"
+mpi-start -pnode -pcmd time -t openmpi -pre compile.sh -- hybrid
+unset MPI_START_DISABLE_LRMS_INTEGRATION
+
+echo "MPICH2 (hydra):"
+mpi-start -pnode -pcmd time -t mpich2 -pre compile.sh -- hybrid
+
+echo "MPICH2 (mpd):"
+export MPI_MPICH2_DISABLE_HYDRA=1
+mpi-start -pnode -pcmd time -t mpich2 -pre compile.sh -- hybrid
+unset MPI_MPICH2_DISABLE_HYDRA
+
+echo "MPICH2 (with OSC mpiexec):"
+export MPI_MPICH2_MPIEXEC=/usr/local/bin/mpiexec
+mpi-start -pnode -pcmd time -t mpich2 -pre compile.sh -- hybrid
+unset MPI_MPICH2_MPIEXEC
+
+echo "LAM:"
+mpi-start -pnode -pcmd time -t lam -pre compile.sh -- hybrid
+
+cd
+rm -rf $D

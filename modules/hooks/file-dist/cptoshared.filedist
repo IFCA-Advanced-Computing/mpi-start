@@ -65,11 +65,13 @@ copy() {
     fi
 
     # copy proxy to shared location also
-    if test "x${X509_USER_PROXY}" != "x" -a -f ${X509_USER_PROXY} ; then
-        debug_msg "Copying user proxy to shared location."
-        NEW_PROXY="${SHARED_BASE_PATH}/.x509up_u`id -u`"
-        cp ${X509_USER_PROXY} ${NEW_PROXY}
-        export X509_USER_PROXY=${NEW_PROXY}
+    if test "x${X509_USER_PROXY}" != "x" ; then
+        if test -a -f ${X509_USER_PROXY} ; then
+            debug_msg "Copying user proxy to shared location."
+            NEW_PROXY="${SHARED_BASE_PATH}/.x509up_u`id -u`"
+            cp ${X509_USER_PROXY} ${NEW_PROXY}
+            export X509_USER_PROXY=${NEW_PROXY}
+        fi
     fi
 
     cd ${SHARED_BASE_PATH}/${MYDIR}
