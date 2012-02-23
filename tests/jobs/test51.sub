@@ -94,7 +94,7 @@ cat > compile.sh << EOF
 pre_run_hook () {
   # Actually compile the program.
   rm -f \${I2G_MPI_APPLICATION}
-  echo "Using CC \$MPI_MPICC: `which \$MPI_MPICC`"
+  echo "Using CC: \$MPI_MPICC"
   cmd="\${MPI_MPICC} \${MPI_MPICC_OPTS} -o \${I2G_MPI_APPLICATION} \${I2G_MPI_APPLICATION}.c"
   \$cmd
   if [ ! \$? -eq 0 ]; then
@@ -112,10 +112,10 @@ EOF
 echo "Using: `~/src/mpi-start/bin/mpi-start -V`"
 
 # Location of MPICH2!
-export MPI_MPICH2_PATH=~/tests/mpich2/mpich2
-#export MPI_MPICH2_MPIEXEC_PARAMS=-verbose
-echo "MPICH2 (hydra):"
-mpi-start -vv -pcmd time -t mpich2 -pre compile.sh -- cpi 
+export MPI_MPICH2_PATH=~/gpfs_enol/mpich2
+export MPI_MPICH2_MPIEXEC_PARAMS="-launcher sge"
+echo "MPICH2 (hydra with SGE):"
+~/src/mpi-start/bin/mpi-start -pcmd time -t mpich2 -pre compile.sh -- cpi 
 
 cd
 rm -rf $D
