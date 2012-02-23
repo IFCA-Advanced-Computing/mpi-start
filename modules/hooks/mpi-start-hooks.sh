@@ -387,7 +387,7 @@ mpi_start_post_run_hook_generic () {
     mpi_start_run_post_hook "$I2G_MPI_POST_RUN_HOOK" 1
 
     # If cleanup is defined, call it (if not disabled!)
-    if test "x$MPI_START_DISABLE_CLEANUP" = "xyes" ; then
+    if test "x$MPI_START_DISABLE_CLEANUP" != "xyes" ; then
         if test "x$chosenDistrMethod" != "x" -a "x$chosenDistrMethod" != "xundef" ; then
             unset clean
             . $chosenDistrMethod &> /dev/null
