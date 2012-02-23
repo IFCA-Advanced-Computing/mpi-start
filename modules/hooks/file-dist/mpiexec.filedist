@@ -71,7 +71,7 @@ copy() {
 
     # finally copy the user proxy
     if test "x${X509_USER_PROXY}" != "x" ; then
-        if test -a -f ${X509_USER_PROXY} ; then
+        if test -f ${X509_USER_PROXY} ; then
             I2G_MPI_APPLICATION="cat"
             I2G_MPI_APPLICATION_STDIN="${X509_USER_PROXY}"
             I2G_MPI_APPLICATION_STDOUT="${X509_USER_PROXY}_out"

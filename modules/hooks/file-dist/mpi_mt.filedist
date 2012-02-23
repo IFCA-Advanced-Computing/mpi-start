@@ -50,7 +50,7 @@ copy() {
 
     # handle X509 proxy
     if test "x${X509_USER_PROXY}" != "x" ; then
-        if test -a -f ${X509_USER_PROXY} ; then
+        if test -f ${X509_USER_PROXY} ; then
             I2G_MPI_APPLICATION=$I2G_MPI_MT
             I2G_MPI_APPLICATION_ARGS="cp $X509_USER_PROXY $X509_USER_PROXY"
             I2G_MPI_PRECOMMAND=

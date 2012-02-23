@@ -67,7 +67,7 @@ copy(){
 
         # copy user proxy to shared location also
         if test "x${X509_USER_PROXY}" != "x" ; then
-            if test -a -f ${X509_USER_PROXY} ; then
+            if test -f ${X509_USER_PROXY} ; then
                 debug_msg "Copying user proxy to remote machine."
                 scp ${X509_USER_PROXY} ${MPI_START_REMOTE_NODE}:${X509_USER_PROXY}
             fi
