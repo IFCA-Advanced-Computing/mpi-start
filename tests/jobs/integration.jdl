@@ -1,0 +1,11 @@
+JobType         = "Normal";
+nodeNumber      = 2;
+Executable      = "tester.sh";
+InputSandbox    = {"tester.sh"};
+StdOutput       = "std.out";
+StdError        = "std.err";
+OutputSandbox   = {"std.out","std.err"};
+Requirements    = Member("MPI-START",
+                         other.GlueHostApplicationSoftwareRunTimeEnvironment)
+Rank = 0;
+
