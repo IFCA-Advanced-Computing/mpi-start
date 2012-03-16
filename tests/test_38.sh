@@ -32,7 +32,7 @@ testBug38() {
     . $MPI_START_PLUGIN_FILES
     mpi_exec
     $MPI_OPENMPI_INFO --parseable | grep "plm:tm" &> /dev/null
-    if test $? -eq 0 ; then
+    if test $? -eq 0 -a "${OPENMPI_VERSION_MAJOR}.${OPENMPI_VERSION_MINOR}" = "1.2" ; then
         out=`echo $MPI_GLOBAL_PARAMS | grep -v "machinefile"`
     else
         out=`echo $MPI_GLOBAL_PARAMS | grep "machinefile"`
