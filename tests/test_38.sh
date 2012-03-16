@@ -8,6 +8,7 @@ export I2G_MPI_START_ENABLE_TESTING="TEST"
 # source the mpi-start code to have all functions
 . $I2G_MPI_START
 mpi_start_check_options
+mpi_start_load_execenv
 
 export MPI_OPENMPI_MPIEXEC=`$MYMKTEMP`
 cat > $MPI_OPENMPI_MPIEXEC << EOF
