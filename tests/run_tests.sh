@@ -43,6 +43,8 @@ RUN_MPICH_TESTS=0
 RUN_OPENMPI_TESTS=0
 RUN_LAM_TESTS=0
 
+export MPI_OPENMPI_MPIEXEC_PARAMS="--mca btl ^openib"
+
 #
 # Check environment variables
 #
