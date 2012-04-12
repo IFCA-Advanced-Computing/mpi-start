@@ -42,7 +42,7 @@ echo "* Configuration"
 echo "*"
 
 echo "** Get yaim profiles"
-wget http://devel.ifca.es/~enol/depot/yaim.tgz --no-check-certificate -O - | tar xzf - -C /etc/
+wget -q http://devel.ifca.es/~enol/depot/yaim.tgz --no-check-certificate -O - | tar xzf - -C /etc/
 
 # Add our host to wn-list
 hostname >> /etc/yaim/wn-list.conf
@@ -77,9 +77,6 @@ MPI_FOO_ENABLE="yes"
 EOF
 cat /etc/yaim/site-info.def | grep MPI
 configure_ok
-rm -f /tmp/env
-touch /tmp/env
-diff_configs /tmp/env 
 
 # uninstalled flavor 
 echo "**             uninstalled flavor"
@@ -226,7 +223,7 @@ diff_configs /tmp/env
 # version
 mpi-start -V
 
-wget https://devel.ifca.es/hg/mpi-start/archive/tip.tar.gz --no-check-certificate -O - | tar -xzf - -C /tmp
+wget -q https://devel.ifca.es/hg/mpi-start/archive/tip.tar.gz --no-check-certificate -O - | tar -xzf - -C /tmp
 mv /tmp/mpi-start-* /tmp/mpi-start
 cat /tmp/mpi-start/tests/run_tests.sh | \
     sed 's/RUN_OMP_TESTS=0/RUN_OMP_TESTS=1/' | \
