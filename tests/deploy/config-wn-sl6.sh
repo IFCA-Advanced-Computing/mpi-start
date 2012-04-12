@@ -104,8 +104,8 @@ configure_ok
 cat > /tmp/env << EOF
 I2G_MPI_START=/usr/bin/mpi-start
 MPI_DEFAULT_FLAVOUR=openmpi
-MPI_OPENMPI_PATH=/usr/lib64/openmpi/1.4-gcc
-MPI_OPENMPI_VERSION=1.4
+MPI_OPENMPI_PATH=/usr/lib64/openmpi
+MPI_OPENMPI_VERSION=1.5.3
 EOF
 diff_configs /tmp/env
 
@@ -121,7 +121,7 @@ configure_ok
 cat > /tmp/env << EOF
 I2G_MPI_START=/usr/bin/mpi-start
 MPI_DEFAULT_FLAVOUR=openmpi
-MPI_OPENMPI_PATH=/usr/lib64/openmpi/1.4-gcc
+MPI_OPENMPI_PATH=/usr/lib64/openmpi
 MPI_OPENMPI_VERSION=3.4.5
 EOF
 diff_configs /tmp/env
@@ -132,14 +132,14 @@ cat >> /etc/yaim/site-info.def << EOF
 #### MPI CONFIGURATION
 MPI_OPENMPI_ENABLE="yes"
 MPI_OPENMPI_VERSION=3.4.5
-MPI_OPENMPI_PATH=/usr/lib64/openmpi/1.4-gcc
+MPI_OPENMPI_PATH=/usr/lib64/openmpi
 EOF
 configure_ok
 cat /etc/yaim/site-info.def | grep MPI
 cat > /tmp/env << EOF
 I2G_MPI_START=/usr/bin/mpi-start
 MPI_DEFAULT_FLAVOUR=openmpi
-MPI_OPENMPI_PATH=/usr/lib64/openmpi/1.4-gcc
+MPI_OPENMPI_PATH=/usr/lib64/openmpi
 MPI_OPENMPI_VERSION=3.4.5
 EOF
 diff_configs /tmp/env
