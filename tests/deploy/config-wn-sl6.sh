@@ -110,6 +110,7 @@ EOF
 diff_configs /tmp/env
 
 # openmpi with version
+echo "**          openmpi + version"
 cat /etc/yaim/site-info.def.orig > /etc/yaim/site-info.def
 cat >> /etc/yaim/site-info.def << EOF
 #### MPI CONFIGURATION
@@ -127,6 +128,7 @@ EOF
 diff_configs /tmp/env
 
 # openmpi with version and path
+echo "**          openmpi + version + path"
 cat /etc/yaim/site-info.def.orig > /etc/yaim/site-info.def
 cat >> /etc/yaim/site-info.def << EOF
 #### MPI CONFIGURATION
@@ -145,6 +147,7 @@ EOF
 diff_configs /tmp/env
 
 # shared home: no
+echo "**          shared home no"
 cat /etc/yaim/site-info.def.orig > /etc/yaim/site-info.def
 cat >> /etc/yaim/site-info.def << EOF
 #### MPI CONFIGURATION
@@ -163,6 +166,7 @@ EOF
 diff_configs /tmp/env
 
 # shared home: yes
+echo "**          shared home yes"
 cat /etc/yaim/site-info.def.orig > /etc/yaim/site-info.def
 cat >> /etc/yaim/site-info.def << EOF
 #### MPI CONFIGURATION
@@ -181,6 +185,7 @@ EOF
 diff_configs /tmp/env
 
 # shared home: yes + path
+echo "**          shared home yes + path"
 cat /etc/yaim/site-info.def.orig > /etc/yaim/site-info.def
 cat >> /etc/yaim/site-info.def << EOF
 #### MPI CONFIGURATION
@@ -201,6 +206,7 @@ EOF
 diff_configs /tmp/env
 
 # openmpi + mpich2
+echo "**          openmpi + mpich2"
 cat /etc/yaim/site-info.def.orig > /etc/yaim/site-info.def
 cat >> /etc/yaim/site-info.def << EOF
 #### MPI CONFIGURATION
@@ -219,11 +225,16 @@ MPI_OPENMPI_VERSION=1.5.3
 EOF
 diff_configs /tmp/env
 
+echo "*"
+echo "* Testing"
+echo "*"
 # complete testing of mpi-start
 # version
+echo "** mpi-start version"
 mpi-start -V
 
-wget https://devel.ifca.es/hg/mpi-start/archive/tip.tar.gz --no-check-certificate -O - | tar -xzf - -C /tmp
+echo "** Run mpi-start tests" 
+wget -q https://devel.ifca.es/hg/mpi-start/archive/tip.tar.gz --no-check-certificate -O - | tar -xzf - -C /tmp
 mv /tmp/mpi-start-* /tmp/mpi-start
 cat /tmp/mpi-start/tests/run_tests.sh | \
     sed 's/RUN_OMP_TESTS=0/RUN_OMP_TESTS=1/' | \
