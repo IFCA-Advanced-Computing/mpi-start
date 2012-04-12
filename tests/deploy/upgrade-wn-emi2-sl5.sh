@@ -17,7 +17,7 @@ if [ $? -ne 0 ] ; then exit 1; fi
 
 ## update 
 echo "** YUM Upgrade"
-yum -y upgrade
+yum update glite-mpi mpi-start glite-yaim-mpi
 
 rpm -q emi-mpi
 
