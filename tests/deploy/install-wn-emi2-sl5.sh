@@ -13,7 +13,7 @@ echo "** Get Repos:"
 echo "***          Epel"
 ## epel
 wget http://download.fedoraproject.org/pub/epel/5/i386/epel-release-5-4.noarch.rpm
-yum -y localinstall epel-release-5-4.noarch.rpm
+yum -q -y localinstall epel-release-5-4.noarch.rpm
 if [ $? -ne 0 ] ; then exit 1; fi
 
 echo "***          Trust Anchors"
@@ -28,19 +28,19 @@ if [ $? -ne 0 ] ; then exit 1; fi
 
 ## update 
 echo "** YUM Update"
-yum -y update
+yum -q -y update
 # install lcg-ca 
 echo "** Install CAs"
-yum -y install ca-policy-egi-core
+yum -q -y install ca-policy-egi-core
 if [ $? -ne 0 ] ; then exit 1; fi
 
 # install mpi packages
 echo "** Install MPI Packages"
-yum -y install openmpi-devel mpich2-devel gcc 
+yum -q -y install openmpi-devel mpich2-devel gcc 
 if [ $? -ne 0 ] ; then exit 1; fi
 
 ## disable security repo and install lam ?!
-yum -y install lam-devel 
+yum -q -y install lam-devel 
 if [ $? -ne 0 ] ; then exit 1; fi
 
 ## install emi-mpi
@@ -55,7 +55,7 @@ fi
 
 echo "** EMI-WN"
 # Install needed tools for WN
-yum -y  install emi-wn 
+yum -q -y  install emi-wn 
 
 echo "******************************************************"
 echo " INSTALLATION SUCCEDED!"
