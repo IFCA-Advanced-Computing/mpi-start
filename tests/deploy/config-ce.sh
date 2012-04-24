@@ -194,6 +194,8 @@ yum -y install emi-mpi
 echo "*******************************************"
 echo " Torque submit filter test" 
 echo "*******************************************"
+
+
 cat /etc/yaim/site-info.def.orig > /etc/yaim/site-info.def
 cat >> /etc/yaim/site-info.def << EOF
 #### MPI CONFIGURATION
@@ -201,17 +203,23 @@ MPI_OPENMPI_ENABLE="yes"
 MPI_OPENMPI_VERSION="1.2.3"
 MPI_SUBMIT_FILTER="yes"
 EOF
+if [ "x$OSTYPE" = "xsl6" ] ; then
+    TORQUE_VAR_DIR=/var/lib/torque
+    echo "TORQUE_VAR_DIR=/var/lib/torque" > /etc/yaim/site-info.def
+else
+    TORQUE_VAR_DIR=/var/torque
+fi
 cat /etc/yaim/site-info.def | grep MPI
 configure_ok 
 echo "submit filter:"
-cat /var/torque/torque.cfg | grep SUBMITFILTER 
+cat $TORQUE_VAR_DIR/torque.cfg | grep SUBMITFILTER 
 if [ $? -ne 0 ] ; then 
     echo "******************************************************"
     echo "Error in submit filter!?"
     echo "******************************************************"
     exit 1
 fi
-echo "#PBS -l nodes=4" | /var/torque/submit_filter | grep "PBS -l nodes=2:ppn=2$" > /dev/null
+echo "#PBS -l nodes=4" | $TORQUE_VAR_DIR/submit_filter | grep "PBS -l nodes=2:ppn=2$" > /dev/null
 if [ $? -ne 0 ] ; then 
     echo "******************************************************"
     echo "Error in submit filter!?"

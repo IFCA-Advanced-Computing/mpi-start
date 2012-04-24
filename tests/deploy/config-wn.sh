@@ -78,14 +78,17 @@ hostname -f >> /etc/yaim/wn-list.conf
 cp /etc/yaim/site-info.def /etc/yaim/site-info.def.orig
 
 # Basic configuration
-echo "** Configure basic WN (no MPI)"
+echo "*"
+echo "** Configure basic CE (no MPI variables)"
+echo "*"
 configure_ok -n WN
 
 
 # wrong configurations
 # wrong path
-echo "** Error cases:"
-echo "**             wrong path"
+echo "*******************************************"
+echo " wrong path"
+echo "*******************************************"
 cat /etc/yaim/site-info.def.orig > /etc/yaim/site-info.def
 cat >> /etc/yaim/site-info.def << EOF
 #### MPI CONFIGURATION
@@ -96,7 +99,9 @@ cat /etc/yaim/site-info.def | grep MPI
 configure_and_fail
 
 # unknown flavor
-echo "**             unknown flavor"
+echo "*******************************************"
+echo " unknown flavor"
+echo "*******************************************"
 cat /etc/yaim/site-info.def.orig > /etc/yaim/site-info.def
 cat >> /etc/yaim/site-info.def << EOF
 #### MPI CONFIGURATION
@@ -109,7 +114,9 @@ touch /tmp/env
 diff_configs /tmp/env 
 
 # uninstalled flavor 
-echo "**             uninstalled flavor"
+echo "*******************************************"
+echo " uninstalled flavor"
+echo "*******************************************"
 
 if [ "x$OSTYPE" = "xdeb6" ] ; then
     # uninstall the flavor
@@ -130,8 +137,9 @@ if [ "x$OSTYPE" = "xdeb6" ] ; then
 fi
 
 # just openmpi
-echo "** OK cases:"
-echo "**          openmpi only"
+echo "*******************************************"
+echo " openmpi only"
+echo "*******************************************"
 cat /etc/yaim/site-info.def.orig > /etc/yaim/site-info.def
 cat >> /etc/yaim/site-info.def << EOF
 #### MPI CONFIGURATION
@@ -148,7 +156,9 @@ EOF
 diff_configs /tmp/env
 
 # openmpi with version
-echo "**          openmpi + version"
+echo "*******************************************"
+echo " openmpi + version"
+echo "*******************************************"
 cat /etc/yaim/site-info.def.orig > /etc/yaim/site-info.def
 cat >> /etc/yaim/site-info.def << EOF
 #### MPI CONFIGURATION
@@ -166,7 +176,9 @@ EOF
 diff_configs /tmp/env
 
 # openmpi with version and path
-echo "**          openmpi  + version + path"
+echo "*******************************************"
+echo " openmpi + version + path"
+echo "*******************************************"
 cat /etc/yaim/site-info.def.orig > /etc/yaim/site-info.def
 cat >> /etc/yaim/site-info.def << EOF
 #### MPI CONFIGURATION
@@ -185,7 +197,9 @@ EOF
 diff_configs /tmp/env
 
 # shared home: no
-echo "**          no shared home" 
+echo "*******************************************"
+echo " no shared path" 
+echo "*******************************************"
 cat /etc/yaim/site-info.def.orig > /etc/yaim/site-info.def
 cat >> /etc/yaim/site-info.def << EOF
 #### MPI CONFIGURATION
@@ -204,7 +218,9 @@ EOF
 diff_configs /tmp/env
 
 # shared home: yes
-echo "**          shared home yes" 
+echo "*******************************************"
+echo " shared path" 
+echo "*******************************************"
 cat /etc/yaim/site-info.def.orig > /etc/yaim/site-info.def
 cat >> /etc/yaim/site-info.def << EOF
 #### MPI CONFIGURATION
@@ -223,7 +239,9 @@ EOF
 diff_configs /tmp/env
 
 # shared home: yes + path
-echo "**          shared home yes + path" 
+echo "*******************************************"
+echo " shared path + path" 
+echo "*******************************************"
 cat /etc/yaim/site-info.def.orig > /etc/yaim/site-info.def
 cat >> /etc/yaim/site-info.def << EOF
 #### MPI CONFIGURATION
@@ -244,7 +262,9 @@ EOF
 diff_configs /tmp/env
 
 # all available flavours (openmpi + mpich2 + lam + mpich)
-echo "**          openmpi + mpich2 + lam" 
+echo "*******************************************"
+echo " All available flavors: $FLAVOURS" 
+echo "*******************************************"
 cat /etc/yaim/site-info.def.orig > /etc/yaim/site-info.def
 for f in FLAVOURS; do
     echo "MPI_${f}_ENABLE=yes" >>  /etc/yaim/site-info.def 
