@@ -1,5 +1,8 @@
 #!/bin/sh
-# testing script for sl5 + emi2 installation
 
-bash ./install-wn-emi2-sl5.sh
-bash ./config-wn-sl5.sh
+export OSTYPE=sl5
+type=wn
+
+bash ./config-repo-$os.sh
+bash ./install-$type-emi2.sh
+bash ./config-$type.sh
