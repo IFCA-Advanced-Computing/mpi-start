@@ -36,7 +36,7 @@ if [ $? -ne 0 ] ; then exit 1; fi
 
 echo "** EMI-CREAM + Torque"
 # Install needed tools for CE
-yum -y install emi-cream-ce emi-torque-server emi-torque-utils
+yum -q -y install emi-cream-ce emi-torque-server emi-torque-utils
 if [ $? -ne 0 ] ; then
     echo "******************************************************"
     echo "ERROR installing cream!"

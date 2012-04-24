@@ -1,7 +1,7 @@
 #!/bin/sh
 # testing script for configuring WN on sl5 
 
-CONFIG_PROFILES="-n MPI_CE -n creamCE -n TORQUE_SERVER"
+CONFIG_PROFILES="-n MPI_CE -n creamCE -n TORQUE_server"
 
 configure_ok() {
     /opt/glite/yaim/bin/yaim -s /etc/yaim/site-info.def -c $CONFIG_PROFILES
@@ -45,6 +45,10 @@ echo "*"
 echo "* Configuration"
 echo "*"
 
+echo "** MUNGE"
+create-munge-key
+service munge start
+
 echo "** Get yaim profiles"
 wget -q http://devel.ifca.es/~enol/depot/yaim.tgz --no-check-certificate -O - | tar xzf - -C /etc/
 
@@ -61,12 +65,22 @@ echo "BATCH_SERVER=`hostname -f`" >> /etc/yaim/site-info.def
 cp /etc/yaim/site-info.def /etc/yaim/site-info.def.orig
 
 # Basic configuration
+echo "*"
 echo "** Configure basic CE (no MPI variables)"
+echo "*"
 configure_ok 
 rm -f /tmp/env
 touch /tmp/env
 diff_configs /tmp/env
 
+
+echo "*"
+echo "** Configure basic CE with MPI"
+echo "*"
+
+echo "*******************************************"
+echo " 1 MPI Flavour"
+echo "*******************************************"
 # Add one MPI flavour
 cat /etc/yaim/site-info.def.orig > /etc/yaim/site-info.def
 cat >> /etc/yaim/site-info.def << EOF
@@ -86,6 +100,9 @@ EOF
 diff_configs /tmp/env
 
 # Shared home to yes
+echo "*******************************************"
+echo " SHARED HOME = yes"
+echo "*******************************************"
 cat /etc/yaim/site-info.def.orig > /etc/yaim/site-info.def
 cat >> /etc/yaim/site-info.def << EOF
 #### MPI CONFIGURATION
@@ -105,6 +122,9 @@ EOF
 diff_configs /tmp/env
 
 # Force mpi-start version (bug #52)
+echo "*******************************************"
+echo " Force MPI-START version"
+echo "*******************************************"
 cat /etc/yaim/site-info.def.orig > /etc/yaim/site-info.def
 cat >> /etc/yaim/site-info.def << EOF
 #### MPI CONFIGURATION
@@ -124,6 +144,9 @@ EOF
 diff_configs /tmp/env
 
 # Try removing mpi-start package (bug #52)
+echo "*******************************************"
+echo " Force MPI-START version (without package)"
+echo "*******************************************"
 yum remove -y mpi-start
 cat /etc/yaim/site-info.def.orig > /etc/yaim/site-info.def
 cat >> /etc/yaim/site-info.def << EOF
@@ -145,6 +168,9 @@ diff_configs /tmp/env
 
 
 # Again without mpi-start package and without version (bug #52)
+echo "*******************************************"
+echo " No MPI-START version (without package)"
+echo "*******************************************"
 cat /etc/yaim/site-info.def.orig > /etc/yaim/site-info.def
 cat >> /etc/yaim/site-info.def << EOF
 #### MPI CONFIGURATION
@@ -165,6 +191,9 @@ diff_configs /tmp/env
 yum -y install emi-mpi
 
 # Test the torque filter
+echo "*******************************************"
+echo " Torque submit filter test" 
+echo "*******************************************"
 cat /etc/yaim/site-info.def.orig > /etc/yaim/site-info.def
 cat >> /etc/yaim/site-info.def << EOF
 #### MPI CONFIGURATION
