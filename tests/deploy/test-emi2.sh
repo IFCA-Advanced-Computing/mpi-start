@@ -4,6 +4,6 @@ OSTYPE=$1
 TYPE=$2
 export OSTYPE
 
-bash ./config-repo-$os.sh
-bash ./install-$type-emi2.sh
-bash ./config-$type.sh
+bash ./config-repo-$OSTYPE.sh
+bash ./install-$TYPE-emi2-$OSTYPE.sh
+bash ./config-$TYPE.sh
