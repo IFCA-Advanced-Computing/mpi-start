@@ -22,10 +22,12 @@ wget --no-check-certificate  https://twiki.cern.ch/twiki/pub/EMI/EMI-2/emi-2-rc4
 if [ $? -ne 0 ] ; then exit 1; fi
 
 ## update 
-echo "** YUM Update + install CAs"
-yum -q -y update
-yum -q -y install ca-policy-egi-core
-if [ $? -ne 0 ] ; then exit 1; fi
+if [ "x$1" = "xNOUPDATE"  ] ; then 
+    echo "** YUM Update + install CAs"
+    yum -q -y update
+    yum -q -y install ca-policy-egi-core
+    if [ $? -ne 0 ] ; then exit 1; fi
+fi
 
 echo "******************************************************"
 echo " REPO CONFIG OK!"

@@ -58,9 +58,11 @@ chmod -R 750 /etc/yaim
 echo "test14.egi.cesga.es" > /etc/yaim/wn-list.conf
 echo "test15.egi.cesga.es" >> /etc/yaim/wn-list.conf
 
+
 echo "MYSQL_PASSWORD=mySq1_${RANDOM}_long_password" >> /etc/yaim/site-info.def
 echo "CREAM_DB_PASSWORD=Cr34m_${RANDOM}_long_password" >> /etc/yaim/site-info.def
 echo "CE_HOST=`hostname -f`" >> /etc/yaim/site-info.def
+echo "CEMON_HOST=`hostname -f`" >> /etc/yaim/site-info.def
 echo "BATCH_SERVER=`hostname -f`" >> /etc/yaim/site-info.def
 
 # back up original config
