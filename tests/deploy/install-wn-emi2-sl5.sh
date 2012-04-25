@@ -10,7 +10,7 @@ echo "** Install MPI Packages"
 yum -q -y install openmpi-devel mpich2-devel gcc 
 if [ $? -ne 0 ] ; then exit 1; fi
 
-if [ "x$OSTYPE" = "xsl5"] ; then 
+if [ "x$OSTYPE" = "xsl5" ] ; then 
     yum -q -y install lam-devel 
     if [ $? -ne 0 ] ; then exit 1; fi
 fi
