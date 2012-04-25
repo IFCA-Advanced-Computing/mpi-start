@@ -42,17 +42,17 @@ echo "*"
 
 
 if [ "x$OSTYPE" = "xsl5" ] ; then
+    FLAVOURS="OPENMPI LAM MPICH2"
     OPENMPI_PATH=/usr/lib64/openmpi/1.4-gcc
     OPENMPI_VERSION=1.4
-    FLAVOURS="OPENMPI LAM MPICH2"
-    MPICH2_PATH=
-    MPICH2_VERSION=
-    LAM_PATH=
-    LAM_VERSION=
+    LAM_PATH=/usr/lib64/lam
+    LAM_VERSION=7.1.2
+    MPICH2_PATH=/usr/lib64/mpich2
+    MPICH2_VERSION=1.2.1p1
 elif [ "x$OSTYPE" = "xsl6" ] ; then
+    FLAVOURS="OPENMPI MPICH2"
     OPENMPI_PATH=/usr/lib64/openmpi
     OPENMPI_VERSION=1.5.3
-    FLAVOURS="OPENMPI MPICH2"
     MPICH2_PATH=/usr/lib64/mpich2
     MPICH2_VERSION=1.2.1
 else
