@@ -4,8 +4,6 @@
 ################
 # REPO CONFIG  #
 ################
-set -x
-
 echo "*"
 echo "* Repository Configuration"
 echo "*"

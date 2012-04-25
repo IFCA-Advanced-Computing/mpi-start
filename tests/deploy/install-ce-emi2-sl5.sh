@@ -5,8 +5,6 @@
 # INSTALLATION #
 ################
 
-set -x
-
 echo "*"
 echo "* Installation "
 echo "*"

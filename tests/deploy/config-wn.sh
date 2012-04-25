@@ -114,8 +114,14 @@ MPI_FOO_ENABLE="yes"
 EOF
 cat /etc/yaim/site-info.def | grep MPI
 configure_ok
-rm -f /tmp/env
-touch /tmp/env
+if [ "x$1" = "xOLDMPISTART" ] ; then
+    cat > /tmp/env << EOF
+I2G_MPI_START=/usr/bin/mpi-start
+EOF 
+else
+    rm -f /tmp/env
+    touch /tmp/env
+fi
 diff_configs /tmp/env 
 
 # uninstalled flavor 

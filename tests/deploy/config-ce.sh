@@ -1,8 +1,6 @@
 #!/bin/sh
 # testing script for configuring WN on sl5 
 
-set -x
-
 CONFIG_PROFILES="-n MPI_CE -n creamCE -n TORQUE_server"
 
 configure_ok() {

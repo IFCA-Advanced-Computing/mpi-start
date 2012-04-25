@@ -18,7 +18,7 @@ echo "** Trust Anchors"
 wget http://repository.egi.eu/sw/production/cas/1/current/repo-files/egi-trustanchors.repo -O /etc/yum.repos.d/egi-trust.repo
 
 echo "***          emi 1"
-wget http://emisoft.web.cern.ch/emisoft/dist/emi/1/sl5/x86_64/updates/emi-release-1.0.1-1.sl5.noarch.rpm
+wget http://emisoft.web.cern.ch/emisoft/dist/EMI/1/sl5/x86_64/updates/emi-release-1.0.1-1.sl5.noarch.rpm 
 yum --nogpg -q -y localinstall emi-release-1.0.1-1.sl5.noarch.rpm
 if [ $? -ne 0 ] ; then exit 1; fi
 
