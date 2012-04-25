@@ -76,6 +76,9 @@ chmod -R 750 /etc/yaim
 # Add our host to wn-list
 hostname -f >> /etc/yaim/wn-list.conf
 
+# Add a fake CE_HOST
+echo "CE_HOST=gridce01.ifca.es" >> /etc/yaim/site-info.def
+
 # back up original config
 cp /etc/yaim/site-info.def /etc/yaim/site-info.def.orig
 
