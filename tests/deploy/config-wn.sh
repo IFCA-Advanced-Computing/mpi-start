@@ -71,6 +71,8 @@ fi
 echo "** Get yaim profiles"
 wget -q http://devel.ifca.es/~enol/depot/yaim.tgz --no-check-certificate -O - | tar xzf - -C /etc/
 
+chmod -R 750 /etc/yaim
+
 # Add our host to wn-list
 hostname -f >> /etc/yaim/wn-list.conf
 

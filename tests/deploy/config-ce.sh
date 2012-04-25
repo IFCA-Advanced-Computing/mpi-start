@@ -52,6 +52,8 @@ service munge start
 echo "** Get yaim profiles"
 wget -q http://devel.ifca.es/~enol/depot/yaim.tgz --no-check-certificate -O - | tar xzf - -C /etc/
 
+chmod -R 750 /etc/yaim
+
 # Add our host to wn-list
 echo "test14.egi.cesga.es" > /etc/yaim/wn-list.conf
 echo "test15.egi.cesga.es" >> /etc/yaim/wn-list.conf
