@@ -11,7 +11,7 @@ echo "*"
 
 echo "** EMI-CREAM + Torque"
 # Install needed tools for CE
-yum -q -y install emi-cream-ce emi-torque-server emi-torque-utils
+yum --nogpg -q -y install emi-cream-ce emi-torque-server emi-torque-utils
 if [ $? -ne 0 ] ; then
     echo "******************************************************"
     echo "ERROR installing cream!"
@@ -21,7 +21,7 @@ fi
 
 ## install emi-mpi
 echo "** EMI-MPI"
-yum -y install emi-mpi
+yum --nogpg -y install emi-mpi
 if [ $? -ne 0 ] ; then
     echo "******************************************************"
     echo "ERROR installing emi-mpi!"
