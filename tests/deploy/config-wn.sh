@@ -53,8 +53,8 @@ elif [ "x$OSTYPE" = "xsl6" ] ; then
     OPENMPI_PATH=/usr/lib64/openmpi
     OPENMPI_VERSION=1.5.3
     FLAVOURS="OPENMPI MPICH2"
-    MPICH2_PATH=
-    MPICH2_VERSION=
+    MPICH2_PATH=/usr/lib64/mpich2
+    MPICH2_VERSION=1.2.1
 else
     # debian
     FLAVOURS="OPENMPI MPICH2 LAM MPICH"
@@ -268,7 +268,7 @@ echo "*******************************************"
 echo " All available flavors: $FLAVOURS" 
 echo "*******************************************"
 cat /etc/yaim/site-info.def.orig > /etc/yaim/site-info.def
-for f in FLAVOURS; do
+for f in $FLAVOURS; do
     echo "MPI_${f}_ENABLE=yes" >>  /etc/yaim/site-info.def 
 done
 configure_ok
@@ -277,11 +277,11 @@ cat > /tmp/env << EOF
 I2G_MPI_START=/usr/bin/mpi-start
 MPI_DEFAULT_FLAVOUR=openmpi
 EOF
-for f in FLAVOURS; do
+for f in $FLAVOURS; do
     VALUE=`eval echo \\$${f}_PATH`
-    echo "MPI_${f}_PATH=$VALUE >>  /tmp/env
+    echo "MPI_${f}_PATH=$VALUE" >>  /tmp/env
     VALUE=`eval echo \\$${f}_VERSION`
-    echo "MPI_${f}_VERSION=$VALUE >>  /tmp/env
+    echo "MPI_${f}_VERSION=$VALUE" >>  /tmp/env
 done
 sort /tmp/env > /tmp/env2
 diff_configs /tmp/env2
@@ -299,7 +299,7 @@ wget -q https://devel.ifca.es/hg/mpi-start/archive/tip.tar.gz --no-check-certifi
 mv /tmp/mpi-start-* /tmp/mpi-start
 cat /tmp/mpi-start/tests/run_tests.sh | \
     sed 's/RUN_OMP_TESTS=0/RUN_OMP_TESTS=1/' > /tmp/mpi-start/tests/runner.sh
-for f in FLAVOURS; do 
+for f in $FLAVOURS; do 
     cat /tmp/mpi-start/tests/run_tests.sh | \
         sed "s/RUN_${f}_TESTS=0/RUN_${f}_TESTS=1/" > /tmp/mpi-start/tests/runner.sh
 done
