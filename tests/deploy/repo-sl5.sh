@@ -4,15 +4,16 @@
 ################
 # REPO CONFIG  #
 ################
+set -x
 
 echo "*"
 echo "* Repository Configuration"
 echo "*"
 
-#echo "** Epel"
-#wget http://download.fedoraproject.org/pub/epel/5/i386/epel-release-5-4.noarch.rpm
-#yum -q -y localinstall epel-release-5-4.noarch.rpm
-#if [ $? -ne 0 ] ; then exit 1; fi
+echo "** Epel"
+wget http://download.fedoraproject.org/pub/epel/5/i386/epel-release-5-4.noarch.rpm
+yum --nogpg -q -y localinstall epel-release-5-4.noarch.rpm
+if [ $? -ne 0 ] ; then exit 1; fi
 
 #echo "** Trust Anchors"
 #wget http://repository.egi.eu/sw/production/cas/1/current/repo-files/egi-trustanchors.repo -O /etc/yum.repos.d/egi-trust.repo
@@ -24,8 +25,8 @@ if [ $? -ne 0 ] ; then exit 1; fi
 ## update 
 if [ "x$1" != "xNOUPDATE"  ] ; then 
     echo "** YUM Update + install CAs"
-    yum -q -y update
-    yum -q -y install ca-policy-egi-core
+    yum --nogpg -q -y update
+    yum --nogpg -q -y install ca-policy-egi-core
     if [ $? -ne 0 ] ; then exit 1; fi
 fi
 
