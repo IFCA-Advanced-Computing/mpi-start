@@ -1,9 +1,8 @@
 JobType         = "Normal";
-CpuNumber       = 4;
+CpuNumber       = 2;
 Executable      = "tester.sh"; 
-Arguments       = "-sl5 4";
+Arguments       = "-sl6 2";
 StdOutput       = "std.out";
 StdError        = "std.err";
 InputSandbox	= {"tester.sh"};
-# , "cpi-openmpi-sl5", "cpi-mpich2-sl5"};
 OutputSandbox   = {"std.out","std.err"};
