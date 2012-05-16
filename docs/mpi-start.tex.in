@@ -505,6 +505,10 @@ compiler}. Some devel packages of the MPI packages do not include the compiler
 as (e.g. gcc, gcc-gfortran, gcc-g++) dependency! They should be installed also
 if you want to support the compilation of MPI applications.
 
+\subsubsection{Upgrading from EMI-1}
+
+There are no major changes between EMI-1 and the EMI-2 releases, no backward incompatible changes have been introduced. However the metapackage has changed the name from \texttt{glite-mpi} to \texttt{emi-mpi}. If you configure the EMI-2 repo on top of a EMI-1 installation and do an upgrade, the glite-mpi package will be automatically upgraded to emi-mpi when a \texttt{yum upgrade} or \texttt{yum update} is performed. There is no need to reconfigure.
+
 \subsubsection{Source Distribution}
 
 Source can be retrieved from the mercurial repository.

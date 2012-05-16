@@ -8,6 +8,7 @@ export I2G_MPI_START_ENABLE_TESTING="TEST"
 # source the mpi-start code to have all functions
 . $I2G_MPI_START
 mpi_start_check_options
+mpi_start_load_execenv
 
 export MPI_OPENMPI_MPIEXEC=`$MYMKTEMP`
 cat > $MPI_OPENMPI_MPIEXEC << EOF
@@ -31,7 +32,7 @@ testBug38() {
     . $MPI_START_PLUGIN_FILES
     mpi_exec
     $MPI_OPENMPI_INFO --parseable | grep "plm:tm" &> /dev/null
-    if test $? -eq 0 ; then
+    if test $? -eq 0 -a "${OPENMPI_VERSION_MAJOR}.${OPENMPI_VERSION_MINOR}" = "1.2" ; then
         out=`echo $MPI_GLOBAL_PARAMS | grep -v "machinefile"`
     else
         out=`echo $MPI_GLOBAL_PARAMS | grep "machinefile"`
