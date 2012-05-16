@@ -80,7 +80,8 @@ rpm: dist
 	rpmbuild --define "_topdir `pwd`/rpms" -bs rpms/SPECS/$(name_prefix)mpi-start.spec
 	rpmbuild $(PACKAGER) --define "_topdir `pwd`/rpms" -bb rpms/SPECS/$(name_prefix)mpi-start.spec
 
-deb: 
+deb: dist
+	mv $(name_prefix)mpi-start-$(VERSION).tar.gz ../$(name_prefix)mpi-start_$(VERSION).orig.tar.gz
 	dpkg-buildpackage -us -uc
 
 
