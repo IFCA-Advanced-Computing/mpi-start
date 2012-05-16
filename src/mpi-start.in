@@ -38,7 +38,7 @@ I2G_MPI_START_KEEP_FILES=${I2G_MPI_START_KEEP_FILES:-0}
 # Cleans up temporary files upon finishing execution 
 #======================================================================
 clean_up() {
-    if test "x$I2G_MPI_START_KEEP_FILES" == "x1"; then
+    if test "x$I2G_MPI_START_KEEP_FILES" = "x1"; then
         exit
     fi
     debug_msg "Cleaning up mpi-start temporary files."
@@ -145,7 +145,7 @@ mpi_start_search_mpiexec() {
     export MPI_MPIEXEC=""
     export MPI_MPIRUN=""
 
-    if test "x${I2G_MPI_TYPE}" == "x" ; then
+    if test "x${I2G_MPI_TYPE}" = "x" ; then
         debug_msg "no mpi type selected, no mpiexec/mpirun search!"
         return 0
     fi
@@ -224,7 +224,7 @@ EOF
 
     while [ $index -lt $vars ]; do
         echo "export ${MPI_START_JOB_ENV[$index]}" >> $MPI_START_MPI_WRAPPER
-        let "index = $index + 1"
+        index=(($index+1))
     done
     chmod +x $MPI_START_MPI_WRAPPER
 }
@@ -238,7 +238,7 @@ EOF
 #======================================================================
 mpi_start_export_variable() {
     local var_name
-    if [[ $1 == *=* ]] ; then
+    if test $1 = *=* ; then
         var_name=`echo $1 | cut -f1 -d"="`
     else
         var_name=$1
@@ -555,7 +555,7 @@ mpi_start_scheduler_detector() {
 
     # check if we have a scheduler 
     if test $MPI_START_READY -ne 0  ; then 
-        if test "x${MPI_START_DUMMY_SCHEDULER}" == "x1" ; then
+        if test "x${MPI_START_DUMMY_SCHEDULER}" = "x1" ; then
             mpi_start_dummy_scheduler
         else
             error_msg "cannot find scheduler"

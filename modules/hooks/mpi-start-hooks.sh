@@ -210,7 +210,7 @@ mpi_start_pre_run_hook_copy () {
         $TARCMD
         st=$?
     else
-        $TARCMD &> /dev/null
+        $TARCMD > /dev/null 2>&1
         st=$?
     fi
     if test $st -ne 0 ; then
@@ -220,7 +220,7 @@ mpi_start_pre_run_hook_copy () {
     fi
 
     unset copy
-    . $chosenDistrMethod &> /dev/null
+    . $chosenDistrMethod > /dev/null 2>&1
     if test $? -ne 0 ; then
         error_msg "Unable to load distribution method $chosenDistrMethod"
         dump_env
@@ -240,14 +240,14 @@ mpi_start_pre_run_hook_copy () {
 mpi_start_run_pre_hook () {
     debug_msg "mpi_start_run_pre_hook"
 
-    if test "x$1" == "x" ; then
+    if test "x$1" = "x" ; then
         return 0 
     fi
     if test -e $1 ; then 
         debug_msg "Try to run pre hooks at $1"
         unset pre_run_hook
         . $1
-        type pre_run_hook &> /dev/null
+        type pre_run_hook > /dev/null 2>&1
         result=$?
         if test $result -ne 0 ; then
             debug_msg "pre_run_hook is not defined, ignoring"
@@ -315,9 +315,9 @@ mpi_start_pre_run_hook_generic () {
             chmod +x $I2G_MPI_APPLICATION 2> /dev/null # do not care if it fails.
         fi
         # add complete path to I2G_MPI_APPLICATIONlication so . does not need to be in PATH
-        which $I2G_MPI_APPLICATION &> /dev/null
+        which $I2G_MPI_APPLICATION > /dev/null 2>&1
         if test $? -ne 0 ; then 
-            if test "${I2G_MPI_APPLICATION/#\/}" == "${I2G_MPI_APPLICATION}" ;  then
+            if test "${I2G_MPI_APPLICATION/#\/}" = "${I2G_MPI_APPLICATION}" ;  then
                 export I2G_MPI_APPLICATION=$PWD/$I2G_MPI_APPLICATION
             fi
         fi
@@ -338,14 +338,14 @@ mpi_start_pre_run_hook_generic () {
 mpi_start_run_post_hook () {
     debug_msg "mpi_start_run_post_hook"
 
-    if test "x$1" == "x" ; then
+    if test "x$1" = "x" ; then
         return 0 
     fi
     if test -e $1 ; then 
         debug_msg "Try to run post hooks at $1"
         unset post_run_hook
         . $1
-        type post_run_hook &> /dev/null
+        type post_run_hook > /dev/null 2>&1
         result=$?
         if test $result -ne 0 ; then
             debug_msg "post_run_hook is not defined, ignoring"
@@ -390,7 +390,7 @@ mpi_start_post_run_hook_generic () {
     if test "x$MPI_START_DISABLE_CLEANUP" != "xyes" ; then
         if test "x$chosenDistrMethod" != "x" -a "x$chosenDistrMethod" != "xundef" ; then
             unset clean
-            . $chosenDistrMethod &> /dev/null
+            . $chosenDistrMethod > /dev/null 2>&1
             debug_msg "Calling post-hook file cleaning"
             clean
         fi

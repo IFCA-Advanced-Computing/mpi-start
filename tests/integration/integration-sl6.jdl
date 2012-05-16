@@ -1,0 +1,8 @@
+JobType         = "Normal";
+CpuNumber       = 2;
+Executable      = "tester.sh"; 
+Arguments       = "-sl6 2";
+StdOutput       = "std.out";
+StdError        = "std.err";
+InputSandbox	= {"tester.sh"};
+OutputSandbox   = {"std.out","std.err"};
