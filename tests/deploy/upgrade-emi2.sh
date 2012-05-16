@@ -6,7 +6,7 @@ export OSTYPE
 
 bash ./repo-emi1-$OSTYPE.sh
 bash ./install-$TYPE-emi1-$OSTYPE.sh
-bash ./config-$TYPE.sh
+bash ./config-$TYPE.sh OLDMPISTART
 
 # update and config again!
 bash ./repo-$OSTYPE.sh NOUPDATE

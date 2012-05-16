@@ -115,9 +115,7 @@ EOF
 cat /etc/yaim/site-info.def | grep MPI
 configure_ok
 if [ "x$1" = "xOLDMPISTART" ] ; then
-    cat > /tmp/env << EOF
-I2G_MPI_START=/usr/bin/mpi-start
-EOF 
+    echo "I2G_MPI_START=/usr/bin/mpi-start" > /tmp/env
 else
     rm -f /tmp/env
     touch /tmp/env
