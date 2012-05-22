@@ -52,13 +52,14 @@ copy() {
             APP_CANONIC=`readlink -f ${I2G_MPI_APPLICATION} 2> /dev/null`
             MYDIR_CANONIC=`readlink -f ${MYDIR} 2> /dev/null`
             if test $? -eq 0; then    # readlink may not available
-                if test `dirname ${APP_CANONIC}` == $MYDIR_CANONIC; then
-                    export I2G_MPI_APPLICATION=${SHARED_BASE_PATH}/${MYDIR}/`basename ${APP_CANONIC}`
+		SUBS_APP=`echo $APP_CANONIC | sed -e "s#^${MYDIR_CANONIC}#${SHARED_BASE_PATH}/${MYDIR}#"`
+                if test "${SUBS_APP}" != "${APP_CANONIC}" ; then
+                    export I2G_MPI_APPLICATION=${SUBS_APP}
                 fi
             else
-                APP_DIR=`dirname ${I2G_MPI_APPLICATION}`
-                if test "${APP_DIR}" = "${MYDIR}"; then
-                    export I2G_MPI_APPLICATION=${SHARED_BASE_PATH}/${MYDIR}/`basename ${I2G_MPI_APPLICATION}`
+		SUBS_APP=`echo $I2G_MPI_APPLICATION | sed -e "s#^${MYDIR_CANONIC}#${SHARED_BASE_PATH}/${MYDIR}#"`
+                if test "${SUBS_APP}" != "${I2G_MPI_APPLICATION}" ; then
+                    export I2G_MPI_APPLICATION=${SUBS_APP}
                 fi
             fi
         fi
