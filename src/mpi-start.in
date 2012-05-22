@@ -224,7 +224,7 @@ EOF
 
     while [ $index -lt $vars ]; do
         echo "export ${MPI_START_JOB_ENV[$index]}" >> $MPI_START_MPI_WRAPPER
-        index=(($index+1))
+        index=$(($index+1))
     done
     chmod +x $MPI_START_MPI_WRAPPER
 }
