@@ -12,7 +12,7 @@ if test "x$MPI_START_MPI_PREFIX" = "x"  ; then
 fi
 
 # activate MPI
-mpi_start_activate_mpi $MPI_START_MPI_PREFIX "$MPI_START_MPI_MODULE"
+mpi_start_activate_mpi $MPI_START_MPI_PREFIX $MPI_START_MPI_MODULE
 
 #
 # start an mpi job

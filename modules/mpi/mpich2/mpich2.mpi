@@ -16,7 +16,7 @@ export OSC_MPIEXEC=0
 export HYDRA_MPIEXEC=0
 
 # activate MPI
-mpi_start_activate_mpi $MPI_START_MPI_PREFIX "$MPI_START_MPI_MODULE"
+mpi_start_activate_mpi $MPI_START_MPI_PREFIX $MPI_START_MPI_MODULE
 # further determine if the mpiexec is OSC or hydra or whatever
 if test "x$MPI_MPIEXEC" != "x"; then
     $MPI_MPIEXEC 2>&1 | grep -e "-\<np\>" > /dev/null 2>&1

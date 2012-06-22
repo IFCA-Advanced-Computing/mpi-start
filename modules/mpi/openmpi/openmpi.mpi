@@ -33,7 +33,7 @@ if test "x$MPI_START_MPI_PREFIX" = "x"  ; then
 fi
 
 # activate MPI
-mpi_start_activate_mpi $MPI_START_MPI_PREFIX "$MPI_START_MPI_MODULE"
+mpi_start_activate_mpi $MPI_START_MPI_PREFIX $MPI_START_MPI_MODULE
 search_openmpi_info_command
 # get openmpi version
 export OPENMPI_VERSION_MAJOR=`$MPI_OPENMPI_INFO --parseable -v ompi major | grep "ompi:version:full" | cut -f4 -d":"` 

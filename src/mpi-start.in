@@ -22,6 +22,7 @@ MPI_START_NSLOTS=0
 MPI_START_NSLOTS_PER_HOST=0
 MPI_START_READY=-1 
 MPI_START_MPI_PREFIX=""
+MPI_START_MPI_MODULE=""
 MPI_START_CLEANUP_FILES=""
 MPI_START_SCHEDULER=""
 MPI_START_NP=1
@@ -198,8 +199,9 @@ mpi_start_activate_mpi() {
             export LD_LIBRARY_PATH=$1/lib:$LD_LIBRARY_PATH
         fi
     else
-        debug_msg "activate MPI via modules : $2"
-        for mod in $2 ; do
+        shift
+        debug_msg "activate MPI via modules : $*"
+        for mod in $* ; do
             debug_msg  "+  module load  $mod"
             module load $mod
         done
@@ -708,7 +710,7 @@ mpi_start_load_execenv() {
 
     if test "x{$MPI_VERSION}" != "x" ; then
         debug_msg " will check for specific MPI version : $MPI_VERSION"
-        MPI_VERSION=`echo $MPI_VERSION | sed -e s/\\\\./__/g`
+        MPI_VERSION=`echo $MPI_VERSION | sed -e s/\\\\./__/g | sed -e s/-/_/g` 
     fi
 
     # FIXME: why there is I2G_<flavour>_PREFIX and MPI_<flavour>_PATH ?
@@ -722,7 +724,7 @@ mpi_start_load_execenv() {
         # first check the one with version included
         VALUE=`eval echo \\$${MPI_PREFIX}${MPI_TYPE}${US}${MPI_VERSION}${MPI_PATH_SUFFIX}`
         if test "x$VALUE" != "x" ; then
-            debug_msg " found MPI version: $MPI_VERSION"
+            debug_msg " found MPI path for version $MPI_VERSION"
             MPI_START_MPI_PREFIX=$VALUE
         else
             # try default without version
@@ -740,6 +742,24 @@ mpi_start_load_execenv() {
         MPI_START_MPI_PREFIX=$I2G_PREFIX
     fi
     export MPI_START_MPI_PREFIX
+
+    # same thing for modules
+    VALUE=`eval echo \\$${MPI_PREFIX}${MPI_TYPE}${US}${MPI_VERSION}${MPI_MODULE_SUFFIX}`
+    if test "x$VALUE" != "x" ; then
+        debug_msg " found MPI modules for version $MPI_VERSION"
+        MPI_START_MPI_MODULE="$VALUE"
+    else
+        # try default without version
+        VALUE=`eval echo \\$${MPI_PREFIX}${MPI_TYPE}${MPI_MODULE_SUFFIX}`
+        if test "x$VALUE" != "x"  ; then 
+            debug_msg " found default MPI in: $VALUE"
+            MPI_START_MPI_MODULE="$VALUE"
+        else
+            MPI_START_MPI_MODULE=
+        fi
+    fi
+    export MPI_START_MPI_MODULE
+
     
     # source the MPI specific configuration file
     info_msg "activate support for $I2G_MPI_TYPE"

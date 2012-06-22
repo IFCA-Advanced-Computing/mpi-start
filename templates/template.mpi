@@ -20,7 +20,7 @@ fi
 
 
 # activate MPI
-mpi_start_activate_mpi $I2G_TEMPLATE_PREFIX "$MPI_START_MPI_MODULE"
+mpi_start_activate_mpi $I2G_TEMPLATE_PREFIX $MPI_START_MPI_MODULE
 
 
 #
