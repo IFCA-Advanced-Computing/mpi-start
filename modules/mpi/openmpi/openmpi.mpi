@@ -21,14 +21,13 @@ search_openmpi_info_command() {
 if test "x$MPI_START_MPI_PREFIX" = "x"  ; then    
     # assume ompi_info knows the correct prefix,
     search_openmpi_info_command
-    ompi_path=`$MPI_OPENMPI_INFO --path prefix --parseable 2> /dev/null`
-    if test $? -ne 0 ; then
+    if test $? -eq 0 ; then
+        export MPI_START_MPI_PREFIX=`$MPI_OPENMPI_INFO --path prefix --parseable 2> /dev/null | cut -f3- -d":"`
+        debug_msg "use system mpi path: $MPI_START_MPI_PREFIX"
+    else
         # if fails, set default in SLC5
         export MPI_START_MPI_PREFIX=/usr/lib64/openmpi/1.4-gcc
         debug_msg "use default mpi path: $MPI_START_MPI_PREFIX"
-    else
-        export MPI_START_MPI_PREFIX=`echo $ompi_path | cut -f3- -d":"`
-        debug_msg "use system mpi path: $MPI_START_MPI_PREFIX"
     fi
 fi
 
