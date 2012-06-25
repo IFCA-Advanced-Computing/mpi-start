@@ -98,6 +98,8 @@ if test "x${RUN_BASIC_TESTS}" = "x1" ; then
     echo "* Basic Tests"
     echo "* RFCs #16, #25"
     ./test_basic.sh || exitcode=1
+    echo "* RFC #58"
+    ./test_58.sh || exitcode=1
     echo "***************************"
 fi
 if test "x${RUN_HOOK_TESTS}" = "x1" ; then
