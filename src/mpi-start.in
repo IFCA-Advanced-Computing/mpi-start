@@ -973,7 +973,16 @@ if test "$I2G_MPI_START_ENABLE_TESTING" != "TEST" ; then
                 ;;
             -d)
                 shift
-                eval export $1
+                var_name=`echo $1 | cut -f1 -d"="`
+                if test "x$var_name" = "x$1" ; then
+                    eval export $var_name
+                elif test "x$var_name" != "x" ; then
+                    var_value=`echo $1 | cut -f2- -d"="`
+                    eval export $var_name=\"$var_value\"
+                else
+                    error_msg "Wrongly formatted argument $1 to -d option"
+                    exit 1
+                fi
                 shift
                 ;;
             --)
