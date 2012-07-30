@@ -554,6 +554,7 @@ Typical variables that the administrator can set in this file are:
 \textbf{Variable}        &              \textbf{Meaning}         \\ \hline
 \texttt{MPI\_DEFAULT\_FLAVOUR} & name of the default flavour for jobs running at the site \\ \hline
 \texttt{MPI\_<flavour>\_PATH} & Path of the bin and lib directories for the MPI flavour \\ \hline
+\texttt{MPI\_<flavour>\_MODULE} & Name of the module that loads the MPI flavour environment. When defined, the \texttt{MPI\_<flavour>\_PATH} will not be used. \\ \hline
 \texttt{MPI\_<flavour>\_VERSION} & preferred version of the MPI flavour \\ \hline
 \texttt{MPI\_<flavour>\_MPIEXEC} & Path of the MPIEXEC binary for the specific flavour \\ \hline
 \texttt{MPI\_<flavour>\_MPIEXEC\_PARAMS} & Parameters for the MPIEXEC of the flavour \\ \hline

@@ -77,6 +77,4 @@ testCallMultipleModule() {
 mod2" "$OUT"
 }
 
-
-
 . $SHUNIT2
