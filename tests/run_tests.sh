@@ -122,7 +122,7 @@ fi
 if test "x${RUN_FSDETECT_TESTS}" = "x1" ; then
     echo
     echo "***************************"
-    echo "* Filesystem Detection"
+    echo "* Filesystem Detection & File distribution"
     echo "* RFC #31"
     ./test_fsdetect.sh || exitcode=1
     echo "* RFC #53"
@@ -131,6 +131,8 @@ if test "x${RUN_FSDETECT_TESTS}" = "x1" ; then
     ./test_32.sh || exitcode=1
     echo "* RFC #44"
     ./test_44.sh || exitcode=1
+    echo "* RFC #60"
+    ./test_60.sh || exitcode=1
     echo "***************************"
 fi
 if test "x${RUN_SCH_TESTS}" = "x1" ; then
