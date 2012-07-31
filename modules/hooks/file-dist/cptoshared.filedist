@@ -34,8 +34,9 @@ fix_app_path() {
                 return
             fi
         else
-            # not in path and relative, just fix
+            # not in path and relative, just prepend dirs
             export I2G_MPI_APPLICATION=${SHARED_BASE_PATH}/${MYDIR}/${I2G_MPI_APPLICATION}
+            return
         fi
     fi
 
@@ -43,16 +44,19 @@ fix_app_path() {
     APP_CANONIC=`readlink -f ${I2G_MPI_APPLICATION} 2> /dev/null`
     if test $? -eq 0; then
         MYDIR_CANONIC=`readlink -f ${MYDIR} 2> /dev/null`
-        SUBS_APP=`echo $APP_CANONIC | sed -e "s#^${MYDIR_CANONIC}#${SHARED_BASE_PATH}/${MYDIR}#"`
-        if test "${SUBS_APP}" != "${APP_CANONIC}" ; then
-            export I2G_MPI_APPLICATION=${SUBS_APP}
-        fi
     else
-        # readlink is not available !?, lets assume no links...
-        APP_DIR=`dirname ${I2G_MPI_APPLICATION}`
-        if test "${APP_DIR}" = "${MYDIR}"; then
-            export I2G_MPI_APPLICATION=${SHARED_BASE_PATH}/${MYDIR}/`basename ${I2G_MPI_APPLICATION}`
+        APP_CANONIC=`python -c 'import os,sys;print os.path.realpath(sys.argv[1])' ${I2G_MPI_APPLICATION} 2> /dev/null`
+        if test $? -eq 0; then
+            MYDIR_CANONIC=`python -c 'import os,sys;print os.path.realpath(sys.argv[1])' ${MYDIR} 2> /dev/null`
+        else
+            # no readlink, no python, just trust that there are no symbolic links that messes this up
+            APP_CANONIC=$I2G_MPI_APPLICATION
+            MYDIR_CANONIC=$MYDIR_CANONIC
         fi
+    fi
+    SUBS_APP=`echo $APP_CANONIC | sed -e "s#^${MYDIR_CANONIC}#${SHARED_BASE_PATH}/${MYDIR}#"`
+    if test "${SUBS_APP}" != "${APP_CANONIC}" ; then
+        export I2G_MPI_APPLICATION=${SUBS_APP}
     fi
 }
 
