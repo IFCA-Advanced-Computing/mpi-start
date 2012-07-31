@@ -14,6 +14,48 @@ check_distribution_method(){
     return $result
 }
 
+#
+# Fixes the application path to run when moved to shared dir.
+#
+fix_app_path() {
+    if test "x${I2G_MPI_APPLICATION}" = "x" ; then
+        return
+    fi
+
+    if test "${I2G_MPI_APPLICATION/#\/}" == "${I2G_MPI_APPLICATION}" ;  then
+        # relative path, assure is not in path
+        WHICHAPP=`which $I2G_MPI_APPLICATION 2> /dev/null`
+        if test $? -eq 0 ; then 
+            if test "${WHICHAPP/#\/}" == "${WHICHAPP}" ;  then
+                # in path, but relative, fix...
+                I2G_MPI_APPLICATION=${MYDIR}/${WHICHAPP}
+            else
+                # in path, absolute, do not try to fix
+                return
+            fi
+        else
+            # not in path and relative, just fix
+            export I2G_MPI_APPLICATION=${SHARED_BASE_PATH}/${MYDIR}/${I2G_MPI_APPLICATION}
+        fi
+    fi
+
+    # here we have an absolute path, need to fix if common to $MYDIR
+    APP_CANONIC=`readlink -f ${I2G_MPI_APPLICATION} 2> /dev/null`
+    if test $? -eq 0; then
+        MYDIR_CANONIC=`readlink -f ${MYDIR} 2> /dev/null`
+        SUBS_APP=`echo $APP_CANONIC | sed -e "s#^${MYDIR_CANONIC}#${SHARED_BASE_PATH}/${MYDIR}#"`
+        if test "${SUBS_APP}" != "${APP_CANONIC}" ; then
+            export I2G_MPI_APPLICATION=${SUBS_APP}
+        fi
+    else
+        # readlink is not available !?, lets assume no links...
+        APP_DIR=`dirname ${I2G_MPI_APPLICATION}`
+        if test "${APP_DIR}" = "${MYDIR}"; then
+            export I2G_MPI_APPLICATION=${SHARED_BASE_PATH}/${MYDIR}/`basename ${I2G_MPI_APPLICATION}`
+        fi
+    fi
+}
+
 copy() {
     debug_msg "distribute using cptoshared"
     export MPI_START_CPTOSHARED_HOME=$PWD
@@ -38,32 +80,7 @@ copy() {
         chmod a+w ${SHARED_BASE_PATH}/${EDG_WL_SCRATCH}/.mpi
     fi
 
-    if test "x${I2G_MPI_APPLICATION}" != "x" ; then
-        if test "${I2G_MPI_APPLICATION/#\/}" == "${I2G_MPI_APPLICATION}" ;  then
-            WHICHAPP=`which $I2G_MPI_APPLICATION 2> /dev/null`
-            if test $? -eq 0 ; then 
-                if test `dirname $WHICHAPP` == '.' ; then
-                    export I2G_MPI_APPLICATION=${SHARED_BASE_PATH}/${MYDIR}/${I2G_MPI_APPLICATION}
-                fi
-            else
-                export I2G_MPI_APPLICATION=${SHARED_BASE_PATH}/${MYDIR}/${I2G_MPI_APPLICATION}
-            fi
-        else
-            APP_CANONIC=`readlink -f ${I2G_MPI_APPLICATION} 2> /dev/null`
-            MYDIR_CANONIC=`readlink -f ${MYDIR} 2> /dev/null`
-            if test $? -eq 0; then    # readlink may not available
-		SUBS_APP=`echo $APP_CANONIC | sed -e "s#^${MYDIR_CANONIC}#${SHARED_BASE_PATH}/${MYDIR}#"`
-                if test "${SUBS_APP}" != "${APP_CANONIC}" ; then
-                    export I2G_MPI_APPLICATION=${SUBS_APP}
-                fi
-            else
-		SUBS_APP=`echo $I2G_MPI_APPLICATION | sed -e "s#^${MYDIR_CANONIC}#${SHARED_BASE_PATH}/${MYDIR}#"`
-                if test "${SUBS_APP}" != "${I2G_MPI_APPLICATION}" ; then
-                    export I2G_MPI_APPLICATION=${SUBS_APP}
-                fi
-            fi
-        fi
-    fi
+    fix_app_path
 
     # copy proxy to shared location also
     if test "x${X509_USER_PROXY}" != "x" ; then
