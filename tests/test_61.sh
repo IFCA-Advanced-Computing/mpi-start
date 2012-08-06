@@ -21,85 +21,85 @@ setUp () {
 }
 
 testVarJustName () {
-	export I2G_MPI_PRE_RUN_HOOK=`$MYMKTEMP`
+    export I2G_MPI_PRE_RUN_HOOK=`$MYMKTEMP`
     cat > $I2G_MPI_PRE_RUN_HOOK << EOF
 pre_run_hook() {
-	[ -n "\${VAR+x}" ]
+    [ -n "\${VAR+x}" ]
 }
 EOF
-	$I2G_MPI_START -d VAR -- true
-	st=$?
+    $I2G_MPI_START -d VAR -- true
+    st=$?
     assertEquals 0 $st
     rm -rf $I2G_MPI_PRE_RUN_HOOK
 }
 
 testVarEmpty () {
-	export I2G_MPI_PRE_RUN_HOOK=`$MYMKTEMP`
+    export I2G_MPI_PRE_RUN_HOOK=`$MYMKTEMP`
     cat > $I2G_MPI_PRE_RUN_HOOK << EOF
 pre_run_hook() {
-	[ -n "\${VAR+x}" ]
+    [ -n "\${VAR+x}" ]
 }
 EOF
-	$I2G_MPI_START -d VAR= -- true
-	st=$?
+    $I2G_MPI_START -d VAR= -- true
+    st=$?
     assertEquals 0 $st
 }
 
 testVarJustNamePredef() {
-	export VAR="foo bar"
-	export I2G_MPI_PRE_RUN_HOOK=`$MYMKTEMP`
+    export VAR="foo bar"
+    export I2G_MPI_PRE_RUN_HOOK=`$MYMKTEMP`
     cat > $I2G_MPI_PRE_RUN_HOOK << EOF
 pre_run_hook() {
-	[ "x\$VAR" == "x$VAR" ]
+    [ "x\$VAR" == "x$VAR" ]
 }
 EOF
-	$I2G_MPI_START -d VAR -- true
-	st=$?
+    $I2G_MPI_START -d VAR -- true
+    st=$?
     assertEquals 0 $st
 }
 
 testVarEmptyPredef() {
-	export VAR="foo bar"
-	export I2G_MPI_PRE_RUN_HOOK=`$MYMKTEMP`
+    export VAR="foo bar"
+    export I2G_MPI_PRE_RUN_HOOK=`$MYMKTEMP`
     cat > $I2G_MPI_PRE_RUN_HOOK << EOF
 pre_run_hook() {
-	[ -n "\${VAR+x}" ] && [ "x\$VAR" == "x" ]
+    [ -n "\${VAR+x}" ] && [ "x\$VAR" == "x" ]
 }
 EOF
-	$I2G_MPI_START -d VAR= -- true
-	st=$?
+    $I2G_MPI_START -d VAR= -- true
+    st=$?
     assertEquals 0 $st
 }
 
 testVarSimpleValue() {
-	VALUE="1234"
-	export I2G_MPI_PRE_RUN_HOOK=`$MYMKTEMP`
+    VALUE="1234"
+    export I2G_MPI_PRE_RUN_HOOK=`$MYMKTEMP`
     cat > $I2G_MPI_PRE_RUN_HOOK << EOF
 pre_run_hook() {
-	[ "x\$VAR" == "x$VALUE" ]
+    [ "x\$VAR" == "x$VALUE" ]
 }
 EOF
-	$I2G_MPI_START -d VAR="$VALUE" -- true
-	st=$?
+    $I2G_MPI_START -d VAR="$VALUE" -- true
+    st=$?
     assertEquals 0 $st
 }
 
 testVarValueWithSpaces() {
-	VALUE="1234 -foo- 1234"
-	export I2G_MPI_PRE_RUN_HOOK=`$MYMKTEMP`
+    VALUE="1234 -foo- 1234"
+    export I2G_MPI_PRE_RUN_HOOK=`$MYMKTEMP`
     cat > $I2G_MPI_PRE_RUN_HOOK << EOF
 pre_run_hook() {
-	[ "x\$VAR" == "x$VALUE" ]
+    [ "x\$VAR" == "x$VALUE" ]
 }
 EOF
-	$I2G_MPI_START -d VAR="$VALUE" -- true
-	st=$?
+    $I2G_MPI_START -d VAR="$VALUE" -- true
+    st=$?
     assertEquals 0 $st
 }
 
 testWrongSyntax() {
-	$I2G_MPI_START -d V-AR="VALUE" -- true 2> /dev/null
-	st=$?
+    $I2G_MPI_START -d V-AR="VALUE" -- true 2> /dev/null
+    st=$?
     assertEquals 1 $st
 }
 
