@@ -14,31 +14,42 @@ fi
 
 export OSC_MPIEXEC=0
 export HYDRA_MPIEXEC=0
+export MPIRUN_RSH=0
 
 # activate MPI
 mpi_start_activate_mpi $MPI_START_MPI_PREFIX $MPI_START_MPI_MODULE
 # further determine if the mpiexec is OSC or hydra or mpirun_rsh 
-if test "x$MPI_MPIEXEC" != "x"; then
+if test $MPI_MPIEXEC_DEFINED -eq 0 -a $MPI_MPIRUN_DEFINED -eq 0; then
     $MPI_MPIEXEC 2>&1 | grep -e "-\<np\>" > /dev/null 2>&1
     st=$?
     if test $st -ne 0 ; then
         export OSC_MPIEXEC=1
     else
-        # assume mpiexec is HYDRA
-        export HYDRA_MPIEXEC=1
+        # try with mpiexec.hydra
+        MPIEXEC=`which mpiexec.hydra 2> /dev/null`
+        if test $? -eq 0 -a "x$MPI_MVAPICH2_DISABLE_HYDRA" != "x1" ; then
+            export HYDRA_MPIEXEC=1
+            MPI_MPIEXEC=$MPIEXEC
+        else
+            # try to find mpirun_rsh 
+            MPIRUN=`which mpirun_rsh > /dev/null`
+            if test $? -eq 0 ; then
+                MPI_MPIRUN=$MPIRUN
+                export MPIRUN_RSH=1
+            fi
+        fi
     fi
-else 
-    # try to find mpirun_rsh 
-    MPIRUN=`which mpirun_rsh > /dev/null`
-    if test $? -eq 0 ; then
-        MPI_MPIRUN=$MPIRUN
-    else
-        warn_msg "No mpiexec or mpirun_rsh detected, will try generic parameters with mpirun"
+else
+    # check aslo here if we are using OSC
+    $MPI_MPIEXEC 2>&1 | grep -e "-\<np\>" > /dev/null 2>&1
+    st=$?
+    if test $st -ne 0 ; then
+        export OSC_MPIEXEC=1
     fi
 fi
 
 # start an mpi job with mpd
-mpich2_with_mpd () {
+mvapich2_with_mpirunrsh() {
     debug_msg "assume it is safe to set the machinefile and number of processes"
     if test "x${MPI_START_NPHOST}" != "x" ; then
         debug_msg "Creating machine file for per node option"
@@ -61,74 +72,25 @@ mpich2_with_mpd () {
             MACHINES=$MPI_START_MACHINEFILE
         fi
     fi
-    local machines_params="-machinefile $MACHINES -np $MPI_START_NP"
-    MPDBOOT_PARAMS="-n $MPI_START_NHOSTS -f $MPI_START_HOSTFILE"
+    local machines_params="-np $MPI_START_NP -hostfile $MACHINES"
 
-    local SSH_AGENT=ssh
-    if test "x$MPI_START_SSH_AGENT" != "x"; then
-        # we are not using default start methods, setting specific ssh 
-        debug_msg "setting specific ssh agent"
-        MPDBOOT_PARAMS="$MPDBOOT_PARAMS --rsh=$MPI_START_SSH_AGENT"
-        SSH_AGENT="$MPI_START_SSH_AGENT"
-    fi
-
-    # take care that the ".mpd.conf" file is available
-    # make sure that we have a home, of not use pwd
-    if test "x$HOME" == "x" ; then
-        export HOME=$PWD
-    fi
-    echo "MPD_SECRETWORD=" > $HOME/.mpd.conf
-    chmod 0600 $HOME/.mpd.conf
-
-    # Assure that .mpd.conf is present at remote nodes
-    # use provided ssh agent
-    for MPI_START_REMOTE_NODE in `cat $MPI_START_HOSTFILE`; do
-        if test $MPI_START_REMOTE_NODE = `hostname` -o $MPI_START_REMOTE_NODE = `hostname -f` -o $MPI_START_REMOTE_NODE = "localhost" ; then
-            continue
-        fi
-        $SSH_AGENT $MPI_START_REMOTE_NODE "mkdir -p $HOME 2>&1 > /dev/null"
-        if test $? -ne 0 ; then
-            warn_msg "Unable to create $HOME at remote node, proably job will not start"
-            continue
-        fi
-        cat $HOME/.mpd.conf | $SSH_AGENT $MPI_START_REMOTE_NODE cat ">" $HOME/.mpd.conf 
-        if test $? -ne 0 ; then
-            warn_msg "Unable to copy .mpd.conf to remote node, proably job will not start"
-        fi
-    done
-
-    # Start MPICH2 daemon.
-    mpdboot $MPDBOOT_PARAMS 
-    st=$?
-    if test $st -ne 0 ; then
-        error_msg "Unable to start MPD, aborting execution"
-        dump_env
-        exit 1
-    fi
-
-    MPI_GLOBAL_PARAMS="$MPI_GLOBAL_PARAMS $MPICH2_PARAMS $machines_params"
+    MPI_GLOBAL_PARAMS="$MPI_GLOBAL_PARAMS $MVAPICH2_PARAMS $machines_params"
 
     # set the environment variables
     if test "x${MPI_START_ENV_VARIABLES}" != "x" ; then
-        local envparam=""
-        local first=1
-        for var in ${MPI_START_ENV_VARIABLES}; do
-            if test $first -eq 0 ; then
-                envparam="${envparam},${var}"
-            else
-                envparam="-envlist $var"
-                first=0
-            fi
+        local vars=${#MPI_START_JOB_ENV[*]}
+        local index=0
+
+        while [ $index -lt $vars ]; do
+            MPI_LOCAL_PARAMS="${MPI_LOCAL_PARAMS} ${MPI_START_JOB_ENV[$index]}"
+            index=$(($index+1))
         done
-        MPI_LOCAL_PARAMS="${MPI_LOCAL_PARAMS} ${envparam}"
     fi
     mpi_start_get_plugin "generic_mpiexec.sh" 1
     . $MPI_START_PLUGIN_FILES
     generic_mpiexec
     err=$?
 
-    # Stop the daemon.
-    mpdallexit
     return $err
 }
 
@@ -141,45 +103,49 @@ mpi_exec () {
         return $?
     fi
 
-    if test "x$MPI_MPIEXEC" != "x"; then
+    if test $OSC_MPIEXEC -eq 1 then
         MPIEXEC=$MPI_MPIEXEC
         MPI_GLOBAL_PARAMS=$MPI_SPECIFIC_MPIEXEC_PARAMS
-
-        if test ${OSC_MPIEXEC} -eq  1 ; then
-            # OSC mpiexec! 
-            # if a comm method has already been requested don't set
-            if `echo $MPI_GLOBAL_PARAMS | grep -vq "comm=" 2> /dev/null`; then
-                MPI_GLOBAL_PARAMS="$MPI_GLOBAL_PARAMS --comm=pmi"
-            fi
-            if test "x$MPI_START_NPHOST" = "x1" ; then
-                MPI_GLOBAL_PARAMS="$MPI_GLOBAL_PARAMS -pernode"
-            elif test "x${I2G_MPI_PER_NODE}" != "x" ; then
-                warn_msg "Per node option ignored when using OSC mpiexec"
-            fi
-            mpi_start_get_plugin "generic_mpiexec.sh" 1
-            . $MPI_START_PLUGIN_FILES
-            generic_mpiexec
-            err=$?
-        elif test ${HYDRA_MPIEXEC} -eq 1 ; then
-            mpi_start_get_plugin "hydra.sh" 1
-            . $MPI_START_PLUGIN_FILES
-            HYDRA_EXTRA_PARAMS=$MVAPICH2_PARAMS
-            mpiexec_with_hydra
-            err=$?
-        else
-            mpich2_with_mpd
-            err=$?
+        # OSC mpiexec! 
+        # if a comm method has already been requested don't set
+        if `echo $MPI_GLOBAL_PARAMS | grep -vq "comm=" 2> /dev/null`; then
+            MPI_GLOBAL_PARAMS="$MPI_GLOBAL_PARAMS --comm=pmi"
         fi
-    elif test "x$MPI_MPIRUN" != "x"; then
-        MPIEXEC=$MPI_MPIRUN
-        MPI_GLOBAL_PARAMS=$MPI_SPECIFIC_MPIRUN_PARAMS
-        mpich2_with_mpd
+        if test "x$MPI_START_NPHOST" = "x1" ; then
+            MPI_GLOBAL_PARAMS="$MPI_GLOBAL_PARAMS -pernode"
+        elif test "x${I2G_MPI_PER_NODE}" != "x" ; then
+            warn_msg "Per node option ignored when using OSC mpiexec"
+        fi
+        mpi_start_get_plugin "generic_mpiexec.sh" 1
+        . $MPI_START_PLUGIN_FILES
+        generic_mpiexec
+        err=$?
+    elif test $HYDRA_MPIEXEC -eq 1 ; then
+        mpi_start_get_plugin "hydra.sh" 1
+        . $MPI_START_PLUGIN_FILES
+        HYDRA_EXTRA_PARAMS=$MVAPICH2_PARAMS
+        mpiexec_with_hydra
+        err=$?
+    elif test $MPIRUN_RSH -eq 1 ; then
+        mvapich2_with_mpirunrsh
         err=$?
     else
-        debug_msg "no mpiexec/mpirun found!"
-        dump_env
-        exit 1
+        if test "x${MPI_MPIRUN}" != "x" ; then
+            MPIEXEC=$MPI_MPIRUN
+        elif test "x${MPI_MPIEXEC}" != "x" ; then
+            MPIEXEC=$MPI_MPIEXEC
+        else
+            err_msg "No mpirun/mpiexec found."
+            dump_env
+            exit 1
+        fi
+        info_msg "Using generic mpirun/mpiexec options."
+        mpi_start_get_plugin "generic_mpiexec.sh" 1
+        . $MPI_START_PLUGIN_FILES
+        generic_mpiexec
+        err=$?
     fi
+
     return $err
 }
 

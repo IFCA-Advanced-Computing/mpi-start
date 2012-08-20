@@ -28,7 +28,7 @@ mpi_exec () {
         MPIEXEC=$MPI_MPIRUN
         MPI_GLOBAL_PARAMS=$MPI_SPECIFIC_MPIRUN_PARAMS
     else
-        debug_msg "no mpiexec/mpirun found!"
+        error_msg "no mpiexec/mpirun found!"
         dump_env
         exit 1
     fi
