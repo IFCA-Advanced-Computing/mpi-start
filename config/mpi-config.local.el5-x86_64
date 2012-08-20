@@ -5,3 +5,4 @@ MPI_MPICH_PATH=${MPI_MPICH_PATH:-/opt/mpich-1.2.7}
 MPI_OPENMPI_PATH=${MPI_OPENMPI_PATH:-/usr/lib64/openmpi/1.4-gcc}
 MPI_MPICH2_PATH=${MPI_MPICH2_PATH:-/usr/lib64/mpich2}
 MPI_LAM_PATH=${MPI_LAM_PATH:-/usr/lib64/lam}
+MPI_MVAPICH2_PATH=${MPI_MVAPICH2_PATH:-/usr/lib64/mvapich2/1.4-gcc}
