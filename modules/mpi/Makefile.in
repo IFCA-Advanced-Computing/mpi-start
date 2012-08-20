@@ -6,6 +6,7 @@ all:
 	$(MAKE) -C mpich all
 	$(MAKE) -C generic all
 	$(MAKE) -C dummy all
+	$(MAKE) -C mvapich2 all
 
 clean:
 	$(MAKE) -C openmpi clean
@@ -15,6 +16,7 @@ clean:
 	$(MAKE) -C mpich clean
 	$(MAKE) -C generic clean
 	$(MAKE) -C dummy clean
+	$(MAKE) -C mvapich2 clean
 
 install:
 	install -d $(DESTDIR)/$(moduledir)
@@ -27,6 +29,7 @@ install:
 	$(MAKE) -C mpich install
 	$(MAKE) -C generic install
 	$(MAKE) -C dummy install
+	$(MAKE) -C mvapich2 install
 
 uninstall:
 	rm -f $(DESTDIR)/$(moduledir)/generic_mpiexec.sh 
@@ -38,3 +41,4 @@ uninstall:
 	$(MAKE) -C mpich uninstall
 	$(MAKE) -C generic uninstall
 	$(MAKE) -C dummy uninstall
+	$(MAKE) -C mvapich2 uninstall 
