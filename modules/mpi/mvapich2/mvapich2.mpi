@@ -103,7 +103,7 @@ mpi_exec () {
         return $?
     fi
 
-    if test $OSC_MPIEXEC -eq 1 then
+    if test $OSC_MPIEXEC -eq 1 ; then
         MPIEXEC=$MPI_MPIEXEC
         MPI_GLOBAL_PARAMS=$MPI_SPECIFIC_MPIEXEC_PARAMS
         # OSC mpiexec! 
@@ -127,6 +127,7 @@ mpi_exec () {
         mpiexec_with_hydra
         err=$?
     elif test $MPIRUN_RSH -eq 1 ; then
+        MPIEXEC=$MPI_MPIRUN
         mvapich2_with_mpirunrsh
         err=$?
     else
