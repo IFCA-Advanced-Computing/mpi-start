@@ -32,7 +32,7 @@ if test $MPI_MPIEXEC_DEFINED -eq 0 -a $MPI_MPIRUN_DEFINED -eq 0; then
             MPI_MPIEXEC=$MPIEXEC
         else
             # try to find mpirun_rsh 
-            MPIRUN=`which mpirun_rsh > /dev/null`
+            MPIRUN=`which mpirun_rsh 2> /dev/null`
             if test $? -eq 0 ; then
                 MPI_MPIRUN=$MPIRUN
                 export MPIRUN_RSH=1
