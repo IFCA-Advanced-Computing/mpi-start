@@ -122,6 +122,7 @@ modules/mpi/generic/Makefile
 modules/mpi/lam/Makefile
 modules/mpi/mpich/Makefile
 modules/mpi/mpich2/Makefile
+modules/mpi/mvapich2/Makefile
 modules/mpi/openmpi/Makefile
 modules/mpi/pacx/Makefile
 modules/schedulers/Makefile
