@@ -17,19 +17,23 @@ export HYDRA_MPIEXEC=0
 
 # activate MPI
 mpi_start_activate_mpi $MPI_START_MPI_PREFIX $MPI_START_MPI_MODULE
-# further determine if the mpiexec is OSC or hydra or whatever
+# further determine if the mpiexec is OSC or hydra or mpirun_rsh 
 if test "x$MPI_MPIEXEC" != "x"; then
     $MPI_MPIEXEC 2>&1 | grep -e "-\<np\>" > /dev/null 2>&1
     st=$?
     if test $st -ne 0 ; then
         export OSC_MPIEXEC=1
     else
-        # try with mpiexec.hydra
-        MPIEXEC=`which mpiexec.hydra 2> /dev/null`
-        if test $? -eq 0 -a "x$MPI_MPICH2_DISABLE_HYDRA" != "x1" ; then
-            export HYDRA_MPIEXEC=1
-            MPI_MPIEXEC=$MPIEXEC
-        fi
+        # assume mpiexec is HYDRA
+        export HYDRA_MPIEXEC=1
+    fi
+else 
+    # try to find mpirun_rsh 
+    MPIRUN=`which mpirun_rsh > /dev/null`
+    if test $? -eq 0 ; then
+        MPI_MPIRUN=$MPIRUN
+    else
+        warn_msg "No mpiexec or mpirun_rsh detected, will try generic parameters with mpirun"
     fi
 fi
 
@@ -159,7 +163,7 @@ mpi_exec () {
         elif test ${HYDRA_MPIEXEC} -eq 1 ; then
             mpi_start_get_plugin "hydra.sh" 1
             . $MPI_START_PLUGIN_FILES
-            HYDRA_EXTRA_PARAMS=$MPICH2_PARAMS
+            HYDRA_EXTRA_PARAMS=$MVAPICH2_PARAMS
             mpiexec_with_hydra
             err=$?
         else
