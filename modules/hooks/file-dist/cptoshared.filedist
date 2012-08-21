@@ -34,7 +34,6 @@ fix_app_path() {
             else
                 # in path, absolute, only fix if needed
                 PATH_TO_FIX="$WHICHAPP"
-                return
             fi
         else
             # not in path and relative, just prepend dirs
