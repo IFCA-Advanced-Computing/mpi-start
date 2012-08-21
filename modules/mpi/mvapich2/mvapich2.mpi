@@ -50,7 +50,7 @@ fi
 
 # start an mpi job with mpd
 mvapich2_with_mpirunrsh() {
-    debug_msg "assume it is safe to set the machinefile and number of processes"
+    debug_msg "Starting job with mpirun_rsh"
     if test "x${MPI_START_NPHOST}" != "x" ; then
         debug_msg "Creating machine file for per node option"
         mpi_start_mktemp

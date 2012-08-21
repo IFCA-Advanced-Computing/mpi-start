@@ -22,15 +22,18 @@ fix_app_path() {
         return
     fi
 
-    if test "${I2G_MPI_APPLICATION/#\/}" == "${I2G_MPI_APPLICATION}" ;  then
+    PATH_TO_FIX="$I2G_MPI_APPLICATION"
+
+    if test "${I2G_MPI_APPLICATION/#\/}" = "${I2G_MPI_APPLICATION}" ;  then
         # relative path, assure is not in path
         WHICHAPP=`which $I2G_MPI_APPLICATION 2> /dev/null`
         if test $? -eq 0 ; then 
-            if test "${WHICHAPP/#\/}" == "${WHICHAPP}" ;  then
+            if test "${WHICHAPP/#\/}" = "${WHICHAPP}" ;  then
                 # in path, but relative, fix...
-                I2G_MPI_APPLICATION=${MYDIR}/${WHICHAPP}
+                PATH_TO_FIX="${MYDIR}/${WHICHAPP}"
             else
-                # in path, absolute, do not try to fix
+                # in path, absolute, only fix if needed
+                PATH_TO_FIX="$WHICHAPP"
                 return
             fi
         else
@@ -41,16 +44,16 @@ fix_app_path() {
     fi
 
     # here we have an absolute path, need to fix if common to $MYDIR
-    APP_CANONIC=`readlink -f ${I2G_MPI_APPLICATION} 2> /dev/null`
+    APP_CANONIC=`readlink -f ${PATH_TO_FIX} 2> /dev/null`
     if test $? -eq 0; then
         MYDIR_CANONIC=`readlink -f ${MYDIR} 2> /dev/null`
     else
-        APP_CANONIC=`python -c 'import os,sys;print os.path.realpath(sys.argv[1])' ${I2G_MPI_APPLICATION} 2> /dev/null`
+        APP_CANONIC=`python -c 'import os,sys;print os.path.realpath(sys.argv[1])' ${PATH_TO_FIX} 2> /dev/null`
         if test $? -eq 0; then
             MYDIR_CANONIC=`python -c 'import os,sys;print os.path.realpath(sys.argv[1])' ${MYDIR} 2> /dev/null`
         else
             # no readlink, no python, just trust that there are no symbolic links that messes this up
-            APP_CANONIC=$I2G_MPI_APPLICATION
+            APP_CANONIC=$PATH_TO_FIX
             MYDIR_CANONIC=$MYDIR_CANONIC
         fi
     fi
@@ -58,6 +61,7 @@ fix_app_path() {
     if test "${SUBS_APP}" != "${APP_CANONIC}" ; then
         export I2G_MPI_APPLICATION=${SUBS_APP}
     fi
+
 }
 
 copy() {
