@@ -150,7 +150,6 @@ mpi_exec () {
     return $err
 }
 
-
 mpi_start () {
     mpi_start_get_plugin "generic_mpi_start.sh" 1
     . $MPI_START_PLUGIN_FILES

@@ -39,6 +39,7 @@ RUN_AFFINITY_TESTS=1
 # if running these tests, ensure you have proper environment loaded!
 RUN_OMP_TESTS=0
 RUN_MPICH2_TESTS=0
+RUN_MVAPICH2_TESTS=0
 RUN_MPICH_TESTS=0
 RUN_OPENMPI_TESTS=0
 RUN_LAM_TESTS=0
@@ -77,9 +78,9 @@ if test "x${I2G_MPI_START}" = "x" ; then
     fi
 fi
 
-echo 
+echo ""
 echo "** Using $I2G_MPI_START for testing! **"
-echo 
+echo ""
 
 #
 # Run all the tests in the directory
@@ -93,7 +94,7 @@ if test "x${RUN_UNIT_TESTS}" = "x1" ; then
     echo "***************************"
 fi
 if test "x${RUN_BASIC_TESTS}" = "x1" ; then
-    echo
+    echo ""
     echo "***************************"
     echo "* Basic Tests"
     echo "* RFCs #16, #25"
@@ -105,7 +106,7 @@ if test "x${RUN_BASIC_TESTS}" = "x1" ; then
     echo "***************************"
 fi
 if test "x${RUN_HOOK_TESTS}" = "x1" ; then
-    echo
+    echo ""
     echo "***************************"
     echo "* Hook Tests"
     ./test_hooks.sh || exitcode=1
@@ -114,7 +115,7 @@ if test "x${RUN_HOOK_TESTS}" = "x1" ; then
     echo "***************************"
 fi
 if test "x${RUN_NP_TESTS}" = "x1" ; then
-    echo
+    echo ""
     echo "***************************"
     echo "* Process Distribution"
     echo "* RFC #41"
@@ -122,7 +123,7 @@ if test "x${RUN_NP_TESTS}" = "x1" ; then
     echo "***************************"
 fi
 if test "x${RUN_FSDETECT_TESTS}" = "x1" ; then
-    echo
+    echo ""
     echo "***************************"
     echo "* Filesystem Detection & File distribution"
     echo "* RFC #31"
@@ -138,7 +139,7 @@ if test "x${RUN_FSDETECT_TESTS}" = "x1" ; then
     echo "***************************"
 fi
 if test "x${RUN_SCH_TESTS}" = "x1" ; then
-    echo
+    echo ""
     echo "***************************"
     echo "* Scheduler Tests"
     echo "* RFC #4"
@@ -157,7 +158,7 @@ if test "x${RUN_SCH_TESTS}" = "x1" ; then
     echo "***************************"
 fi
 if test "x${RUN_OMP_TESTS}" = "x1" ; then
-    echo
+    echo ""
     echo "***************************"
     echo "* OMP Tests"
     echo "* RFC #21"
@@ -166,7 +167,7 @@ if test "x${RUN_OMP_TESTS}" = "x1" ; then
     echo "***************************"
 fi
 if test "x${RUN_MPICH2_TESTS}" = "x1" ; then
-    echo
+    echo ""
     echo "***************************"
     echo "* MPICH2 Tests"
     export I2G_MPI_TYPE=mpich2
@@ -182,7 +183,7 @@ if test "x${RUN_MPICH2_TESTS}" = "x1" ; then
     echo "***************************"
 fi
 if test "x${RUN_MPICH_TESTS}" = "x1" ; then
-    echo
+    echo ""
     echo "***************************"
     echo "* MPICH Tests"
     export I2G_MPI_TYPE=mpich
@@ -190,7 +191,7 @@ if test "x${RUN_MPICH_TESTS}" = "x1" ; then
     echo "***************************"
 fi
 if test "x${RUN_OPENMPI_TESTS}" = "x1" ; then
-    echo
+    echo ""
     echo "***************************"
     echo "* Open MPI Tests"
     export I2G_MPI_TYPE=openmpi
@@ -205,15 +206,23 @@ if test "x${RUN_OPENMPI_TESTS}" = "x1" ; then
     echo "***************************"
 fi
 if test "x${RUN_LAM_TESTS}" = "x1" ; then
-    echo
+    echo ""
     echo "***************************"
     echo "* LAM Tests"
     export I2G_MPI_TYPE=lam
     ./test_mpi.sh || exitcode=1
     echo "***************************"
 fi
+if test "x${RUN_MVAPICH2_TESTS}" = "x1" ; then
+    echo ""
+    echo "***************************"
+    echo "* MVAPICH2 Tests"
+    export I2G_MPI_TYPE=mvapich2
+    ./test_mpi.sh || exitcode=1
+    echo "***************************"
+fi
 
-echo
+echo ""
 
 if test $REMOVE_MY_SHUNIT -eq 1 ; then
     rm $SHUNIT2
@@ -225,5 +234,11 @@ for f in `cat $tempfiles`; do
     fi
 done
 rm $tempfiles
+
+if test $exitcode -ne 0 ; then
+    echo "***************************"
+    echo " SOME OF THE TESTS FAILED! "
+    echo "***************************"
+fi
 
 exit $exitcode 
