@@ -211,7 +211,7 @@ MPI_SUBMIT_FILTER="yes"
 EOF
 if [ "x$OSTYPE" = "xsl6" ] ; then
     TORQUE_VAR_DIR=/var/lib/torque
-    echo "TORQUE_VAR_DIR=/var/lib/torque" >> /etc/yaim/site-info.def
+    #echo "TORQUE_VAR_DIR=/var/lib/torque" >> /etc/yaim/site-info.def
 else
     TORQUE_VAR_DIR=/var/torque
 fi
