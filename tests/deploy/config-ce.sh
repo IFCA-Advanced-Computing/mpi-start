@@ -82,6 +82,8 @@ echo "*"
 echo "** Configure basic CE with MPI"
 echo "*"
 
+MPI_START_VERSION=`mpi-start -V | cut -f2- -dv`
+
 echo "*******************************************"
 echo " 1 MPI Flavour"
 echo "*******************************************"
@@ -97,7 +99,7 @@ configure_ok
 cat > /tmp/env << EOF
 MPI_NO_SHARED_HOME
 MPI-START
-MPI-START-1.3.0
+MPI-START-${MPI_START_VERSION}
 OPENMPI
 OPENMPI-2.3.4
 EOF
@@ -119,7 +121,7 @@ configure_ok
 cat > /tmp/env << EOF
 MPI_SHARED_HOME
 MPI-START
-MPI-START-1.3.0
+MPI-START-${MPI_START_VERSION}
 OPENMPI
 OPENMPI-2.3.4
 EOF
