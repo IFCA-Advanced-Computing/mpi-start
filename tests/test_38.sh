@@ -4,21 +4,27 @@
 # Tests for ticket #38. 
 #
 
-export I2G_MPI_START_ENABLE_TESTING="TEST"
-# source the mpi-start code to have all functions
-. $I2G_MPI_START
-mpi_start_check_options
-mpi_start_load_execenv
+oneTimeSetUp () {
+    export I2G_MPI_START_ENABLE_TESTING="TEST"
+    # source the mpi-start code to have all functions
+    . $I2G_MPI_START
+    mpi_start_check_options
+    mpi_start_load_execenv
 
-export MPI_OPENMPI_MPIEXEC=`$MYMKTEMP`
-cat > $MPI_OPENMPI_MPIEXEC << EOF
-#/bin/sh
-exit 0
+    export MPI_OPENMPI_MPIEXEC=`$MYMKTEMP`
+    cat > $MPI_OPENMPI_MPIEXEC << EOF
+    #/bin/sh
+    exit 0
 EOF
-chmod +x $MPI_OPENMPI_MPIEXEC
+    chmod +x $MPI_OPENMPI_MPIEXEC
 
-MPI_START_SCHEDULER="pbs"
-MPI_START_DISABLE_LRMS_INTEGRATION="no"
+    MPI_START_SCHEDULER="pbs"
+    MPI_START_DISABLE_LRMS_INTEGRATION="no"
+}
+
+oneTimeTearDown() {
+    clean_up
+}
 
 tearDown() {
     for file in $MPI_START_CLEANUP_FILES; do

@@ -4,10 +4,16 @@
 # Tests for MPI-Start process distribution features 
 #
 
-export I2G_MPI_START_ENABLE_TESTING="TEST"
-# source the mpi-start code to have all functions
-. $I2G_MPI_START
+oneTimeSetUp () {
+    export I2G_MPI_START_ENABLE_TESTING="TEST"
+    # source the mpi-start code to have all functions
+    . $I2G_MPI_START
+    mpi_start_find_mktemp
+}
 
+oneTimeTearDown () {
+    clean_up
+}
 
 setUp () {
     export I2G_MPI_TYPE="dummy"
@@ -29,12 +35,6 @@ setUp () {
     unset I2G_MPI_PER_SOCKET
     export MPI_START_SHARED_FS=1
     export MPI_START_DUMMY_SCHEDULER=1
-}
-
-tearDown() {
-    for file in $MPI_START_CLEANUP_FILES; do
-        [ -f $file ] && rm -f $file
-    done
 }
 
 testPnodeSingle() {

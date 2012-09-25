@@ -2,9 +2,11 @@
 
 # MPI-Start affinity tests
 
-export I2G_MPI_START_ENABLE_TESTING="TEST"
-# source the mpi-start code to have all functions
-. $I2G_MPI_START
+oneTimeSetUp () {
+    export I2G_MPI_START_ENABLE_TESTING="TEST"
+    # source the mpi-start code to have all functions
+    . $I2G_MPI_START
+}
 
 setUp () {
     unset I2G_MPI_NP
@@ -22,9 +24,7 @@ setUp () {
 }
 
 tearDown() {
-    for file in $MPI_START_CLEANUP_FILES; do
-        [ -f $file ] && rm -f $file
-    done
+    clean_up
 }
 
 testNoAffinity() {

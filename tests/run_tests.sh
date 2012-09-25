@@ -37,11 +37,11 @@ RUN_SCH_TESTS=1
 RUN_FSDETECT_TESTS=1
 RUN_AFFINITY_TESTS=1
 # if running these tests, ensure you have proper environment loaded!
-RUN_OMP_TESTS=0
+RUN_OMP_TESTS=1
 RUN_MPICH2_TESTS=0
 RUN_MVAPICH2_TESTS=0
 RUN_MPICH_TESTS=0
-RUN_OPENMPI_TESTS=0
+RUN_OPENMPI_TESTS=1
 RUN_LAM_TESTS=0
 
 export MPI_OPENMPI_MPIEXEC_PARAMS="--mca btl ^openib"
@@ -91,6 +91,8 @@ if test "x${RUN_UNIT_TESTS}" = "x1" ; then
     echo "* Unit Tests"
     echo "* RFCs #30, #35"
     ./test_unit.sh || exitcode=1
+    echo "* RFC #63"
+    ./test_63.sh || exitcode=1
     echo "***************************"
 fi
 if test "x${RUN_BASIC_TESTS}" = "x1" ; then

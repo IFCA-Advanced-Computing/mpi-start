@@ -15,6 +15,10 @@ tearDown() {
     done
 }
 
+oneTimeTearDown () {
+    [ -d $MPI_START_TEMP_DIR ] && rmdir $MPI_START_TEMP_DIR
+}
+
 
 testBug47() {
     export MPI_MPICH_MPIRUN=`$MYMKTEMP`

@@ -2,13 +2,19 @@
 
 # tests for bug #53
 
-export I2G_MPI_START_ENABLE_TESTING="TEST"
-# source the mpi-start code to have all functions
-. $I2G_MPI_START
-mpi_start_check_options
-# load hooks
-mpi_start_get_plugin "mpi-start-hooks.sh" 1
-. $MPI_START_PLUGIN_FILES 
+oneTimeSetUp() {
+    export I2G_MPI_START_ENABLE_TESTING="TEST"
+    # source the mpi-start code to have all functions
+    . $I2G_MPI_START
+    mpi_start_check_options
+    # load hooks
+    mpi_start_get_plugin "mpi-start-hooks.sh" 1
+    . $MPI_START_PLUGIN_FILES 
+}
+
+oneTimeTearDown() {
+    clean_up
+}
 
 setUp () {
     export I2G_MPI_START_DEBUG=1

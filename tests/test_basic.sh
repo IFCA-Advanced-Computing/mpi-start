@@ -226,11 +226,12 @@ pre_run_hook() {
     return \$st
 }
 EOF
-    output=`$I2G_MPI_START -pre $myhook -t dummy -- true`
+    output=`I2G_MPI_START_KEEP_FILES=0 $I2G_MPI_START -pre $myhook -t dummy -- true`
     st=$?
     assertEquals 0 $st
     ls $output 2> /dev/null
-    assertNotEquals 0 $?
+    st=$?
+    assertNotEquals 0 $st
     rm -f $myhook
 }
 . $SHUNIT2

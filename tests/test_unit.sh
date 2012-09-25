@@ -2,9 +2,11 @@
 
 # MPI-Start unit tests for mpi-start main code
 
-export I2G_MPI_START_ENABLE_TESTING="TEST"
-# source the mpi-start code to have all functions
-. $I2G_MPI_START
+oneTimeSetUp() {
+    export I2G_MPI_START_ENABLE_TESTING="TEST"
+    # source the mpi-start code to have all functions
+    . $I2G_MPI_START
+}
 
 setUp () {
     unset I2G_MPI_NP
@@ -15,10 +17,8 @@ setUp () {
     unset I2G_MPI_SINGLE_PROCESS
 }
 
-tearDown () {
-    for file in $MPI_START_CLEANUP_FILES; do
-        [ -f $file ] && rm -f $file
-    done
+oneTimeTearDown () {
+    clean_up
 }
 
 testWarningDisabled () {
