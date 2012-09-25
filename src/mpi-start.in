@@ -45,6 +45,7 @@ clean_up() {
     debug_msg "Cleaning up mpi-start temporary files."
     for file in $MPI_START_CLEANUP_FILES; do
         [ -f $file ] && rm -f $file
+        [ -d $file ] && rm -rf $file
     done
     exit
 }
@@ -120,6 +121,9 @@ mpi_start_find_mktemp() {
         fi
     fi
     rm -f $tempfile
+    # Issue #63, avoid /tmp
+    MPI_START_TEMP_DIR=`TMPDIR=$PWD $MPI_START_MKTEMP -d`
+    MPI_START_CLEANUP_FILES="$MPI_START_TEMP_DIR $MPI_START_CLEANUP_FILES"
 }
 
 #======================================================================
@@ -128,11 +132,13 @@ mpi_start_find_mktemp() {
 # Name of file is returned in MPI_START_TEMP_FILE
 #======================================================================
 mpi_start_mktemp() {
-    MPI_START_TEMP_FILE=`$MPI_START_MKTEMP $*`
-    if test $? -ne 0 ; then
+    MPI_START_TEMP_FILE=`TMPDIR=$MPI_START_TEMP_DIR $MPI_START_MKTEMP $*`
+    st=$?
+    if test $st -ne 0 ; then
         error_msg "Unable to create temp file!"
     fi
     MPI_START_CLEANUP_FILES="$MPI_START_TEMP_FILE $MPI_START_CLEANUP_FILES"
+    return $st
 }
 
 #======================================================================
