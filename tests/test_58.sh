@@ -2,30 +2,22 @@
 
 # tests for bug #58
 
+module () { 
+    if test "x$1" = "xload"  ; then
+        if test "x$2" != "x" ; then
+            echo "$2"
+            return 0
+        fi
+    fi
+}
+
+
 oneTimeSetUp () {
     export I2G_MPI_START_ENABLE_TESTING="TEST"
     # source the mpi-start code to have all functions
     . $I2G_MPI_START
     mpi_start_check_options
     mpi_start_load_execenv
-
-    export moduledir=`$MYMKTEMP -d`
-    cat > $moduledir/module << EOF
-    #!/bin/sh
-
-    if test "x\$1" = "xload"  ; then
-        if test "x\$2" != "x" ; then
-            echo "\$2"
-            exit 0
-        fi
-    fi
-
-    exit 1
-EOF
-
-    chmod +x $moduledir/module
-
-    export PATH=$moduledir:$PATH
 }
 
 oneTimeTearDown() {
