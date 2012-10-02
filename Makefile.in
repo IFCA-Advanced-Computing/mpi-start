@@ -73,7 +73,7 @@ dist:
 
 rpm: dist 
 	mkdir -p build/SOURCES build/SRPMS build/SPECS build/BUILD build/RPMS
-	cp $(name_prefix)mpi-start-$(VERSION).src.tar.gz build/SOURCES
+	cp build/$(name_prefix)mpi-start-$(VERSION).src.tar.gz build/SOURCES
 	sed -e "s/@NAME_PREFIX@/$(name_prefix)/" \
 		-e "s/@VERSION@/$(VERSION)/" mpi-start.spec.in \
 		> build/SPECS/$(name_prefix)mpi-start.spec
