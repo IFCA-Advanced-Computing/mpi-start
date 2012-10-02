@@ -9,8 +9,6 @@ all:
 	$(MAKE) -C config all 
 
 clean:
-	rm -f *.tar.gz
-	rm -rf bin etc
 	rm -rf build 
 	$(MAKE) -C src clean
 	$(MAKE) -C modules clean
@@ -45,11 +43,12 @@ uninstall:
 	rm -f $(DESTDIR)/$(sysconfdir)/profile.d/mpi_start.sh $(DESTDIR)/$(sysconfdir)/profile.d/mpi_start.csh
 
 tarball: all
-	mkdir -p bin
-	mkdir -p etc
-	$(MAKE) -C src install DESTDIR=`pwd` prefix="" 
-	$(MAKE) -C modules install DESTDIR=`pwd` prefix="" 
-	tar czf mpi-start-$(VERSION).tar.gz bin/* etc/*
+	mkdir -p build
+	mkdir -p build/bin
+	mkdir -p build/etc
+	$(MAKE) -C src install DESTDIR=`pwd`/build prefix="" 
+	$(MAKE) -C modules install DESTDIR=`pwd`/build prefix="" 
+	tar czf build/mpi-start-$(VERSION).tar.gz -C build bin etc
 
 DISTFILES=src\
 modules\
@@ -64,17 +63,17 @@ README \
 VERSION
 
 dist:
-	rm -rf $(name_prefix)mpi-start-$(VERSION)
+	mkdir -p build
+	rm -rf build/$(name_prefix)mpi-start-$(VERSION)
 	# what if hg is not here!
 	# hg archive $(name_prefix)mpi-start-$(VERSION)
-	mkdir $(name_prefix)mpi-start-$(VERSION)
-	cp -a $(DISTFILES) $(name_prefix)mpi-start-$(VERSION)
-	tar czf $(name_prefix)mpi-start-$(VERSION).tar.gz $(name_prefix)mpi-start-$(VERSION)
-	rm -rf $(name_prefix)mpi-start-$(VERSION)
+	mkdir build/$(name_prefix)mpi-start-$(VERSION)
+	cp -a $(DISTFILES) build/$(name_prefix)mpi-start-$(VERSION)
+	tar czf build/$(name_prefix)mpi-start-$(VERSION).src.tar.gz -C build $(name_prefix)mpi-start-$(VERSION)
 
 rpm: dist 
 	mkdir -p build/SOURCES build/SRPMS build/SPECS build/BUILD build/RPMS
-	cp $(name_prefix)mpi-start-$(VERSION).tar.gz build/SOURCES
+	cp $(name_prefix)mpi-start-$(VERSION).src.tar.gz build/SOURCES
 	sed -e "s/@NAME_PREFIX@/$(name_prefix)/" \
 		-e "s/@VERSION@/$(VERSION)/" mpi-start.spec.in \
 		> build/SPECS/$(name_prefix)mpi-start.spec
@@ -82,9 +81,11 @@ rpm: dist
 	rpmbuild $(PACKAGER) --define "_topdir `pwd`/build" -bb build/SPECS/$(name_prefix)mpi-start.spec
 
 deb: dist
-	mv $(name_prefix)mpi-start-$(VERSION).tar.gz ../$(name_prefix)mpi-start_$(VERSION).orig.tar.gz
+	#mv $(name_prefix)mpi-start-$(VERSION).tar.gz ../$(name_prefix)mpi-start_$(VERSION).orig.tar.gz
 	dpkg-buildpackage -us -uc
 
+tests: tarball
+	$(MAKE) -C tests tests
 
 maintainer-clean: clean
 	rm -f $(maintainerclean_files)

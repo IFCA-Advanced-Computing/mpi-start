@@ -5,3 +5,6 @@ clean:
 install:
 
 uninstall:
+
+tests:
+	I2G_MPI_START=`pwd`/../build/bin/mpi-start ./run_tests.sh 
