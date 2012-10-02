@@ -11,6 +11,7 @@ all:
 clean:
 	rm -f *.tar.gz
 	rm -rf bin etc
+	rm -rf build 
 	$(MAKE) -C src clean
 	$(MAKE) -C modules clean
 	$(MAKE) -C templates clean
@@ -72,13 +73,13 @@ dist:
 	rm -rf $(name_prefix)mpi-start-$(VERSION)
 
 rpm: dist 
-	mkdir -p rpms/SOURCES rpms/SRPMS rpms/SPECS rpms/BUILD rpms/RPMS
-	cp $(name_prefix)mpi-start-$(VERSION).tar.gz rpms/SOURCES
+	mkdir -p build/SOURCES build/SRPMS build/SPECS build/BUILD build/RPMS
+	cp $(name_prefix)mpi-start-$(VERSION).tar.gz build/SOURCES
 	sed -e "s/@NAME_PREFIX@/$(name_prefix)/" \
 		-e "s/@VERSION@/$(VERSION)/" mpi-start.spec.in \
-		> rpms/SPECS/$(name_prefix)mpi-start.spec
-	rpmbuild --define "_topdir `pwd`/rpms" -bs rpms/SPECS/$(name_prefix)mpi-start.spec
-	rpmbuild $(PACKAGER) --define "_topdir `pwd`/rpms" -bb rpms/SPECS/$(name_prefix)mpi-start.spec
+		> build/SPECS/$(name_prefix)mpi-start.spec
+	rpmbuild --define "_topdir `pwd`/build" -bs build/SPECS/$(name_prefix)mpi-start.spec
+	rpmbuild $(PACKAGER) --define "_topdir `pwd`/build" -bb build/SPECS/$(name_prefix)mpi-start.spec
 
 deb: dist
 	mv $(name_prefix)mpi-start-$(VERSION).tar.gz ../$(name_prefix)mpi-start_$(VERSION).orig.tar.gz
@@ -86,7 +87,6 @@ deb: dist
 
 
 maintainer-clean: clean
-	rm -rf rpms 
 	rm -f $(maintainerclean_files)
 
 export VERSION
