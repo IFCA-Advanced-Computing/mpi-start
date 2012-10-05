@@ -8,6 +8,7 @@ OSTYPE=$2
 TYPE=$3
 
 ./baserepo.sh $EMIRELEASE $OSTYPE $TYPE && \
+    ./preinstall.sh $EMIRELEASE $OSTYPE $TYPE && \
     ./certrepo.sh $EMIRELEASE $OSTYPE $TYPE && \
     ./install.sh $EMIRELEASE $OSTYPE $TYPE && \
     ./config-$TYPE.sh $EMIRELEASE $OSTYPE $TYPE

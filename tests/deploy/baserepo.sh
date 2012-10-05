@@ -49,7 +49,7 @@ wget -nv $CA_URL -O $DEST
 echo "** YUM Update"
 yum -q -y update
 echo "** Install CAs"
-yum -q -y install lcg-ca ca-policy-egi-core
+yum -q -y install lcg-CA ca-policy-egi-core
 if [ $? -ne 0 ] ; then exit 1; fi
 
 echo "******************************************************"

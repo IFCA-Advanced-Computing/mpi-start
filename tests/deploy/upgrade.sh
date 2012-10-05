@@ -16,10 +16,6 @@ OSTYPE=$2
 # ce, wn
 TYPE=$3
 
-echo "** YUM update"
-# just to have everything uptodate.
-yum -q -y update 
-
 ## update 
 echo "** YUM Update mpi packages"
 
@@ -29,9 +25,12 @@ else
     MPI_RPM=emi-mpi
 fi
 
-yum update $MPI_RPM mpi-start glite-yaim-mpi
+yum -y update $MPI_RPM mpi-start glite-yaim-mpi
 
+echo "** Installed versions:"
 rpm -q emi-mpi
+rpm -q mpi-start
+rpm -q glite-yaim-mpi 
 
 if [ $? -ne 0 ] ; then
     echo "******************************************************"
