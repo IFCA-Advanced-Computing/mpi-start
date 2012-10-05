@@ -1,6 +1,14 @@
 #!/bin/sh
 # testing script for configuring WN on sl5 
 
+# 1, 2
+EMIRELEASE=$1 
+# sl5, sl6
+OSTYPE=$2
+# ce, wn
+TYPE=$3
+
+
 configure_ok() {
     /opt/glite/yaim/bin/yaim -s /etc/yaim/site-info.def -c -n MPI_WN $*
     if [ $? -ne 0 ] ; then
@@ -84,7 +92,7 @@ cp /etc/yaim/site-info.def /etc/yaim/site-info.def.orig
 
 # Basic configuration
 echo "*"
-echo "** Configure basic CE (no MPI variables)"
+echo "** Configure basic WN (no MPI variables)"
 echo "*"
 configure_ok -n WN
 
@@ -114,7 +122,7 @@ MPI_FOO_ENABLE="yes"
 EOF
 cat /etc/yaim/site-info.def | grep MPI
 configure_ok
-if [ "x$1" = "xOLDMPISTART" ] ; then
+if [ "x$1" != "xNOPROFILEMPISTART" ] ; then
     echo "I2G_MPI_START=/usr/bin/mpi-start" > /tmp/env
 else
     rm -f /tmp/env

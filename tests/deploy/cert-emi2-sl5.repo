@@ -1,0 +1,13 @@
+# ETICS Automatic Repomd (Yum) Repository
+#
+# Submission-Name based repository
+#
+# Submission name: emi_R_2_rc_sl5_64
+
+[ETICS-name-emi_R_2_rc_sl5_64]
+name=ETICS Repository of emi_R_2_rc_sl5_64
+baseurl=http://etics-repository.cern.ch/repository/pm/volatile/repomd/name/emi_R_2_rc_sl5_64
+protect=1
+enabled=1
+gpgcheck=0
+priority=1

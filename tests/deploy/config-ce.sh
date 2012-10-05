@@ -1,25 +1,36 @@
 #!/bin/sh
-# testing script for configuring WN on sl5 
+
+# 1, 2
+EMIRELEASE=$1 
+# sl5, sl6
+OSTYPE=$2
+# ce, wn
+TYPE=$3
+
 
 CONFIG_PROFILES="-n MPI_CE -n creamCE -n TORQUE_server"
 
 configure_ok() {
-    /opt/glite/yaim/bin/yaim -s /etc/yaim/site-info.def -c $CONFIG_PROFILES
+    /opt/glite/yaim/bin/yaim -s /etc/yaim/site-info.def -c $CONFIG_PROFILES >& /dev/null
     if [ $? -ne 0 ] ; then
         echo "******************************************************"
         echo "ERROR Configuring CE" 
         echo "******************************************************"
         exit 1
+    else
+        echo "* --> Configuration completed OK" 
     fi
 }
 
 configure_and_fail () {
-    /opt/glite/yaim/bin/yaim -s /etc/yaim/site-info.def -c $CONFIG_PROFILES
+    /opt/glite/yaim/bin/yaim -s /etc/yaim/site-info.def -c $CONFIG_PROFILES >& /dev/null
     if [ $? -eq 0 ] ; then
         echo "******************************************************"
         echo "Expected ERROR Configuring CE, and was success"
         echo "******************************************************"
         exit 1
+    else
+        echo "* --> Configuration failed as expected" 
     fi
 }
 
@@ -45,9 +56,15 @@ echo "*"
 echo "* Configuration"
 echo "*"
 
+mkdir -p /etc/grid-security
+cp hostcert.pem  /etc/grid-security/hostcert.pem
+cp hostkey.pem /etc/grid-security/hostkey.pem
+
 echo "** MUNGE"
-create-munge-key
-service munge start
+if [ ! -f /etc/munge/munge.key ] ; then
+	create-munge-key
+fi
+service munge restart
 
 echo "** Get yaim profiles"
 wget -q http://devel.ifca.es/~enol/depot/yaim.tgz --no-check-certificate -O - | tar xzf - -C /etc/
@@ -58,9 +75,21 @@ chmod -R 750 /etc/yaim
 echo "test14.egi.cesga.es" > /etc/yaim/wn-list.conf
 echo "test15.egi.cesga.es" >> /etc/yaim/wn-list.conf
 
+PASSWORDS="MYSQL_PASSWORD  CREAM_DB_PASSWORD"
 
-echo "MYSQL_PASSWORD=mySq1_${RANDOM}_long_password" >> /etc/yaim/site-info.def
-echo "CREAM_DB_PASSWORD=Cr34m_${RANDOM}_long_password" >> /etc/yaim/site-info.def
+if [ -f /etc/yaim/site-info.def.orig ] ; then
+	for p in $PASSWORDS ; do 
+		grep $p /etc/yaim/site-info.def.orig >> /etc/yaim/site-info.def
+	done
+fi
+
+for p in $PASSWORDS ; do
+	grep $p /etc/yaim/site-info.def > /dev/null
+	if [ $? -ne 0 ] ; then
+		echo "${p}=my_${RANDOM}_long_password" >> /etc/yaim/site-info.def
+        fi
+done
+
 echo "CE_HOST=`hostname -f`" >> /etc/yaim/site-info.def
 echo "CEMON_HOST=`hostname -f`" >> /etc/yaim/site-info.def
 echo "BATCH_SERVER=`hostname -f`" >> /etc/yaim/site-info.def
@@ -211,7 +240,6 @@ MPI_SUBMIT_FILTER="yes"
 EOF
 if [ "x$OSTYPE" = "xsl6" ] ; then
     TORQUE_VAR_DIR=/var/lib/torque
-    #echo "TORQUE_VAR_DIR=/var/lib/torque" >> /etc/yaim/site-info.def
 else
     TORQUE_VAR_DIR=/var/torque
 fi
@@ -225,6 +253,8 @@ if [ $? -ne 0 ] ; then
     echo "******************************************************"
     exit 1
 fi
+echo "Submit filter test -> nodes=4, should return nodes=2:ppn=2:"
+echo "#PBS -l nodes=4" | $TORQUE_VAR_DIR/submit_filter
 echo "#PBS -l nodes=4" | $TORQUE_VAR_DIR/submit_filter | grep "PBS -l nodes=2:ppn=2$" > /dev/null
 if [ $? -ne 0 ] ; then 
     echo "******************************************************"

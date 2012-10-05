@@ -9,9 +9,27 @@ echo "*"
 echo "* Upgrade"
 echo "*"
 
+# 1, 2
+EMIRELEASE=$1 
+# sl5, sl6
+OSTYPE=$2
+# ce, wn
+TYPE=$3
+
+echo "** YUM update"
+# just to have everything uptodate.
+yum -q -y update 
+
 ## update 
 echo "** YUM Update mpi packages"
-yum update glite-mpi mpi-start glite-yaim-mpi
+
+if [ "$EMIRELEASE" = "1" ] ; then
+    MPI_RPM=glite-mpi
+else
+    MPI_RPM=emi-mpi
+fi
+
+yum update $MPI_RPM mpi-start glite-yaim-mpi
 
 rpm -q emi-mpi
 
@@ -22,9 +40,6 @@ if [ $? -ne 0 ] ; then
     exit 1
 fi
 
-echo "** YUM update"
-# just to have everything uptodate.
-yum -q -y update 
 
 echo "******************************************************"
 echo " INSTALLATION SUCCEDED!"
