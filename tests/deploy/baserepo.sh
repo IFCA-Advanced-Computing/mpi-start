@@ -32,7 +32,7 @@ echo "** EMI Release repo"
 EMI_URL=http://emisoft.web.cern.ch/emisoft/dist/EMI/$EMIRELEASE/$OSTYPE/x86_64/base
 if [ "$EMIRELEASE" = "1" ] ; then
     EMI_URL=http://emisoft.web.cern.ch/emisoft/dist/EMI/$EMIRELEASE/$OSTYPE/x86_64/updates
-    EMI_RPM=emi-release-${EMIRELEASE}.0.1-1.$OSTYPE.rpm
+    EMI_RPM=emi-release-${EMIRELEASE}.0.1-1.$OSTYPE.noarch.rpm
 else
     EMI_RPM=emi-release-${EMIRELEASE}.0.0-1.$OSTYPE.noarch.rpm
 fi

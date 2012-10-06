@@ -30,7 +30,7 @@ yum -y update $MPI_RPM mpi-start glite-yaim-mpi
 echo "** Installed versions:"
 rpm -q emi-mpi
 rpm -q mpi-start
-rpm -q glite-yaim-mpi 
+rpm -q glite-yaim-mpi
 
 if [ $? -ne 0 ] ; then
     echo "******************************************************"

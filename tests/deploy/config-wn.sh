@@ -317,6 +317,7 @@ cat /tmp/mpi-start/tests/run_tests.sh | \
 for f in $FLAVOURS; do 
     cat /tmp/mpi-start/tests/run_tests.sh | \
         sed "s/RUN_${f}_TESTS=0/RUN_${f}_TESTS=1/" > /tmp/mpi-start/tests/runner.sh
+    cat /tmp/mpi-start/tests/runner.sh > /tmp/mpi-start/tests/run_tests.sh
 done
 chmod +x /tmp/mpi-start/tests/runner.sh
 chown -R dteam001:dteam /tmp/mpi-start/
