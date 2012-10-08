@@ -55,7 +55,6 @@ EOF
     # the directory should not exist
     ls $SHARED_DIR 2> /dev/null
     st=$?
-    echo $st
     assertNotEquals "0" "$st"
 }
 
