@@ -34,7 +34,7 @@ MPI_LOCAL_PARAMS=""
 declare -a MPI_START_JOB_ENV
 MPI_START_DUMMY_SCHEDULER=${MPI_START_DUMMY_SCHEDULER:-1}
 I2G_MPI_START_KEEP_FILES=${I2G_MPI_START_KEEP_FILES:-0}
-MPI_START_DO_NOT_USE_WRAPPER=${MPI_START_DO_NOT_USE_WRAPPER:-0}
+MPI_START_DO_NOT_USE_WRAPPER=${MPI_START_DO_NOT_USE_WRAPPER:-1}
 
 #======================================================================
 # Cleans up temporary files upon finishing execution 
@@ -232,17 +232,27 @@ mpi_start_create_wrapper() {
     mkdir -p $BASEDIR
     if test $? -ne 0 ; then
         warn_msg "Unable to create temp dir for wrapper at $BASEDIR, using default TMPDIR"
-        BASEDIR=$TMPDIR
+    else
+        MPI_START_TEMP_DIR=`TMPDIR=$BASEDIR $MPI_START_MKTEMP -d`
+        if test $? -ne 0 ; then
+            warn_msg "Unable to create temp dir for wrapper at $BASEDIR, using default TMPDIR"
+        fi
+        MPI_START_CLEANUP_FILES="$MPI_START_TEMP_DIR $MPI_START_CLEANUP_FILES"
     fi
-    MPI_START_TEMP_DIR=`TMPDIR=$BASEDIR $MPI_START_MKTEMP -d`
-    MPI_START_CLEANUP_FILES="$MPI_START_TEMP_DIR $MPI_START_CLEANUP_FILES"
     mpi_start_mktemp
     export MPI_START_MPI_WRAPPER=$MPI_START_TEMP_FILE
     unset MPI_START_TEMP_DIR
     cat > $MPI_START_MPI_WRAPPER << EOF
 #!/bin/sh
-test "x\$I2G_MPI_START_TRACE" = "x1" && set -x
+test "x\$I2G_MPI_START_TRACE" = "x1" && set -x || true
 EOF
+    # check that the wrapper is executable
+    chmod +x $MPI_START_MPI_WRAPPER 2> /dev/null
+    $MPI_START_MPI_WRAPPER 2> /dev/null
+    if test $? -ne 0 ; then
+        warn_msg "Unable to execute wrapper, falling back to no wrapper" 
+        return 1
+    fi
     local vars=${#MPI_START_JOB_ENV[*]}
     local index=0
 
@@ -251,6 +261,7 @@ EOF
         index=$(($index+1))
     done
     chmod +x $MPI_START_MPI_WRAPPER
+    return 0
 }
 
 #======================================================================
@@ -292,21 +303,21 @@ mpi_start_execute_no_wrapper() {
             # no output
             if test "x${I2G_MPI_APPLICATION_STDERR}" = "x" ; then
                 # no error
-                $@
+                eval $@
             else
                 # only error
-                $@ 2> ${I2G_MPI_APPLICATION_STDERR}
+                eval $@ 2> ${I2G_MPI_APPLICATION_STDERR}
             fi
         else
             if test "x${I2G_MPI_APPLICATION_STDERR}" = "x" ; then
                 # only output
-                $@ > ${I2G_MPI_APPLICATION_STDOUT}
+                eval $@ > ${I2G_MPI_APPLICATION_STDOUT}
             elif test ${I2G_MPI_APPLICATION_STDOUT} = ${I2G_MPI_APPLICATION_STDERR} ; then
                 # same output and error
-                $@ > ${I2G_MPI_APPLICATION_STDOUT} 2>&1
+                eval $@ > ${I2G_MPI_APPLICATION_STDOUT} 2>&1
             else
                 # different output and error
-                $@ > ${I2G_MPI_APPLICATION_STDOUT} 2> ${I2G_MPI_APPLICATION_STDERR} 
+                eval $@ > ${I2G_MPI_APPLICATION_STDOUT} 2> ${I2G_MPI_APPLICATION_STDERR} 
             fi
         fi
     else
@@ -314,21 +325,21 @@ mpi_start_execute_no_wrapper() {
             # no output
             if test "x${I2G_MPI_APPLICATION_STDERR}" = "x" ; then
                 # no error
-                $@ < $I2G_MPI_APPLICATION_STDIN
+                eval $@ < $I2G_MPI_APPLICATION_STDIN
             else
                 # only error
-                $@ 2> ${I2G_MPI_APPLICATION_STDERR} < $I2G_MPI_APPLICATION_STDIN
+                eval $@ 2> ${I2G_MPI_APPLICATION_STDERR} < $I2G_MPI_APPLICATION_STDIN
             fi
         else
             if test "x${I2G_MPI_APPLICATION_STDERR}" = "x" ; then
                 # only output
-                $@ > ${I2G_MPI_APPLICATION_STDOUT} < $I2G_MPI_APPLICATION_STDIN
+                eval $@ > ${I2G_MPI_APPLICATION_STDOUT} < $I2G_MPI_APPLICATION_STDIN
             elif test ${I2G_MPI_APPLICATION_STDOUT} = ${I2G_MPI_APPLICATION_STDERR} ; then
                 # same output and error
-                $@ > ${I2G_MPI_APPLICATION_STDOUT} 2>&1 < $I2G_MPI_APPLICATION_STDIN
+                eval $@ > ${I2G_MPI_APPLICATION_STDOUT} 2>&1 < $I2G_MPI_APPLICATION_STDIN
             else
                 # different output and error
-                $@ > ${I2G_MPI_APPLICATION_STDOUT} 2> ${I2G_MPI_APPLICATION_STDERR} < $I2G_MPI_APPLICATION_STDIN
+                eval $@ > ${I2G_MPI_APPLICATION_STDOUT} 2> ${I2G_MPI_APPLICATION_STDERR} < $I2G_MPI_APPLICATION_STDIN
             fi
         fi
     fi
@@ -341,7 +352,7 @@ mpi_start_execute_wrapper() {
     else
         mpi_start_create_wrapper
         if test $? -ne 0 ; then
-            mpi_start_execute_no_wrapper
+            mpi_start_execute_no_wrapper $@
             return $?
         fi
         local output=""

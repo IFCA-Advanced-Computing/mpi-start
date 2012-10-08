@@ -173,8 +173,12 @@ EOF
 
 testInOutputErrorFile () {
     myapp=`$MYMKTEMP`
+    ARGS="ARG1 ARG2"
     cat > $myapp << EOF
 #!/bin/bash
+if test "x\$*" != "x$ARGS" ; then 
+    echo "Arguments do not match"
+fi
 while read line ; do
     echo -n \$line
 done
@@ -185,7 +189,7 @@ EOF
     echo "OUTPUT" > $myin 
     myerr=`$MYMKTEMP`
     myout=`$MYMKTEMP`
-    `$I2G_MPI_START -i $myin -o $myout -e $myerr -- $myapp`
+    `$I2G_MPI_START -i $myin -o $myout -e $myerr -- $myapp $ARGS`
     st=$?
     assertEquals 0 $st
     out=`cat $myout`

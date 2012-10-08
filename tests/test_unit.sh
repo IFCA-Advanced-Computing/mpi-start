@@ -19,7 +19,6 @@ setUp () {
 }
 
 oneTimeTearDown () {
-    echo $MPI_START_CLEANUP_FILES
     for f in $MPI_START_CLEANUP_FILES ; do
         [ -f "$f" ] && rm -f $f
         [ -d "$f" ] && rm -rf $f
