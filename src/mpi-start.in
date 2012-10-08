@@ -27,13 +27,14 @@ MPI_START_CLEANUP_FILES=""
 MPI_START_SCHEDULER=""
 MPI_START_NP=1
 MPI_START_NPHOST=''
+unset MPI_START_TEMP_DIR 
 # mpiexec params
 MPI_GLOBAL_PARAMS=""
 MPI_LOCAL_PARAMS=""
 declare -a MPI_START_JOB_ENV
 MPI_START_DUMMY_SCHEDULER=${MPI_START_DUMMY_SCHEDULER:-1}
 I2G_MPI_START_KEEP_FILES=${I2G_MPI_START_KEEP_FILES:-0}
-
+MPI_START_DO_NOT_USE_WRAPPER=${MPI_START_DO_NOT_USE_WRAPPER:-0}
 
 #======================================================================
 # Cleans up temporary files upon finishing execution 
@@ -44,8 +45,8 @@ clean_up() {
     fi
     debug_msg "Cleaning up mpi-start temporary files."
     for file in $MPI_START_CLEANUP_FILES; do
-        [ -f $file ] && rm -f $file
-        [ -d $file ] && rm -rf $file
+        [ -f "$file" ] && rm -f $file
+        [ -d "$file" ] && rm -rf $file
     done
     exit
 }
@@ -121,9 +122,6 @@ mpi_start_find_mktemp() {
         fi
     fi
     rm -f $tempfile
-    # Issue #63, avoid /tmp
-    MPI_START_TEMP_DIR=`TMPDIR=$PWD $MPI_START_MKTEMP -d`
-    MPI_START_CLEANUP_FILES="$MPI_START_TEMP_DIR $MPI_START_CLEANUP_FILES"
 }
 
 #======================================================================
@@ -132,7 +130,11 @@ mpi_start_find_mktemp() {
 # Name of file is returned in MPI_START_TEMP_FILE
 #======================================================================
 mpi_start_mktemp() {
-    MPI_START_TEMP_FILE=`TMPDIR=$MPI_START_TEMP_DIR $MPI_START_MKTEMP $*`
+    if test "x$MPI_START_TEMP_DIR" = "x" ; then
+        MPI_START_TEMP_FILE=`$MPI_START_MKTEMP $*`
+    else
+        MPI_START_TEMP_FILE=`TMPDIR=$MPI_START_TEMP_DIR $MPI_START_MKTEMP $*`
+    fi
     st=$?
     if test $st -ne 0 ; then
         error_msg "Unable to create temp file!"
@@ -225,8 +227,18 @@ mpi_start_activate_mpi() {
 # env variables
 #======================================================================
 mpi_start_create_wrapper() {
+    # Issue #63, avoid /tmp
+    BASEDIR=$HOME/.mpi_start_tmp
+    mkdir -p $BASEDIR
+    if test $? -ne 0 ; then
+        warn_msg "Unable to create temp dir for wrapper at $BASEDIR, using default TMPDIR"
+        BASEDIR=$TMPDIR
+    fi
+    MPI_START_TEMP_DIR=`TMPDIR=$BASEDIR $MPI_START_MKTEMP -d`
+    MPI_START_CLEANUP_FILES="$MPI_START_TEMP_DIR $MPI_START_CLEANUP_FILES"
     mpi_start_mktemp
     export MPI_START_MPI_WRAPPER=$MPI_START_TEMP_FILE
+    unset MPI_START_TEMP_DIR
     cat > $MPI_START_MPI_WRAPPER << EOF
 #!/bin/sh
 test "x\$I2G_MPI_START_TRACE" = "x1" && set -x
@@ -252,6 +264,7 @@ mpi_start_export_variable() {
     local var_name
     if test $1 = *=* ; then
         var_name=`echo $1 | cut -f1 -d"="`
+        eval $1
     else
         var_name=$1
     fi
@@ -260,9 +273,11 @@ mpi_start_export_variable() {
     shift
     if test "x$*" != "x"; then
         MPI_START_JOB_ENV[${#MPI_START_JOB_ENV[*]}]="${var_value}="'"'${*}'"'
+        eval $var_value="${*}"
     else
         MPI_START_JOB_ENV[${#MPI_START_JOB_ENV[*]}]="$var_value"
     fi
+    export $var_name
 }
 
 #======================================================================
@@ -270,57 +285,65 @@ mpi_start_export_variable() {
 #
 # $* command line to execute 
 #======================================================================
-mpi_start_execute_wrapper() {
-    if test "x${MPI_START_DO_NOT_USE_WRAPPER}" = "x1" ; then
-        if test "x${I2G_MPI_APPLICATION_STDIN}" = "x" ; then
-            # no input
-            if test "x${I2G_MPI_APPLICATION_STDOUT}" = "x" ; then
-                # no output
-                if test "x${I2G_MPI_APPLICATION_STDERR}" = "x" ; then
-                    # no error
-                    $*
-                else
-                    # only error
-                    $* 2> ${I2G_MPI_APPLICATION_STDERR}
-                fi
+mpi_start_execute_no_wrapper() {
+    if test "x${I2G_MPI_APPLICATION_STDIN}" = "x" ; then
+        # no input
+        if test "x${I2G_MPI_APPLICATION_STDOUT}" = "x" ; then
+            # no output
+            if test "x${I2G_MPI_APPLICATION_STDERR}" = "x" ; then
+                # no error
+                $@
             else
-                if test "x${I2G_MPI_APPLICATION_STDERR}" = "x" ; then
-                    # only output
-                    $* \> ${I2G_MPI_APPLICATION_STDOUT}
-                elif test ${I2G_MPI_APPLICATION_STDOUT} = ${I2G_MPI_APPLICATION_STDERR} ; then
-                    # same output and error
-                    $* \> ${I2G_MPI_APPLICATION_STDOUT} 2>&1
-                else
-                    # different output and error
-                    $* \> ${I2G_MPI_APPLICATION_STDOUT} 2> ${I2G_MPI_APPLICATION_STDERR} 
-                fi
+                # only error
+                $@ 2> ${I2G_MPI_APPLICATION_STDERR}
             fi
         else
-            if test "x${I2G_MPI_APPLICATION_STDOUT}" = "x" ; then
-                # no output
-                if test "x${I2G_MPI_APPLICATION_STDERR}" = "x" ; then
-                    # no error
-                    $* < $I2G_MPI_APPLICATION_STDIN
-                else
-                    # only error
-                    $* 2> ${I2G_MPI_APPLICATION_STDERR} < $I2G_MPI_APPLICATION_STDIN
-                fi
+            if test "x${I2G_MPI_APPLICATION_STDERR}" = "x" ; then
+                # only output
+                $@ > ${I2G_MPI_APPLICATION_STDOUT}
+            elif test ${I2G_MPI_APPLICATION_STDOUT} = ${I2G_MPI_APPLICATION_STDERR} ; then
+                # same output and error
+                $@ > ${I2G_MPI_APPLICATION_STDOUT} 2>&1
             else
-                if test "x${I2G_MPI_APPLICATION_STDERR}" = "x" ; then
-                    # only output
-                    $* \> ${I2G_MPI_APPLICATION_STDOUT} < $I2G_MPI_APPLICATION_STDIN
-                elif test ${I2G_MPI_APPLICATION_STDOUT} = ${I2G_MPI_APPLICATION_STDERR} ; then
-                    # same output and error
-                    $* \> ${I2G_MPI_APPLICATION_STDOUT} 2>&1 < $I2G_MPI_APPLICATION_STDIN
-                else
-                    # different output and error
-                    $* \> ${I2G_MPI_APPLICATION_STDOUT} 2> ${I2G_MPI_APPLICATION_STDERR} < $I2G_MPI_APPLICATION_STDIN
-                fi
+                # different output and error
+                $@ > ${I2G_MPI_APPLICATION_STDOUT} 2> ${I2G_MPI_APPLICATION_STDERR} 
             fi
         fi
-        return $?
+    else
+        if test "x${I2G_MPI_APPLICATION_STDOUT}" = "x" ; then
+            # no output
+            if test "x${I2G_MPI_APPLICATION_STDERR}" = "x" ; then
+                # no error
+                $@ < $I2G_MPI_APPLICATION_STDIN
+            else
+                # only error
+                $@ 2> ${I2G_MPI_APPLICATION_STDERR} < $I2G_MPI_APPLICATION_STDIN
+            fi
+        else
+            if test "x${I2G_MPI_APPLICATION_STDERR}" = "x" ; then
+                # only output
+                $@ > ${I2G_MPI_APPLICATION_STDOUT} < $I2G_MPI_APPLICATION_STDIN
+            elif test ${I2G_MPI_APPLICATION_STDOUT} = ${I2G_MPI_APPLICATION_STDERR} ; then
+                # same output and error
+                $@ > ${I2G_MPI_APPLICATION_STDOUT} 2>&1 < $I2G_MPI_APPLICATION_STDIN
+            else
+                # different output and error
+                $@ > ${I2G_MPI_APPLICATION_STDOUT} 2> ${I2G_MPI_APPLICATION_STDERR} < $I2G_MPI_APPLICATION_STDIN
+            fi
+        fi
+    fi
+    return $?
+}
+
+mpi_start_execute_wrapper() {
+    if test "x${MPI_START_DO_NOT_USE_WRAPPER}" = "x1" ; then
+        mpi_start_execute_no_wrapper $@
     else
         mpi_start_create_wrapper
+        if test $? -ne 0 ; then
+            mpi_start_execute_no_wrapper
+            return $?
+        fi
         local output=""
         local error=""
         local input=""
@@ -337,7 +360,7 @@ mpi_start_execute_wrapper() {
         if test "x${I2G_MPI_APPLICATION_STDIN}" != "x" ; then
             input="< ${I2G_MPI_APPLICATION_STDIN}"
         fi 
-        echo "$* $output $error $input" >> $MPI_START_MPI_WRAPPER
+        echo "$@ $output $error $input" >> $MPI_START_MPI_WRAPPER
         echo "exit \$?" >> $MPI_START_MPI_WRAPPER
         $MPI_START_MPI_WRAPPER
         err=$?

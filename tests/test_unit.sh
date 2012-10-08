@@ -6,6 +6,7 @@ oneTimeSetUp() {
     export I2G_MPI_START_ENABLE_TESTING="TEST"
     # source the mpi-start code to have all functions
     . $I2G_MPI_START
+    mpi_start_find_mktemp
 }
 
 setUp () {
@@ -18,7 +19,11 @@ setUp () {
 }
 
 oneTimeTearDown () {
-    clean_up
+    echo $MPI_START_CLEANUP_FILES
+    for f in $MPI_START_CLEANUP_FILES ; do
+        [ -f "$f" ] && rm -f $f
+        [ -d "$f" ] && rm -rf $f
+    done
 }
 
 testWarningDisabled () {
@@ -157,7 +162,6 @@ testSearchMpiexec() {
 }
 
 testMktempFile () {
-    mpi_start_find_mktemp
     mpi_start_mktemp
     st=$?
     file=$MPI_START_TEMP_FILE
@@ -169,7 +173,6 @@ testMktempFile () {
 }
 
 testMktempDir () {
-    mpi_start_find_mktemp
     mpi_start_mktemp -d
     st=$?
     dir=$MPI_START_TEMP_FILE
@@ -212,22 +215,29 @@ testExportVariable() {
 
 testExecuteWrapperNoWrapper () {
     export MPI_START_DO_NOT_USE_WRAPPER=1
-    output=`mpi_start_execute_wrapper /bin/echo "hello world"`
+    outfile=`$MYMKTEMP`
+    mpi_start_execute_wrapper /bin/echo "hello world" > $outfile
     st=$?
     assertEquals 0 $st
+    output=`cat $outfile`
     assertEquals "hello world" "$output"
     unset MPI_START_DO_NOT_USE_WRAPPER
+    rm -f $outfile
 }
 
 testExecuteWrapper () {
-    output=`mpi_start_execute_wrapper /bin/echo "hello world"`
+    outfile=`$MYMKTEMP`
+    mpi_start_execute_wrapper /bin/echo "hello world" > $outfile
     st=$?
     assertEquals 0 $st
+    output=`cat $outfile`
     assertEquals "hello world" "$output"
+    rm -f $outfile
 }
 
 testHookOrder() {
     MPI_START_ETC=`$MYMKTEMP -d`
+    outfile=`$MYMKTEMP`
     # load options, to be able to load anything later
     mpi_start_check_options
     echo $MPI_START_ETC_LIST | grep $MPI_START_ETC > /dev/null
@@ -245,11 +255,14 @@ testHookOrder() {
     echo "echo -n 4" >> $I2G_MPI_PRE_RUN_HOOK
     I2G_MPI_POST_RUN_HOOK=$I2G_MPI_PRE_RUN_HOOK
     # now test the hooks
-    output=`mpi_start_pre_run_hook`
+    mpi_start_pre_run_hook > $outfile
+    output=`cat $outfile`
     assertEquals "1234" "$output"
-    output=`mpi_start_post_run_hook`
+    mpi_start_post_run_hook > $outfile
+    output=`cat $outfile`
     assertEquals "1234" "$output"
     rm -rf $mydir
+    rm -f $outfile
 }
 
 . $SHUNIT2

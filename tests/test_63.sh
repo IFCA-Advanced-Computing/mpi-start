@@ -8,17 +8,30 @@ oneTimeSetUp () {
 }
 
 oneTimeTearDown () {
-    clean_up
+    for f in $MPI_START_CLEANUP_FILES; do
+        [ -f "$f" ] && rm -f $f
+        [ -d "$f" ] && rm -rf $f
+    done
 }
 
-testLocalTempDir() {
-    mpi_start_mktemp
+testWrapperinHOME() {
+    mpi_start_create_wrapper
     st=$?
     assertEquals "0" "$?"
     DIR_TEMP_FILE_1=`dirname $MPI_START_TEMP_FILE`
     DIR_TEMP_FILE=`dirname $DIR_TEMP_FILE_1`
-    assertEquals "$PWD" "$DIR_TEMP_FILE"
+    assertEquals "$HOME/.mpi_start_tmp" "$DIR_TEMP_FILE"
 }
+
+testNoHome() {
+    OLDHOME="$HOME"
+    unset HOME
+    mpi_start_create_wrapper 2> /dev/null
+    st=$?
+    assertEquals "0" "$?"
+    HOME=$OLDHOME
+}
+
 
 testFakeTempDir () {
     TEMP_DIR=`$MYMKTEMP -d`

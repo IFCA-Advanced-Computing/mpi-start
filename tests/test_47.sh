@@ -9,14 +9,11 @@ export I2G_MPI_START_ENABLE_TESTING="TEST"
 . $I2G_MPI_START
 mpi_start_check_options
 
-tearDown() {
-    for file in $MPI_START_CLEANUP_FILES; do
-        [ -f $file ] && rm -f $file
-    done
-}
-
 oneTimeTearDown () {
-    [ -d $MPI_START_TEMP_DIR ] && rmdir $MPI_START_TEMP_DIR
+    for f in $MPI_START_CLEANUP_FILES; do
+        [ -f "$f" ] && rm -f $f
+        [ -d "$f" ] && rm -rf $f
+    done
 }
 
 
