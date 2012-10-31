@@ -45,11 +45,14 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/mpi-start/*.scheduler
 %{_sysconfdir}/mpi-start/*.sh
 %{_mandir}/man1/*
-%{_sysconfdir}/profile.d/mpi_start.csh
-%{_sysconfdir}/profile.d/mpi_start.sh
+%config(noreplace) %{_sysconfdir}/profile.d/mpi_start.csh
+%config(noreplace) %{_sysconfdir}/profile.d/mpi_start.sh
 %doc docs/AUTHORS docs/COPYING docs/LICENSE README ChangeLog
 
 %changelog
+* Wed Oct 31 2012 Enol Fernandez <enolfc _AT_ ifca.unican.es> - 1.5.0-1%{?dist}
+- Added generic copy to method.
+
 * Wed Sep 26 2012 Enol Fernandez <enolfc _AT_ ifca.unican.es> - 1.4.0-1%{?dist}
 - Added MVAPICH2 support.
 - Fix #59, #60, #61, #63.
