@@ -84,6 +84,13 @@ deb: dist
 	#mv $(name_prefix)mpi-start-$(VERSION).tar.gz ../$(name_prefix)mpi-start_$(VERSION).orig.tar.gz
 	dpkg-buildpackage -us -uc
 
+metapackage-rpm:
+	mkdir -p build/SOURCES build/SRPMS build/SPECS build/BUILD build/RPMS
+	cp emi-mpi.spec build/SPECS
+	rpmbuild --define "_topdir `pwd`/build" -bs build/SPECS/emi-mpi.spec
+	rpmbuild --define "_topdir `pwd`/build" -bb build/SPECS/emi-mpi.spec
+
+
 tests: tarball
 	$(MAKE) -C tests tests
 

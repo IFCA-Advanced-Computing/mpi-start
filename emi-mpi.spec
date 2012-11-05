@@ -10,13 +10,13 @@ License: GPLv2
 Group: Development/Tools
 URL: http://devel.ifca.es/mpi-start/
 # No source, since this is a metapackage
-#Source: glite-mpi-%{version}.tar.gz
+# Source: emi-mpi.tar.gz
 BuildArch: noarch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n) 
 
 # Fields for transition from glite-mpi to emi-mpi 
 Provides: glite-mpi = %{version}-%{release} 
-Obsoletes: glite-mpi
+Obsoletes: glite-mpi < %{version}-%{release} 
 
 # metapackage dependencies
 Requires: glite-yaim-mpi
@@ -27,7 +27,7 @@ AutoReqProv: yes
 EMI Metapackage for MPI tools (mpi-start and yaim-mpi).
 
 %prep
-#%setup -q
+# Nothing, this is a metapackage!
 
 %build
 
