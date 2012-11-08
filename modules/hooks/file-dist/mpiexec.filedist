@@ -22,6 +22,15 @@ check_distribution_method() {
     return $result
 }	
 
+# copy_from_node 
+# $1 -> remote node
+# $2 -> files to copy, path is relative from cwd 
+# $3 -> destination at local machine
+copy_from_node() {
+    error_msg "not supported method!"
+    return 1
+}
+
 copy() {
     debug_msg "distribute using mpiexec"
     # backup old values

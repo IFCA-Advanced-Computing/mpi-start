@@ -220,6 +220,7 @@ mpi_start_pre_run_hook_copy () {
     fi
 
     unset copy
+    unset copy_from_node 
     . $chosenDistrMethod > /dev/null 2>&1
     if test $? -ne 0 ; then
         error_msg "Unable to load distribution method $chosenDistrMethod"

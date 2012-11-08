@@ -60,7 +60,19 @@ fix_app_path() {
     if test "${SUBS_APP}" != "${APP_CANONIC}" ; then
         export I2G_MPI_APPLICATION=${SUBS_APP}
     fi
+}
 
+# copy_from_node 
+# $1 -> remote node
+# $1 -> files to copy, path relative to $PWD
+# $2 -> destination at local machine
+copy_from_node() {
+    debug_msg "gathering data from remote hosts"
+    if test "x$1" = "x" -o "x$2" = "x" -o "x$3" = "x" ; then
+        error_msg "Missing arguments to gather_data, not copying anything"
+        return 1
+    fi
+    cp $PWD/$2 $3 
 }
 
 copy() {

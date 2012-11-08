@@ -90,7 +90,6 @@ metapackage-rpm:
 	rpmbuild --define "_topdir `pwd`/build" -bs build/SPECS/emi-mpi.spec
 	rpmbuild --define "_topdir `pwd`/build" -bb build/SPECS/emi-mpi.spec
 
-
 tests: tarball
 	$(MAKE) -C tests tests
 

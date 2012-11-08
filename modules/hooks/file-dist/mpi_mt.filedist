@@ -20,6 +20,11 @@ check_distribution_method(){
     return $result
 }
 
+copy_from_node() {
+    error_msg "Unsupported method!"
+    return 1
+}
+
 copy() {
     debug_msg "distribute using mpi_mt"
     # backup old values

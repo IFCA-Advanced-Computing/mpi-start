@@ -46,6 +46,7 @@ RUN_LAM_TESTS=0
 
 export MPI_OPENMPI_MPIEXEC_PARAMS="--mca btl ^openib"
 
+
 #
 # Check environment variables
 #
@@ -138,6 +139,8 @@ if test "x${RUN_FSDETECT_TESTS}" = "x1" ; then
     ./test_44.sh || exitcode=1
     echo "* RFC #60"
     ./test_60.sh || exitcode=1
+    echo "* RFC #5"
+    ./test_5.sh || exitcode=1
     echo "***************************"
 fi
 if test "x${RUN_SCH_TESTS}" = "x1" ; then
