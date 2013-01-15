@@ -310,8 +310,8 @@ echo "** mpi-start version"
 mpi-start -V
 
 echo "** Run mpi-start tests" 
-wget -q https://devel.ifca.es/hg/mpi-start/archive/tip.tar.gz --no-check-certificate -O - | tar -xzf - -C /tmp
-mv /tmp/mpi-start-* /tmp/mpi-start
+wget -q https://bitbucket.org/enolfc/mpi-start/get/tip.tar.gz --no-check-certificate -O - | tar -xzf - -C /tmp
+mv /tmp/*mpi-start-* /tmp/mpi-start
 cat /tmp/mpi-start/tests/run_tests.sh | \
     sed 's/RUN_OMP_TESTS=0/RUN_OMP_TESTS=1/' > /tmp/mpi-start/tests/runner.sh
 for f in $FLAVOURS; do 
