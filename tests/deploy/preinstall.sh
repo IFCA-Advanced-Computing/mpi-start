@@ -29,7 +29,8 @@ if [ "$TYPE" = "ce" ] ; then
 else
     if [ $EMIRELEASE = 3 ]; then
         echo "** yaim clients + fetch crl"
-        yum -q -y install fetch-crl glite-yaim-clients
+        yum -q -y install fetch-crl
+        yum --nogpg -q -y install glite-yaim-clients
     else
         echo "** EMI-WN"
         # Install needed tools for WN
