@@ -28,17 +28,19 @@ wget -nv "$EPEL_URL/$EPEL_RPM"
 yum -q -y localinstall $EPEL_RPM 
 if [ $? -ne 0 ] ; then exit 1; fi
 
-echo "** EMI Release repo"
-EMI_URL=http://emisoft.web.cern.ch/emisoft/dist/EMI/$EMIRELEASE/$OSTYPE/x86_64/base
-if [ "$EMIRELEASE" = "1" ] ; then
-    EMI_URL=http://emisoft.web.cern.ch/emisoft/dist/EMI/$EMIRELEASE/$OSTYPE/x86_64/updates
-    EMI_RPM=emi-release-${EMIRELEASE}.0.1-1.$OSTYPE.noarch.rpm
-else
-    EMI_RPM=emi-release-${EMIRELEASE}.0.0-1.$OSTYPE.noarch.rpm
+if [ $EMIRELEASE != 3 ] ; then
+    echo "** EMI Release repo"
+    EMI_URL=http://emisoft.web.cern.ch/emisoft/dist/EMI/$EMIRELEASE/$OSTYPE/x86_64/base
+    if [ "$EMIRELEASE" = "1" ] ; then
+        EMI_URL=http://emisoft.web.cern.ch/emisoft/dist/EMI/$EMIRELEASE/$OSTYPE/x86_64/updates
+        EMI_RPM=emi-release-${EMIRELEASE}.0.1-1.$OSTYPE.noarch.rpm
+    else
+        EMI_RPM=emi-release-${EMIRELEASE}.0.0-1.$OSTYPE.noarch.rpm
+    fi
+    wget -nv "$EMI_URL/$EMI_RPM"
+    yum -q -y localinstall $EMI_RPM 
+    if [ $? -ne 0 ] ; then exit 1; fi
 fi
-wget -nv "$EMI_URL/$EMI_RPM"
-yum -q -y localinstall $EMI_RPM 
-if [ $? -ne 0 ] ; then exit 1; fi
 
 echo "** EGI Trust Anchors"
 CA_URL=http://repository.egi.eu/sw/production/cas/1/current/repo-files/egi-trustanchors.repo

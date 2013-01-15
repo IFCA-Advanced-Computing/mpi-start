@@ -27,10 +27,14 @@ if [ "$TYPE" = "ce" ] ; then
         exit 1
     fi
 else
-    echo "** EMI-WN"
-    # Install needed tools for WN
-    yum -q -y  install emi-wn 
-
+    if [ $EMIRELEASE = 3 ]; then
+        echo "** yaim clients + fetch crl"
+        yum -q -y install fetch-crl glite-yaim-clients
+    else
+        echo "** EMI-WN"
+        # Install needed tools for WN
+        yum -q -y  install emi-wn 
+    fi
     # install mpi packages
     echo "** Install MPI Flavors"
     yum -q -y install openmpi-devel mpich2-devel gcc 
