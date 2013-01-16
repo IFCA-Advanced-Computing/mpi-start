@@ -7,9 +7,15 @@ OSTYPE=$2
 # ce, wn
 TYPE=$3
 
-./baserepo.sh $EMIRELEASE $OSTYPE $TYPE && \
-    ./preinstall.sh $EMIRELEASE $OSTYPE $TYPE && \
-    ./baseinstall.sh $EMIRELEASE $OSTYPE $TYPE && \
+if [ $EMIRELEASE = 3 ] ; then
+    PREEMIRELEASE=2
+else
+    PREEMIRELEASE=$EMIRELEASE
+fi
+
+./baserepo.sh $PREEMIRELEASE $OSTYPE $TYPE && \
+    ./preinstall.sh $PREEMIRELEASE $OSTYPE $TYPE && \
+    ./baseinstall.sh $PREEMIRELEASE $OSTYPE $TYPE && \
     ./baseconfig-$TYPE.sh $EMIRELEASE $OSTYPE $TYPE && \
     ./certrepo.sh $EMIRELEASE $OSTYPE $TYPE && \
     ./upgrade.sh $EMIRELEASE $OSTYPE $TYPE && \
