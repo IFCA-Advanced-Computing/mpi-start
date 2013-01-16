@@ -2,7 +2,7 @@
 name=EMI 3 Testing Base Repository
 baseurl=http://emisoft.web.cern.ch/emisoft/dist/EMI/testing/3/sl6/$basearch/base
 #gpgkey=http://emisoft.web.cern.ch/emisoft/dist/EMI/3/RPM-GPG-KEY-emi
-priority=45
+priority=1
 protect=1
 enabled=1
 gpgcheck=0
@@ -13,5 +13,5 @@ baseurl=http://emisoft.web.cern.ch/emisoft/dist/EMI/testing/3/sl6/$basearch/thir
 #gpgkey=http://emisoft.web.cern.ch/emisoft/dist/EMI/3/RPM-GPG-KEY-emi
 protect=1
 enabled=1
-priority=45
+priority=1
 gpgcheck=0
