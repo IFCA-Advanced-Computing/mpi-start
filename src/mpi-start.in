@@ -48,7 +48,9 @@ clean_up() {
         [ -f "$file" ] && rm -f $file
         [ -d "$file" ] && rm -rf $file
     done
-    exit
+    if test "$I2G_MPI_START_ENABLE_TESTING" != "TEST" ; then
+        exit
+    fi
 }
 
 trap clean_up EXIT
