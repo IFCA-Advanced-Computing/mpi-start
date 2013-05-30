@@ -50,6 +50,9 @@ rm -rf $RPM_BUILD_ROOT
 %doc docs/AUTHORS docs/COPYING docs/LICENSE README ChangeLog
 
 %changelog
+* Wed Oct 31 2012 Enol Fernandez <enolfc _AT_ ifca.unican.es> - 1.5.1-1%{?dist}
+- Improved packaging.
+
 * Wed Oct 31 2012 Enol Fernandez <enolfc _AT_ ifca.unican.es> - 1.5.0-1%{?dist}
 - Added generic copy to method (#5).
 
