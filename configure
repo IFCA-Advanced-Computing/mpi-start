@@ -1,5 +1,6 @@
 #!/bin/sh
 
+
 # Configure script for mpi-start.
 # not very fancy stuff
 name_prefix=""
@@ -45,6 +46,7 @@ show_help () {
     echo "  --mandir=DATADIR/man"
     echo "  --dist=''"
     echo "  --build=''"
+    echo "  --target=''"
     echo "  --packager=''"
     exit 0
 }
@@ -104,6 +106,8 @@ do
             dist=$optarg ;;
         -build=* | --build=*)
             build=$optarg ;;
+        -target=* | --target=*)
+            target=$optarg ;;
         -packager=* | --packager=*)
             packager=$optarg ;;
     esac
@@ -182,7 +186,7 @@ if [ -z "$dist" ] ; then
 fi
 
 if [ -f config/mpi-config.local${dist}-${arch} ] ; then
-    cp config/mpi-config.local.${dist}-${arch} config/mpi-config.local
+    cp config/mpi-config.local${dist}-${arch} config/mpi-config.local
 fi
 ########################################################################
 

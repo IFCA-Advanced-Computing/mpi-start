@@ -24,7 +24,7 @@ A generic startup mechanism for different MPI installation in a cluster/grid.
 
 %build
 cd $RPM_BUILD_DIR/@NAME_PREFIX@mpi-start-@VERSION@
-%configure 
+%configure --dist="%{?dist}"
 %{__make}
 
 %install
