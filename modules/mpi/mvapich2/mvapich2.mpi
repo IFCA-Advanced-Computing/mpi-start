@@ -12,19 +12,17 @@ if test "x$MPI_START_MPI_PREFIX" = "x"  ; then
     debug_msg "use default mpi path: $MPI_START_MPI_PREFIX"
 fi
 
-export OSC_MPIEXEC=0
 export HYDRA_MPIEXEC=0
 export MPIRUN_RSH=0
 
 # activate MPI
 mpi_start_activate_mpi $MPI_START_MPI_PREFIX $MPI_START_MPI_MODULE
-# further determine if the mpiexec is OSC or hydra or mpirun_rsh 
+mpi_start_get_plugin "osc_mpiexec.sh" 1
+. $MPI_START_PLUGIN_FILES
+
+# further determine if the mpiexec is hydra or mpirun_rsh 
 if test $MPI_MPIEXEC_DEFINED -eq 0 -a $MPI_MPIRUN_DEFINED -eq 0; then
-    $MPI_MPIEXEC 2>&1 | grep -e "-\<np\>" > /dev/null 2>&1
-    st=$?
-    if test $st -ne 0 ; then
-        export OSC_MPIEXEC=1
-    else
+    if test $OSC_MPIEXEC -eq 0 ; then
         # try with mpiexec.hydra
         MPIEXEC=`which mpiexec.hydra 2> /dev/null`
         if test $? -eq 0 -a "x$MPI_MVAPICH2_DISABLE_HYDRA" != "x1" ; then
@@ -38,13 +36,6 @@ if test $MPI_MPIEXEC_DEFINED -eq 0 -a $MPI_MPIRUN_DEFINED -eq 0; then
                 export MPIRUN_RSH=1
             fi
         fi
-    fi
-else
-    # check aslo here if we are using OSC
-    $MPI_MPIEXEC 2>&1 | grep -e "-\<np\>" > /dev/null 2>&1
-    st=$?
-    if test $st -ne 0 ; then
-        export OSC_MPIEXEC=1
     fi
 fi
 
@@ -106,19 +97,9 @@ mpi_exec () {
     if test $OSC_MPIEXEC -eq 1 ; then
         MPIEXEC=$MPI_MPIEXEC
         MPI_GLOBAL_PARAMS=$MPI_SPECIFIC_MPIEXEC_PARAMS
-        # OSC mpiexec! 
-        # if a comm method has already been requested don't set
-        if `echo $MPI_GLOBAL_PARAMS | grep -vq "comm=" 2> /dev/null`; then
-            MPI_GLOBAL_PARAMS="$MPI_GLOBAL_PARAMS --comm=pmi"
-        fi
-        if test "x$MPI_START_NPHOST" = "x1" ; then
-            MPI_GLOBAL_PARAMS="$MPI_GLOBAL_PARAMS -pernode"
-        elif test "x${I2G_MPI_PER_NODE}" != "x" ; then
-            warn_msg "Per node option ignored when using OSC mpiexec"
-        fi
-        mpi_start_get_plugin "generic_mpiexec.sh" 1
-        . $MPI_START_PLUGIN_FILES
-        generic_mpiexec
+
+        I2G_MPIEXEC_COMM="pmi"
+        osc_mpiexec 
         err=$?
     elif test $HYDRA_MPIEXEC -eq 1 ; then
         mpi_start_get_plugin "hydra.sh" 1

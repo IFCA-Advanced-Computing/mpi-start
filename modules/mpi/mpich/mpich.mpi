@@ -11,8 +11,11 @@ if test "x$MPI_START_MPI_PREFIX" = "x"  ; then
     debug_msg "use default mpi path: $MPI_START_MPI_PREFIX"
 fi
 
+
 # activate MPI
 mpi_start_activate_mpi $MPI_START_MPI_PREFIX $MPI_START_MPI_MODULE
+mpi_start_get_plugin "osc_mpiexec.sh" 1
+. $MPI_START_PLUGIN_FILES
 
 #
 # start an mpi job
@@ -23,6 +26,27 @@ mpi_exec () {
         return $?
     fi
 
+    # do prefer mpirun!
+    if test "x$MPI_MPIRUN" != "x"; then
+        MPIEXEC="$MPI_MPIRUN"
+        MPI_GLOBAL_PARAMS="$MPI_SPECIFIC_MPIRUN_PARAMS"
+    elif test "x$MPI_MPIEXEC" != "x"; then
+        MPIEXEC=$MPI_MPIEXEC
+        MPI_GLOBAL_PARAMS="$MPI_SPECIFIC_MPIEXEC_PARAMS"
+        
+        if test ${OSC_MPIEXEC} -eq  1 ; then
+            osc_mpiexec 
+            err=$?
+            # no need to do anything else
+            return $err
+        fi
+    else
+        error_msg "no mpiexec/mpirun found!"
+        dump_env
+        exit 1
+    fi
+
+    # NO OSC mpiexec case
     local machines_params=""
     if test "x$I2G_MPI_PER_NODE" = "x1" ; then
         machines_params="-machinefile $MPI_START_HOSTFILE -np $MPI_START_NP"
@@ -39,31 +63,6 @@ mpi_exec () {
         machines_params="-machinefile $MPI_START_MACHINEFILE -np $MPI_START_NP"
     fi
  
-    # do prefer mpirun!
-    if test "x$MPI_MPIRUN" != "x"; then
-        MPIEXEC="$MPI_MPIRUN"
-        MPI_GLOBAL_PARAMS="$MPI_SPECIFIC_MPIRUN_PARAMS"
-    elif test "x$MPI_MPIEXEC" != "x"; then
-        MPIEXEC=$MPI_MPIEXEC
-        MPI_GLOBAL_PARAMS="$MPI_SPECIFIC_MPIEXEC_PARAMS"
-
-        # how to test if the mpiexec needs the -np and -machinefile args??
-        $MPIEXEC 2>&1 | grep -e "-\<np\>" > /dev/null 2>&1
-        status=$?
-        if test $status -ne 0 ; then
-            # OSC mpiexec! 
-            debug_msg "Found OSC MPIEXEC, do not set machinefile!"
-            if test "x$I2G_MPI_PER_NODE" = "x1" ; then
-                MPI_GLOBAL_PARAMS="$MPI_GLOBAL_PARAMS -pernode"
-                machines_params=''
-            fi
-        fi
-    else
-        error_msg "no mpiexec/mpirun found!"
-        dump_env
-        exit 1
-    fi
-
     if test "x$MPI_START_SSH_AGENT" != "x"; then
         # we are not using default start methods, setting specific ssh 
         debug_msg "setting specific ssh agent"
