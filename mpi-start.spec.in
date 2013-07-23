@@ -10,8 +10,8 @@ Version: @VERSION@
 Release: 1%{?dist}
 License: GPLv2
 Group: Development/Tools
-Source: https://devel.ifca.es/mpi-start/downloads/mpi-start-%{version}.src.tar.gz
-URL: http://devel.ifca.es/mpi-start/
+Source: mpi-start-%{version}.src.tar.gz
+URL: https://github.com/IFCA/mpi-start 
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n) 
 BuildArch: noarch
 # Packager: Enol Fernandez <enolfc AT ifca DOT unican DOT es> 
@@ -50,6 +50,10 @@ rm -rf $RPM_BUILD_ROOT
 %doc docs/AUTHORS docs/COPYING docs/LICENSE README ChangeLog
 
 %changelog
+* Tue Jul 23 2013 Enol Fernandez <enolfc _AT_ ifca.unican.es> - 1.5.2-%{release}
+- Migrated to github.
+- Fix issue #1 (OSC mpiexec with mpich configuration)
+
 * Wed Oct 31 2012 Enol Fernandez <enolfc _AT_ ifca.unican.es> - 1.5.1-1%{?dist}
 - Improved packaging.
 
