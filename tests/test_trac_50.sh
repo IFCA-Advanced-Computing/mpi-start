@@ -4,6 +4,19 @@
 # Tests for ticket #50
 #
 
+oneTimeSetUp() {
+    MYTMPDIR=`$MYMKTEMP -d`
+    cat > $MYTMPDIR/mpdboot << EOF
+#!/bin/sh
+echo "$*"
+exit 0
+EOF
+    chmod +x $MYTMPDIR/mpdboot
+    cp $MYTMPDIR/mpdboot $MYTMPDIR/mpdallexit
+    oldPATH="$PATH"
+    export PATH=$MYTMPDIR:$PATH
+}
+
 setUp () {
     unset I2G_MPI_NP
     unset I2G_MPI_APPLICATION
@@ -16,6 +29,11 @@ setUp () {
     unset MPI_MPICH2_DISABLE_HYDRA
     export MPI_START_SHARED_FS=1
     export I2G_MPI_TYPE=mpich2
+}
+
+oneTimeTearDown (){
+    export PATH="$oldPATH"
+    rm -rf $MYTMPDIR
 }
 
 testBug50_OSC() {
