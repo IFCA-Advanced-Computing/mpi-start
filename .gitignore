@@ -2,4 +2,5 @@ debian/files
 debian/mpi-start.debhelper.log
 debian/mpi-start.substvars
 debian/mpi-start/
+Makefile
 
