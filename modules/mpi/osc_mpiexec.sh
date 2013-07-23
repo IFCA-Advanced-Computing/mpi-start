@@ -20,7 +20,7 @@ osc_mpiexec () {
     # OSC mpiexec! 
     # if a comm method has already been requested don't set
     if `echo $MPI_GLOBAL_PARAMS | grep -vq "comm=" 2> /dev/null`; then
-        if "x$I2G_MPIEXEC_COMM" != "x" -a "x$MPIEXEC_COMM" = "x" ; then
+        if test "x$I2G_MPIEXEC_COMM" != "x" -a "x$MPIEXEC_COMM" = "x" ; then
             MPI_GLOBAL_PARAMS="$MPI_GLOBAL_PARAMS --comm=$I2G_MPIEXEC_COMM"
         fi
     fi
