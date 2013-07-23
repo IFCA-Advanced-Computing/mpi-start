@@ -1,5 +1,6 @@
 #!/bin/sh
 
+
 # Configure script for mpi-start.
 # not very fancy stuff
 name_prefix=""
@@ -43,6 +44,9 @@ show_help () {
     echo "  --libdir=DATADIR"
     echo "  --sysconfdir=DATADIR"
     echo "  --mandir=DATADIR/man"
+    echo "  --dist=''"
+    echo "  --build=''"
+    echo "  --target=''"
     echo "  --packager=''"
     exit 0
 }
@@ -98,6 +102,12 @@ do
             sysconfdir=$optarg ;;
         -mandir=* | --mandir=*)
             mandir=$optarg ;;
+        -dist=* | --dist=*)
+            dist=$optarg ;;
+        -build=* | --build=*)
+            build=$optarg ;;
+        -target=* | --target=*)
+            target=$optarg ;;
         -packager=* | --packager=*)
             packager=$optarg ;;
     esac
@@ -106,6 +116,7 @@ done
 if [ ! -z "$packager" ] ; then
     PACKAGER="--define \"packager $packager\""
 fi
+
 
 files='Makefile
 src/Makefile
@@ -150,61 +161,33 @@ done
 
 
 ################### DEFAULT CONFIG FILE FOR MPI ########################
-DEBIAN=0
-SL5_64=0
-SL5_32=0
-SL6_64=0
-SL6_32=0
-
-os=`uname`
-if [ $os = 'Linux' ]; then
-    # determine the Distro
-    which lsb_release > /dev/null 2> /dev/null
+if [ -z "$build" ] ; then
+    # assume uname is correct as target arch 
+    arch=`uname -m`
+else
+    echo "$build" | grep "x86_64" > /dev/null
     if [ $? -eq 0 ] ; then
-        ISSUE=`lsb_release -a 2> /dev/null`
+        arch="x86_64"
     else
-        ISSUE=`cat /etc/issue`
-    fi
-    echo $ISSUE | egrep -i "debian|ubuntu" > /dev/null
-    if [ $? -eq 0 ] ; then
-        DEBIAN=1
-    else
-        # lets assume SciLinux (or RH EL!)
-        VERSION=`echo $ISSUE | grep -i "release" | sed -e 's/.*[Rr]elease \([0-9.]*\).*/\1/'`
-        echo $VERSION | grep "^5\." > /dev/null
-        if [ $? -eq 0 ] ; then
-            machine=`uname -m`
-            if [ $machine = 'x86_64' ] ; then
-                SL5_64=1
-            else
-                SL5_32=1
-            fi
-        else
-            echo $VERSION | grep "^6\." > /dev/null
-            if [ $? -eq 0 ] ; then
-                machine=`uname -m`
-                if [ $machine = 'x86_64' ] ; then
-                    SL6_64=1
-                else
-                    SL6_32=1
-                fi
-            fi
-        fi
+        # assume i386
+        arch="i386"
     fi
 fi
 
-if [ $DEBIAN -eq 1 ] ; then
-    cp config/mpi-config.local.debian config/mpi-config.local
-elif [ $SL5_32 -eq 1 ] ; then
-    cp config/mpi-config.local.el5-i386 config/mpi-config.local
-elif [ $SL5_64 -eq 1 ] ; then
-    cp config/mpi-config.local.el5-x86_64 config/mpi-config.local
-elif [ $SL6_32 -eq 1 ] ; then
-    cp config/mpi-config.local.el6-i386 config/mpi-config.local
-elif [ $SL6_64 -eq 1 ] ; then
-    cp config/mpi-config.local.el6-x86_64 config/mpi-config.local
+if [ -z "$dist" ] ; then
+    if [ -z "target" ]; then
+        # probably we are on debian, no arch
+        dist=.debian
+        arch=""
+    else
+        # dist is missing in some el5 (CentOS/SL)
+        echo "$target" | grep "redhat" > /dev/null && dist=".el5"
+    fi
 fi
 
+if [ -f config/mpi-config.local${dist}-${arch} ] ; then
+    cp config/mpi-config.local${dist}-${arch} config/mpi-config.local
+fi
 ########################################################################
 
 
