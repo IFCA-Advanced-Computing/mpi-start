@@ -162,7 +162,7 @@ done
 
 ################### DEFAULT CONFIG FILE FOR MPI ########################
 if [ -z "$build" ] ; then
-    # assume uname is correct as target distro 
+    # assume uname is correct as target arch 
     arch=`uname -m`
 else
     echo "$build" | grep "x86_64" > /dev/null
