@@ -93,7 +93,7 @@ if test "x${RUN_UNIT_TESTS}" = "x1" ; then
     echo "* RFCs #30, #35"
     ./test_unit.sh || exitcode=1
     echo "* RFC #63"
-    ./test_63.sh || exitcode=1
+    ./test_trac_63.sh || exitcode=1
     echo "***************************"
 fi
 if test "x${RUN_BASIC_TESTS}" = "x1" ; then
@@ -103,9 +103,9 @@ if test "x${RUN_BASIC_TESTS}" = "x1" ; then
     echo "* RFCs #16, #25"
     ./test_basic.sh || exitcode=1
     echo "* RFC #58"
-    ./test_58.sh || exitcode=1
+    ./test_trac_58.sh || exitcode=1
     echo "* RFC #61"
-    ./test_61.sh || exitcode=1
+    ./test_trac_61.sh || exitcode=1
     echo "***************************"
 fi
 if test "x${RUN_HOOK_TESTS}" = "x1" ; then
@@ -114,7 +114,7 @@ if test "x${RUN_HOOK_TESTS}" = "x1" ; then
     echo "* Hook Tests"
     ./test_hooks.sh || exitcode=1
     echo "* RFC #47"
-    ./test_47.sh || exitcode=1
+    ./test_trac_47.sh || exitcode=1
     echo "***************************"
 fi
 if test "x${RUN_NP_TESTS}" = "x1" ; then
@@ -132,15 +132,15 @@ if test "x${RUN_FSDETECT_TESTS}" = "x1" ; then
     echo "* RFC #31"
     ./test_fsdetect.sh || exitcode=1
     echo "* RFC #53"
-    ./test_53.sh || exitcode=1
+    ./test_trac_53.sh || exitcode=1
     echo "* RFC #32"
-    ./test_32.sh || exitcode=1
+    ./test_trac_32.sh || exitcode=1
     echo "* RFC #44"
-    ./test_44.sh || exitcode=1
+    ./test_trac_44.sh || exitcode=1
     echo "* RFC #60"
-    ./test_60.sh || exitcode=1
+    ./test_trac_60.sh || exitcode=1
     echo "* RFC #5"
-    ./test_5.sh || exitcode=1
+    ./test_trac_5.sh || exitcode=1
     echo "***************************"
 fi
 if test "x${RUN_SCH_TESTS}" = "x1" ; then
@@ -180,10 +180,10 @@ if test "x${RUN_MPICH2_TESTS}" = "x1" ; then
     export HYDRA_BOOTSTRAP=fork
     ./test_mpi.sh || exitcode=1
     echo "* RFC #50"
-    ./test_50.sh || exitcode=1
+    ./test_trac_50.sh || exitcode=1
     if test "x${RUN_AFFINITY_TESTS}" = "x1" ; then
         echo "* RFC #48"
-        ./test_affinity_48.sh || exitcode=1
+        ./test_affinity_trac_48.sh || exitcode=1
     fi
     echo "***************************"
 fi
@@ -203,10 +203,10 @@ if test "x${RUN_OPENMPI_TESTS}" = "x1" ; then
     ./test_mpi.sh || exitcode=1
     # test for bug 38
     echo "* RFC #38"
-    ./test_38.sh || exitcode=1
+    ./test_trac_38.sh || exitcode=1
     if test "x${RUN_AFFINITY_TESTS}" = "x1" ; then
         echo "* RFC #27"
-        ./test_affinity_27.sh || exitcode=1
+        ./test_affinity_trac_27.sh || exitcode=1
     fi
     echo "***************************"
 fi
