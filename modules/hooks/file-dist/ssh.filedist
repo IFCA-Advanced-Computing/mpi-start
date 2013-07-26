@@ -19,13 +19,22 @@ check_distribution_method(){
 	return $result
 }
 
+
+# check if $1 is the localhost
+is_localhost () {
+    test "$1" = `hostname` \
+        -o "$1" = `hostname -s` \
+        -o "$1" = `hostname -f` \
+        -o "$1" = "localhost" 
+}
+
 copy_from_node() {
     debug_msg "copy data from remote host $1"
     if test "x$1" = "x" -o "x$2" = "x" -o "x$3" = "x" ; then
         error_msg "Missing arguments to gather_data, not copying anything"
         return 1
     fi
-    if test $1 = `hostname` -o $1 = `hostname -f` -o $1 = "localhost" ; then
+    if is_localhost $1 ; then
         cp $PWD/$2 $3
     else
         scp $1:$PWD/$2 $3
@@ -36,7 +45,7 @@ copy(){
     debug_msg "ssh copy"
 
     for MPI_START_REMOTE_NODE in `cat $MPI_START_HOSTFILE`; do
-        if test $MPI_START_REMOTE_NODE = `hostname` -o $MPI_START_REMOTE_NODE = `hostname -f` -o $MPI_START_REMOTE_NODE = "localhost" ; then
+        if is_localhost $MPI_START_REMOTE_NODE ; then
             debug_msg "skip local machine"
             continue
         fi
@@ -93,7 +102,7 @@ clean() {
     debug_msg "mpi_start_post_run_hook_generic"
 
     for MPI_START_REMOTE_NODE in `cat $MPI_START_HOSTFILE`; do
-        if test $MPI_START_REMOTE_NODE = `hostname` -o $MPI_START_REMOTE_NODE = `hostname -f` -o $MPI_START_REMOTE_NODE = "localhost" ; then
+        if is_localhost $MPI_START_REMOTE_NODE ; then
             debug_msg "skip local machine"
             continue
         fi
