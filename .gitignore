@@ -3,4 +3,10 @@ debian/mpi-start.debhelper.log
 debian/mpi-start.substvars
 debian/mpi-start/
 Makefile
+docs/mpi-start.aux
+docs/mpi-start.log
+docs/mpi-start.out
+docs/mpi-start.pdf
+docs/mpi-start.tex
+docs/mpi-start.toc
 

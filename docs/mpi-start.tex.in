@@ -1,12 +1,12 @@
-\documentclass{emi}
+\documentclass{mpi-start}
 
 \usepackage{tabularx}
 \usepackage{url}
 
 \title{mpi-start and MPI-Utils}
 \author{E. Fernández}
-\DocVersion{1.0.5}
-\EMICompVersion{@VERSION@}
+\DocVersion{1.0.6}
+\CompVersion{@VERSION@}
 \Date{\today}
 
 \Abstract{
@@ -35,16 +35,15 @@ mpi-start provides an abstraction layer that offers a unique interface to start 
 
 mpi-start was originally developed in the frame of the int.eu.grid project for
 the execution of MPI applications with the CrossBroker metascheduler and then
-extended its use as the official way of starting MPI jobs within EGEE.
-Currently, it is part of the EMI project. 
+extended its use as the official way of starting MPI jobs within EGEE. mpi-start was then included in the EMI project.
 
-There is a trac page at \url{http://devel.ifca.es/mpi-start} with information about the development of mpi-start.
+Development is tracked at \url{http://github.com/IFCA/mpi-start}.
 
 \subsubsection{Requirements}
 mpi-start only requires bash compatible shell for working. mpi-start uses several commands that are available in most unix systems: readlink, mount and mktemp.
 
 \subsubsection{Source Code}
-Source code is available at mpi-start mercurial repository (\url{https://devel.ifca.es/hg/mpi-start}). Released versions are tagged as \texttt{mpi-start\_R\_X\_Y\_Z-r}, where X.Y.Z is the mpi-start version and r the revision number for that version.
+Source code is available at mpi-start git repository (\url{https://github.com/IFCA/mpi-start}). Released versions are tagged as \texttt{mpi-start\_R\_X\_Y\_Z-r}, where X.Y.Z is the mpi-start version and r the revision number for that version.
 
 \subsection{MPI-Utils}
 \subsubsection{Description}
@@ -465,7 +464,7 @@ Compiler & \texttt{MPI\_COMPILER\_HOOK} & If set to $0$, disable compiler hook.\
 
 \subsubsection{Binary Distribution}
 
-Binary packages for mpi-start are generated in EMI using ETICS. Check their repositories for the correct package for your distribution. Once you have the repositories configured you only need to install the package using your favorite package manager:
+Binary packages for mpi-start are generated in the openSUSE build service and distributed by EMI. Check their repositories for the correct package for your distribution. Once you have the repositories configured you only need to install the package using your favorite package manager:
 
 For RedHat based distributions:
 \begin{small}
@@ -509,11 +508,15 @@ if you want to support the compilation of MPI applications.
 
 There are no major changes between EMI-1 and the EMI-2 releases, no backward incompatible changes have been introduced. However the metapackage has changed the name from \texttt{glite-mpi} to \texttt{emi-mpi}. If you configure the EMI-2 repo on top of a EMI-1 installation and do an upgrade, the glite-mpi package will be automatically upgraded to emi-mpi when a \texttt{yum upgrade} or \texttt{yum update} is performed. There is no need to reconfigure.
 
+\subsubsection{Upgrading from EMI-2}
+
+The mpi-start packages are automatically upgraded when using the EMI-3 repositories, there is no need to reconfigure.
+
 \subsubsection{Source Distribution}
 
-Source can be retrieved from the mercurial repository.
+Source can be retrieved from the git repository.
 
-Installation is as easy as "make install". The default installation prefix is "/usr". If a non default installation wants to be done, use the PREFIX variable in make install
+Installation is as easy as "./configure \&\& make install". The default installation prefix is "/usr". If a non default installation wants to be done, use the PREFIX variable in make install
 
 \begin{small}
 \begin{verbatim}
@@ -1150,6 +1153,7 @@ Torque/PBS can be configured with the yaim module as described in previous secti
 SUBMITFILTER /var/torque/submit_filter.pl
 \end{verbatim}
 
+% XXX we need a new submit filter
 Then download the \texttt{submit\_filter.pl} from \url
 {http://devel.ifca.es/rep/submit\_filter.pl} and put it in the above location.
 

@@ -8,7 +8,7 @@ Version: 1.0.2
 Release: 1%{?dist}
 License: GPLv2
 Group: Development/Tools
-URL: http://devel.ifca.es/mpi-start/
+URL: http://github.com/IFCA/mpi-start
 # No source, since this is a metapackage
 # Source: emi-mpi.tar.gz
 BuildArch: noarch
