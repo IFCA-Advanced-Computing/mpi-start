@@ -1,3 +1,5 @@
+% mpi-start.cls:
+% Code mostly from:
 % emi.cls: 
 % Branched from egee.cls 1.6 
 % revision 2.0 [based on word template]
@@ -27,8 +29,8 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesClass{emi}[2011/03/24 EMI LaTeX Class]
-\typeout{EMI LaTeX class -- 2011/03/24}
+\ProvidesClass{mpi-start}[2013/07/30 mpi-start LaTeX Class]
+\typeout{mpi-start LaTeX class -- 2013/07/30}
 %
 %% Interface - example of an option, should we want to use these later.
 %\newif\ifmonotitle\monotitlefalse
@@ -124,7 +126,7 @@
 
 \def\@defaultfooter{
   \def\@oddfoot{\vbox to \footsize {%
-    {\color{blue}\hrule width \textwidth height 1pt depth 0pt}%
+    {\color{black}\hrule width \textwidth height 1pt depth 0pt}%
     \vfil
     %\small\hbox to \textwidth{\ISTNumber%
     \small\hbox to \textwidth{%
@@ -139,7 +141,7 @@
 
 \def\ps@title{%
   \@defaultfooter
-  \def\@oddhead{\hbox to \textwidth{\EMILogo}}
+  \def\@oddhead{\hbox to \textwidth{\Logo}}
 }
 
 \def\ps@headings{%
@@ -148,7 +150,7 @@
 %\hrule width \textwidth height 1pt\relax
       \vbox to 0.75\headheight{%
         \hbox to \textwidth{%
-          \hbox to 0pt{\EMILogo\hss}%
+          \hbox to 0pt{\Logo\hss}%
           \hfil
 
 %%          \hbox to 8cm{%
@@ -210,7 +212,7 @@
       }%
 %\hrule width \textwidth height 1pt\relax
       \vfil\vskip 2.5mm\relax
-      {\color{blue}\hrule width \textwidth height 1pt depth 0pt}%
+      {\color{black}\hrule width \textwidth height 1pt depth 0pt}%
     }%
   }%
 }
@@ -223,7 +225,7 @@
 \ifpdf
         \DeclareGraphicsExtensions{.jpg,.pdf,.png}
         \pdfcompresslevel=9
-	\pdfinfo{ /Title (EMI) }
+	\pdfinfo{ /Title (mpi-start) }
 \else   
         \DeclareGraphicsExtensions{.eps}
 \fi
@@ -232,6 +234,7 @@
 
 \definecolor{MyTeal}{rgb}{0,0.46,0.46}
 \definecolor{blue}{rgb}{0.05,0.26,0.5}
+\definecolor{mygreen}{rgb}{0.13,0.47,0.1}
 %\definecolor{blue}{rgb}{0.1,0.1,0.5} %% egee blue
 \definecolor{lightgrey}{gray}{0.65}
 
@@ -243,7 +246,7 @@
 \hbox{}% Force top of page
 \vfill
 {\centering
-        \fontsize{30}{50}{\textbf{\textsc{\textcolor{blue}{European Middleware Initiative}}}}\\[40mm]%
+        \fontsize{30}{50}{\textbf{\textsc{\textcolor{mygreen}{mpi-start}}}}\\[40mm]%
         %\Huge{\textbf{\textsc{\textcolor{blue}{European Middleware Initiative}}}}\\[20mm]%
 
         \fontsize{22}{28}{\textbf{\textsc{\@title}}}\\[2mm]%
@@ -258,13 +261,13 @@
      
       \vbox{
      
-      {\color{MyTeal}\hrule width \frontboxwidth height 1mm depth 0pt}  
+      {\color{mygreen}\hrule width \frontboxwidth height 1mm depth 0pt}  
       
       \hbox to \frontboxwidth{\sf
       \begin{tabularx}{\frontboxwidth}{l>{\raggedright\arraybackslash}X} 
 \\ 
+                Version: & \textbf{\@CompVersion}\\[3mm]
                 Document version: & \textbf{\@DocVersion}\\[3mm]
-                EMI Component Version: & \textbf{\@EMICompVersion}\\[3mm]
                 Date: & \textbf{\@Date}\\[3mm]
                 %Document status: & \textbf{\@DocStatus}\\[3mm]
                 
@@ -272,7 +275,7 @@
   
      }
      
-       {\color{MyTeal}\hrule width \frontboxwidth height 1mm depth 0pt}
+       {\color{mygreen}\hrule width \frontboxwidth height 1mm depth 0pt}
      %}%centering
      }
 
@@ -333,12 +336,12 @@
 % common constants
 %
 %\def\ISTNumber{INFSO-RI-508833}
-\newsavebox{\@EMILogo}
-%\savebox{\@EMILogo}{\includegraphics[height=0.75\headheight]{EMILogo}}
-\savebox{\@EMILogo}{\includegraphics[height=0.95\headheight]{EMILogo}}
-\def\EMILogo{\usebox{\@EMILogo}}
-%\def\LargeEMILogo{\includegraphics[height=\headheight]{EMILogo}}
-\def\SmallEMILogo{\includegraphics[height=\headheight]{EMILogo}}
+\newsavebox{\@Logo}
+%\savebox{\@Logo}{\includegraphics[height=0.75\headheight]{Logo}}
+\savebox{\@Logo}{\includegraphics[height=0.95\headheight]{mpistartLogo}}
+\def\Logo{\usebox{\@Logo}}
+%\def\LargeLogo{\includegraphics[height=\headheight]{Logo}}
+\def\SmallLogo{\includegraphics[height=\headheight]{mpistartLogo}}
 % DEL \def\ISTLogo{\includegraphics[height=\headheight]{isi}}
 
 %
@@ -356,8 +359,8 @@
 \gdef\@DocVersion{\@latex@warning@no@line{No \noexpand\DocVersion given %
         (e.g. 0.1.2)}}
 
-\def\EMICompVersion#1{\gdef\@EMICompVersion{#1}}
-\gdef\@EMICompVersion{\@latex@warning@no@line{No \noexpand\EMICompVersion given %
+\def\CompVersion#1{\gdef\@CompVersion{#1}}
+\gdef\@CompVersion{\@latex@warning@no@line{No \noexpand\CompVersion given %
         (e.g. 1.2.3)}}
 
 \def\Date#1{\gdef\@Date{#1}}

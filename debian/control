@@ -4,9 +4,9 @@ Priority: optional
 Maintainer: Enol Fernandez <enolfc@ifca.unican.es>
 Build-Depends: debhelper (>= 7)
 Standards-Version: 3.8.3
-Vcs-hg: https://devel.ifca.es/hg/mpi-start
-Vcs-browser: https://devel.ifca.es/hg/mpi-start
-Homepage: https://devel.ifca.es/mpi-start/
+Vcs-git: https://github.com/IFCA/mpi-start.git 
+Vcs-browser: https://github.com/IFCA/mpi-start
+Homepage: https://github.com/IFCA/mpi-start
 
 Package: mpi-start
 Architecture: all
@@ -17,4 +17,4 @@ Description: MPI startup mechanism abstraction layer
  the nodes on which MPI applications are run. The package is used to
  help the user start MPI applications on heterogeneous Grid sites. 
  .
- Check the project home page at: http://devel.ifca.es/mpi-start/
+ Check the project home page at: http://github.com/IFCA/mpi-start
