@@ -1,3 +1,9 @@
+mpi-start (1.5.2) precise; urgency=low
+
+  * New upstream release.
+
+ -- Enol Fernandez <enol@ifca.unican.es>  Wed, 31 Jul 2013 10:46:44 +0200
+
 mpi-start (1.5.0) precise; urgency=low
 
   * New upstream release.
