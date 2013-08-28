@@ -442,6 +442,62 @@ mpi_start_get_plugin() {
 
 
 #======================================================================
+# Load the mpi configuration variables 
+#======================================================================
+mpi_start_load_mpi_config() {
+    local pfx=mpi-config
+    local cfiles=${pfx}.${MPI_START_UNAME}
+    if test "x${MPI_START_OS_DIST_TYPE}" != "x" ; then
+        cfiles="${pfx}.${MPI_START_OS_DIST_TYPE} $cfiles"
+        if test "x${MPI_START_OS_RELEASE_MAJOR}" != "x" ; then
+            cfiles="${pfx}.${MPI_START_OS_DIST_TYPE}${MPI_START_OS_RELEASE_MAJOR} $cfiles"
+            if test "x${MPI_START_ARCH}" != "x" ; then
+                cfiles="${pfx}.${MPI_START_OS_DIST_TYPE}${MPI_START_OS_RELEASE_MAJOR}-${MPI_START_ARCH} $cfiles"
+            fi
+        fi
+    fi
+    for c in $cfiles; do 
+        mpi_start_get_plugin $c 1
+        if test "x${MPI_START_PLUGIN_FILES}" != "x" ; then
+            info_msg "Loading configuration from $MPI_START_PLUGIN_FILES"
+            . ${MPI_START_PLUGIN_FILES}
+            break
+        fi
+    done
+    # finally load the mpi-config.local if available
+    mpi_start_get_plugin "mpi-config.local" 1
+    if test "x${MPI_START_PLUGIN_FILES}" != "x" ; then
+        info_msg "Loading local configuration from $MPI_START_PLUGIN_FILES"
+        . ${MPI_START_PLUGIN_FILES}
+    fi
+}
+
+#======================================================================
+# Try to find out the current OS distribution 
+#======================================================================
+mpi_start_detect_os() {
+    MPI_START_UNAME=`uname -s | tr "[:upper:]" "[:lower:]"`
+    MPI_START_ARCH=`uname -m`
+
+    if test "x${MPI_START_UNAME}" = "xlinux" ; then
+        which lsb_release 2> /dev/null > /dev/null
+        if test $? -eq 0 ; then
+            export MPI_START_OS_DIST=`lsb_release -si 2> /dev/null`
+            echo $MPI_START_OS_DIST | egrep -i "debian|ubuntu" > /dev/null 
+            if test $? -eq 0 ; then
+                export MPI_START_OS_DIST_TYPE="debian"
+            fi
+            echo $MPI_START_OS_DIST | egrep -i "redhat|scientificlinux" > /dev/null 
+            if test $? -eq 0 ; then
+                export MPI_START_OS_DIST_TYPE="el"
+            fi
+            export MPI_START_OS_RELEASE=`lsb_release -sr 2> /dev/null`
+            export MPI_START_OS_RELEASE_MAJOR=`echo $MPI_START_OS_RELEASE | cut -f1 -d"."`
+        fi
+    fi
+}
+
+#======================================================================
 # Checks that mpi-start are correct and coherent
 #======================================================================
 mpi_start_check_options() {
@@ -468,7 +524,8 @@ mpi_start_check_options() {
         set -x
     fi
 
-    MPI_START_UNAME=`uname -s | tr "[:upper:]" "[:lower:]"`
+    # detect os flavor
+    mpi_start_detect_os
 
     if test -r "${I2G_MPI_CONFIG}" ; then 
         . ${I2G_MPI_CONFIG}
@@ -546,11 +603,8 @@ mpi_start_check_options() {
         dump_env
     fi
 
-    # source the local mpi-start variables if any
-    mpi_start_get_plugin "mpi-config.local" 1
-    if test "x${MPI_START_PLUGIN_FILES}" != "x" ; then
-        . ${MPI_START_PLUGIN_FILES}
-    fi
+    # try to source the OS mpi variables
+    mpi_start_load_mpi_config
 }
 
 
