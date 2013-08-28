@@ -11,3 +11,4 @@ docs/mpi-start.tex
 docs/mpi-start.toc
 build
 src/mpi-start
+tests/test.o
