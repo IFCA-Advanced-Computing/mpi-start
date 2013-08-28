@@ -38,8 +38,8 @@ rm -rf $RPM_BUILD_ROOT
 %files
 %defattr(-,root,root,-)
 %{_bindir}/mpi-start
-%config(noreplace) %{_sysconfdir}/mpi-start/*.local
 %{_sysconfdir}/mpi-start/*.filedist
+%{_sysconfdir}/mpi-start/mpi-config.*
 %{_sysconfdir}/mpi-start/*.hook
 %{_sysconfdir}/mpi-start/*.mpi
 %{_sysconfdir}/mpi-start/*.scheduler
@@ -50,10 +50,11 @@ rm -rf $RPM_BUILD_ROOT
 %doc docs/AUTHORS docs/COPYING docs/LICENSE README ChangeLog
 
 %changelog
-* Tue Jul 30 2013 Enol Fernandez <enolfc _AT_ ifca.unican.es> - 1.5.2-%{release}
+* Wed Aug 28 2013 Enol Fernandez <enolfc _AT_ ifca.unican.es> - 1.5.2-%{release}
 - Migrated to github.
 - Fix issue #1 (OSC mpiexec with mpich configuration)
 - Fix issue #2 (ssh copy fails if hostname command returns hostname with domain)
+- Fix issue #6 (Default mpi configuration should be detected by the runtime)
 
 * Wed Oct 31 2012 Enol Fernandez <enolfc _AT_ ifca.unican.es> - 1.5.1-1%{?dist}
 - Improved packaging.
