@@ -143,7 +143,7 @@ modules/schedulers/pbs/Makefile
 modules/schedulers/sge/Makefile
 modules/schedulers/slurm/Makefile'
 
-maintainerclean_files="$files config/mpi-config.local"
+maintainerclean_files="$files"
 
 for f in $files ; do
     cat > $f << EOF
@@ -161,33 +161,33 @@ done
 
 
 ################### DEFAULT CONFIG FILE FOR MPI ########################
-if [ -z "$build" ] ; then
-    # assume uname is correct as target arch 
-    arch=`uname -m`
-else
-    echo "$build" | grep "x86_64" > /dev/null
-    if [ $? -eq 0 ] ; then
-        arch="x86_64"
-    else
-        # assume i386
-        arch="i386"
-    fi
-fi
-
-if [ -z "$dist" ] ; then
-    if [ -z "target" ]; then
-        # probably we are on debian, no arch
-        dist=.debian
-        arch=""
-    else
-        # dist is missing in some el5 (CentOS/SL)
-        echo "$target" | grep "redhat" > /dev/null && dist=".el5"
-    fi
-fi
-
-if [ -f config/mpi-config.local${dist}-${arch} ] ; then
-    cp config/mpi-config.local${dist}-${arch} config/mpi-config.local
-fi
+#if [ -z "$build" ] ; then
+#    # assume uname is correct as target arch 
+#    arch=`uname -m`
+#else
+#    echo "$build" | grep "x86_64" > /dev/null
+#    if [ $? -eq 0 ] ; then
+#        arch="x86_64"
+#    else
+#        # assume i386
+#        arch="i386"
+#    fi
+#fi
+#
+#if [ -z "$dist" ] ; then
+#    if [ -z "target" ]; then
+#        # probably we are on debian, no arch
+#        dist=.debian
+#        arch=""
+#    else
+#        # dist is missing in some el5 (CentOS/SL)
+#        echo "$target" | grep "redhat" > /dev/null && dist=".el5"
+#    fi
+#fi
+#
+#if [ -f config/mpi-config.local${dist}-${arch} ] ; then
+#    cp config/mpi-config.local${dist}-${arch} config/mpi-config.local
+#fi
 ########################################################################
 
 
