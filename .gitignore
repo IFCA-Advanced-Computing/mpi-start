@@ -9,4 +9,5 @@ docs/mpi-start.out
 docs/mpi-start.pdf
 docs/mpi-start.tex
 docs/mpi-start.toc
-
+build
+src/mpi-start
