@@ -48,6 +48,7 @@ tarball: all
 	mkdir -p build/etc
 	$(MAKE) -C src install DESTDIR=`pwd`/build prefix="" 
 	$(MAKE) -C modules install DESTDIR=`pwd`/build prefix="" 
+	$(MAKE) -C config install DESTDIR=`pwd`/build prefix="" 
 	tar czf build/mpi-start-$(VERSION).tar.gz -C build bin etc
 
 DISTFILES=src\

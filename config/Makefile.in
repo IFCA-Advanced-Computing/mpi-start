@@ -1,13 +1,21 @@
-all: mpi-config.local
-
-mpi-config.local:
-	cp mpi-config.local.template mpi-config.local	
+all:
 
 clean:
 
 install:
 	install -d $(DESTDIR)/$(moduledir)
-	install -m 0644 mpi-config.local  $(DESTDIR)/$(moduledir)/
+	install -m 0644 mpi-config.local.template  $(DESTDIR)/$(moduledir)/
+	install -m 0644 mpi-config.debian $(DESTDIR)/$(moduledir)/
+	install -m 0644 mpi-config.el5-i386 $(DESTDIR)/$(moduledir)/
+	install -m 0644 mpi-config.el6-i386 $(DESTDIR)/$(moduledir)/
+	install -m 0644 mpi-config.el5-x86_64 $(DESTDIR)/$(moduledir)/
+	install -m 0644 mpi-config.el6-x86_64 $(DESTDIR)/$(moduledir)/
 
 uninstall:
-	rm -f $(DESTDIR)/$(moduledir)/mpi-config.local
+	rm -f $(DESTDIR)/$(moduledir)/mpi-config.local.template
+	rm -f $(DESTDIR)/$(moduledir)/mpi-config.debian
+	rm -f $(DESTDIR)/$(moduledir)/mpi-config.el5-i386
+	rm -f $(DESTDIR)/$(moduledir)/mpi-config.el6-i386
+	rm -f $(DESTDIR)/$(moduledir)/mpi-config.el5-x86_64
+	rm -f $(DESTDIR)/$(moduledir)/mpi-config.el6-x86_64
+
