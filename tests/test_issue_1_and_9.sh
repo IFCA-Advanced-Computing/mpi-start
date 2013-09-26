@@ -23,6 +23,10 @@ fake_mpiexec() {
     echo "fake mpiexec -np option" 1>&2
 }
 
+fake_hydra_mpiexec() {
+    echo "fake hydra mpiexec, fake no options" 1>&2
+}
+
 testValidOSCmpiexec() {
     export MPI_MPIEXEC=fake_osc_mpiexec
     mpi_start_get_plugin "osc_mpiexec.sh" 1
@@ -37,6 +41,12 @@ testInvalidOSCmpiexec() {
     assertEquals "0" "$OSC_MPIEXEC"
 }
 
-# XXX missing tests for OSC mpiexec with the implementations
+testHydrampiexec() {
+    export MPI_MPIEXEC=fake_hydra_mpiexec
+    mpi_start_get_plugin "osc_mpiexec.sh" 1
+    . $MPI_START_PLUGIN_FILES
+    assertEquals "0" "$OSC_MPIEXEC"
+}
+
 
 . $SHUNIT2
