@@ -145,6 +145,8 @@ if test "x${RUN_FSDETECT_TESTS}" = "x1" ; then
     ./test_trac_60.sh || exitcode=1
     echo "* RFC #5"
     ./test_trac_5.sh || exitcode=1
+    echo "* Issue #3"
+    ./test_issue_3.sh || exitcode=1
     echo "***************************"
 fi
 if test "x${RUN_SCH_TESTS}" = "x1" ; then
