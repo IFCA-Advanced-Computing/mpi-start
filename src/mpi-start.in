@@ -392,21 +392,26 @@ mpi_start_dummy_scheduler() {
     export MPI_START_HOSTFILE=$MPI_START_TEMP_FILE
     mpi_start_mktemp
     export MPI_START_HOST_SLOTS_FILE=$MPI_START_TEMP_FILE
-    local myhost=`hostname`
-    local slots=1
-    if test "x${MPI_DUMMY_SCH_SLOTS}" != "x" ; then
-        slots=$MPI_DUMMY_SCH_SLOTS
+    if test "x$MPI_START_DUMMY_SCH_HOSTS" = "x" ; then
+        MPI_START_DUMMY_SCH_HOSTS=`hostname`
     fi
-    local n=$slots
-    while [ $n -ne 0 ]; do
-        echo $myhost >> $MPI_START_MACHINEFILE
-        n=`expr $n - 1`
+    local nhosts=0
+    local slots=0
+    MPI_START_DUMMY_SCH_SLOTS=${MPI_START_DUMMY_SCH_SLOTS:-1}
+    for host in $MPI_START_DUMMY_SCH_HOSTS ; do
+        local n=$MPI_START_DUMMY_SCH_SLOTS
+        while [ $n -ne 0 ]; do
+            echo $host >> $MPI_START_MACHINEFILE
+            n=`expr $n - 1`
+        done
+        echo $host > $MPI_START_HOSTFILE
+        echo "$host $slots"> $MPI_START_HOST_SLOTS_FILE
+        nhosts=`expr $nhosts + 1`
+        slots=`expr $slots + $MPI_START_DUMMY_SCH_SLOTS`
     done
-    echo $myhost > $MPI_START_HOSTFILE
-    echo "$myhost $slots"> $MPI_START_HOST_SLOTS_FILE
     export MPI_START_NSLOTS=$slots
-    export MPI_START_NHOSTS=1
-    export MPI_START_NSLOTS_PER_HOST=$slots
+    export MPI_START_NHOSTS=$nhosts
+    export MPI_START_NSLOTS_PER_HOST=$MPI_START_DUMMY_SCH_SLOTS
     SCHEDULER_NAME="mpi-start-dummy"
     export MPI_START_SCHEDULER=$SCHEDULER_NAME
 }
