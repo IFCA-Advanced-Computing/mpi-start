@@ -57,6 +57,7 @@ rm -rf $RPM_BUILD_ROOT
 - Fix issue #2 (ssh copy fails if hostname command returns hostname with domain)
 - Fix issue #6 (Default mpi configuration should be detected by the runtime)
 - Fix issue #9 (mpiexec copy method activated when using hydra)
+- New feature #8 (Support host list scheduler)
 
 * Wed Oct 31 2012 Enol Fernandez <enolfc _AT_ ifca.unican.es> - 1.5.1-1%{?dist}
 - Improved packaging.
