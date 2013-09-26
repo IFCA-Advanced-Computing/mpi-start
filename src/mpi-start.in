@@ -492,8 +492,12 @@ mpi_start_detect_os() {
                 export MPI_START_OS_DIST_TYPE="el"
             fi
             export MPI_START_OS_RELEASE=`lsb_release -sr 2> /dev/null`
-            export MPI_START_OS_RELEASE_MAJOR=`echo $MPI_START_OS_RELEASE | cut -f1 -d"."`
+            export MPI_START_OS_RELEASE_MAJOR=`echo "$MPI_START_OS_RELEASE" | cut -f1 -d"."`
         fi
+    elif test "x${MPI_START_UNAME}" = "xdarwin" ; then
+        export MPI_START_OS_DIST_TYPE=`uname -s`
+        export MPI_START_OS_RELEASE=`uname -r`
+        export MPI_START_OS_RELEASE_MAJOR=`echo "$MPI_START_OS_RELEASE" | cut -f1 -d"."`
     fi
 }
 
