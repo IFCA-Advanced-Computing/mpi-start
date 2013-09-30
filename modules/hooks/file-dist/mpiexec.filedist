@@ -10,12 +10,8 @@ check_distribution_method() {
     result=255
     if test "x$I2G_MPI_TYPE" = "xmpich" -o "x$I2G_MPI_TYPE" = "xmpich2"; then 	
         if test "x${MPI_START_SCHEDULER}" = "xpbs" ; then
-            if test "x${MPI_MPIEXEC}" != "x" ; then
-                $MPI_MPIEXEC 2>&1 | grep -e "-\<np\>" > /dev/null 2>&1
-                status=$?
-                if test $status -ne 0 ; then
-                    result=0
-                fi
+            if test ${OSC_MPIEXEC} -eq 1 ; then
+                result=0
             fi
         fi
     fi

@@ -94,8 +94,8 @@ if test "x${RUN_UNIT_TESTS}" = "x1" ; then
     ./test_unit.sh || exitcode=1
     echo "* RFC #63"
     ./test_trac_63.sh || exitcode=1
-    echo "* Issue #1"
-    ./test_issue_1.sh || exitcode=1
+    echo "* Issue #1, #9"
+    ./test_issue_1_and_9.sh || exitcode=1
     echo "* Issue #6"
     ./test_issue_6.sh || exitcode=1
     echo "***************************"
@@ -145,6 +145,8 @@ if test "x${RUN_FSDETECT_TESTS}" = "x1" ; then
     ./test_trac_60.sh || exitcode=1
     echo "* RFC #5"
     ./test_trac_5.sh || exitcode=1
+    echo "* Issue #3"
+    ./test_issue_3.sh || exitcode=1
     echo "***************************"
 fi
 if test "x${RUN_SCH_TESTS}" = "x1" ; then

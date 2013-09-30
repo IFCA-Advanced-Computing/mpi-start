@@ -22,11 +22,17 @@ mpi_start_get_plugin "osc_mpiexec.sh" 1
 # further determine if the mpiexec is hydra 
 if test $OSC_MPIEXEC -eq 0 ; then
     if test "x$MPI_MPIEXEC" != "x"; then
-        # try with mpiexec.hydra
+        # No mpiexec? try finding mpiexec.hydra
         MPIEXEC=`which mpiexec.hydra 2> /dev/null`
         if test $? -eq 0 -a "x$MPI_MPICH2_DISABLE_HYDRA" != "x1" ; then
             export HYDRA_MPIEXEC=1
             MPI_MPIEXEC=$MPIEXEC
+        fi
+    else
+        # check if defined mpiexec is hydra
+        $MPI_MPIEXEC -version 2>&1 | grep -i "hydra" > /dev/null 2>&1
+        if test $? -eq 0 ; then
+            export HYDRA_MPIEXEC=1
         fi
     fi
 fi
