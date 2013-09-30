@@ -65,7 +65,7 @@ setUp () {
 
 testPreCompiledOMP () {
     # force the number of threads? 
-    OUTPUT=`$I2G_MPI_START -d MPI_USE_OMP=1 -t dummy -d MPI_DUMMY_SCH_SLOTS=2 -e /dev/null $OMP_BIN`
+    OUTPUT=`$I2G_MPI_START -d MPI_USE_OMP=1 -t dummy -d MPI_START_DUMMY_SCH_SLOTS=2 -e /dev/null $OMP_BIN`
     st=$?
     assertEquals 0 $st
     assertEquals "Number of threads = 2" "$OUTPUT"
@@ -84,7 +84,7 @@ post_run_hook () {
 }
 EOF
     # force the number of threads? 
-    OUTPUT=`$I2G_MPI_START -d MPI_USE_OMP=1 -t dummy -d MPI_DUMMY_SCH_SLOTS=2 \
+    OUTPUT=`$I2G_MPI_START -d MPI_USE_OMP=1 -t dummy -d MPI_START_DUMMY_SCH_SLOTS=2 \
             -pre $myhook -post $myhook -e /dev/null`
     st=$?
     assertEquals 0 $st
