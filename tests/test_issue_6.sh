@@ -12,6 +12,7 @@ oneTimeSetUp () {
 setUp() {
     export MPI_START_ETC_LIST=`$MYMKTEMP -d`
     export MPI_LOADED=0
+    export MPI_LOADED_2=0
 }
 
 tearDown() {
@@ -28,36 +29,46 @@ oneTimeTearDown () {
 testConfigDistReleaseArch() {
     echo "export MPI_LOADED=1" > $MPI_START_ETC_LIST/mpi-config.${MPI_START_OS_DIST_TYPE}${MPI_START_OS_RELEASE_MAJOR}-${MPI_START_ARCH}
     assertEquals "0" "$MPI_LOADED"
+    assertEquals "0" "$MPI_LOADED_2"
     mpi_start_load_mpi_config
     assertEquals "1" "$MPI_LOADED"
+    assertEquals "0" "$MPI_LOADED_2"
 }
 
 testConfigDistRelease() {
     echo "export MPI_LOADED=1" > $MPI_START_ETC_LIST/mpi-config.${MPI_START_OS_DIST_TYPE}${MPI_START_OS_RELEASE_MAJOR}
     assertEquals "0" "$MPI_LOADED"
+    assertEquals "0" "$MPI_LOADED_2"
     mpi_start_load_mpi_config
     assertEquals "1" "$MPI_LOADED"
+    assertEquals "0" "$MPI_LOADED_2"
 }
 
 testConfigDist() {
     echo "export MPI_LOADED=1" > $MPI_START_ETC_LIST/mpi-config.${MPI_START_OS_DIST_TYPE}
     assertEquals "0" "$MPI_LOADED"
+    assertEquals "0" "$MPI_LOADED_2"
     mpi_start_load_mpi_config
     assertEquals "1" "$MPI_LOADED"
+    assertEquals "0" "$MPI_LOADED_2"
 }
 
 testConfigUname() {
     echo "export MPI_LOADED=1" > $MPI_START_ETC_LIST/mpi-config.${MPI_START_UNAME}
     assertEquals "0" "$MPI_LOADED"
+    assertEquals "0" "$MPI_LOADED_2"
     mpi_start_load_mpi_config
     assertEquals "1" "$MPI_LOADED"
+    assertEquals "0" "$MPI_LOADED_2"
 }
 
 testConfigLocal() {
     echo "export MPI_LOADED=1" > $MPI_START_ETC_LIST/mpi-config.local
     assertEquals "0" "$MPI_LOADED"
+    assertEquals "0" "$MPI_LOADED_2"
     mpi_start_load_mpi_config
     assertEquals "1" "$MPI_LOADED"
+    assertEquals "0" "$MPI_LOADED_2"
 }
 
 testConfigOrderDistReleaseArch() {
@@ -67,6 +78,7 @@ testConfigOrderDistReleaseArch() {
     echo "export MPI_LOADED_2=3" > $MPI_START_ETC_LIST/mpi-config.${MPI_START_OS_DIST_TYPE}
     echo "export MPI_LOADED_2=4" > $MPI_START_ETC_LIST/mpi-config.${MPI_START_UNAME}
     assertEquals "0" "$MPI_LOADED"
+    assertEquals "0" "$MPI_LOADED_2"
     mpi_start_load_mpi_config
     assertEquals "1" "$MPI_LOADED"
     assertEquals "1" "$MPI_LOADED_2"
@@ -78,6 +90,7 @@ testConfigOrderDistRelease() {
     echo "export MPI_LOADED_2=3" > $MPI_START_ETC_LIST/mpi-config.${MPI_START_OS_DIST_TYPE}
     echo "export MPI_LOADED_2=4" > $MPI_START_ETC_LIST/mpi-config.${MPI_START_UNAME}
     assertEquals "0" "$MPI_LOADED"
+    assertEquals "0" "$MPI_LOADED_2"
     mpi_start_load_mpi_config
     assertEquals "1" "$MPI_LOADED"
     assertEquals "2" "$MPI_LOADED_2"
@@ -85,9 +98,11 @@ testConfigOrderDistRelease() {
 
 testConfigOrderDist() {
     echo "export MPI_LOADED=1" > $MPI_START_ETC_LIST/mpi-config.local
-    echo "export MPI_LOADED_2=3" > $MPI_START_ETC_LIST/mpi-config.${MPI_START_OS_DIST_TYPE}
+    # darwin is not case sensitive for file names!!!!
     echo "export MPI_LOADED_2=4" > $MPI_START_ETC_LIST/mpi-config.${MPI_START_UNAME}
+    echo "export MPI_LOADED_2=3" > $MPI_START_ETC_LIST/mpi-config.${MPI_START_OS_DIST_TYPE}
     assertEquals "0" "$MPI_LOADED"
+    assertEquals "0" "$MPI_LOADED_2"
     mpi_start_load_mpi_config
     assertEquals "1" "$MPI_LOADED"
     assertEquals "3" "$MPI_LOADED_2"
@@ -97,6 +112,7 @@ testConfigOrderUname() {
     echo "export MPI_LOADED=1" > $MPI_START_ETC_LIST/mpi-config.local
     echo "export MPI_LOADED_2=4" > $MPI_START_ETC_LIST/mpi-config.${MPI_START_UNAME}
     assertEquals "0" "$MPI_LOADED"
+    assertEquals "0" "$MPI_LOADED_2"
     mpi_start_load_mpi_config
     assertEquals "1" "$MPI_LOADED"
     assertEquals "4" "$MPI_LOADED_2"

@@ -1,3 +1,7 @@
+2013-09-26 Enol Fernández <enolfc _AT_ ifca.unican.es> - 1.5.2
+	* Development migrated to github
+	* Fixes for issues #1, #2, #6, #8 & #9
+
 2012-11-08 Enol Fernández  <enolfc _AT_ ifca.unican.es> - 1.5.0
 	* New copy_from_node method (#5)
 

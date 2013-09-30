@@ -7,10 +7,19 @@ unset I2G_MPIEXEC_COMM
 
 # detect OSC mpiexec
 if test "x$MPI_MPIEXEC" != "x"; then
-    $MPI_MPIEXEC 2>&1 | grep -e "-\<np\>" > /dev/null 2>&1
+    local VERSION_INFO=`$MPI_MPIEXEC -version 2>&1`
     st=$?
-    if test $st -ne 0 ; then
-        export OSC_MPIEXEC=1
+    if test $st -eq 0 ; then
+        echo $VERSION_INFO | grep -i "hydra" > /dev/null 2>&1
+        st=$?
+        if test $st -ne 0 ; then
+            # for sure not hydra, check that we do not have -np option
+            $MPI_MPIEXEC 2>&1 | grep -e "-\<np\>" > /dev/null 2>&1
+            st=$?
+            if test $st -ne 0 ; then
+                export OSC_MPIEXEC=1
+            fi
+        fi
     fi
 fi
 
