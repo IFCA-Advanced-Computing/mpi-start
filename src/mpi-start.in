@@ -405,7 +405,7 @@ mpi_start_dummy_scheduler() {
             n=`expr $n - 1`
         done
         echo $host > $MPI_START_HOSTFILE
-        echo "$host $slots"> $MPI_START_HOST_SLOTS_FILE
+        echo "$host $MPI_START_DUMMY_SCH_SLOTS"> $MPI_START_HOST_SLOTS_FILE
         nhosts=`expr $nhosts + 1`
         slots=`expr $slots + $MPI_START_DUMMY_SCH_SLOTS`
     done
