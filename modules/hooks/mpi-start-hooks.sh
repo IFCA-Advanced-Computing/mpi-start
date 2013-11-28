@@ -255,12 +255,12 @@ mpi_start_run_pre_hook () {
             return 0
         fi
 		debug_msg "call pre_run hook"
-        if test "x$I2G_MPI_START_VERBOSE" = "x1" -a "x$2" = "1"; then
+        if test "x$I2G_MPI_START_VERBOSE" = "x1" -a "x$2" = "x1"; then
             echo "-<START PRE-RUN HOOK>---------------------------------------------------";
         fi
         pre_run_hook
         result=$?
-        if test "x$I2G_MPI_START_VERBOSE" = "x1" -a "x$2" = "1"; then
+        if test "x$I2G_MPI_START_VERBOSE" = "x1" -a "x$2" = "x1"; then
             echo "-<STOP  PRE-RUN HOOK>---------------------------------------------------"; 
         fi
         if test $result -ne 0 ; then 
@@ -353,12 +353,12 @@ mpi_start_run_post_hook () {
             return 0
         fi
         debug_msg "call post-run hook"
-        if test "x$I2G_MPI_START_VERBOSE" = "x1" -a "x$2" = "1"; then
+        if test "x$I2G_MPI_START_VERBOSE" = "x1" -a "x$2" = "x1"; then
             echo "-<START POST-RUN HOOK>--------------------------------------------------";
         fi
         post_run_hook
         result=$?
-        if test "x$I2G_MPI_START_VERBOSE" = "x1" -a "x$2" = "1"; then
+        if test "x$I2G_MPI_START_VERBOSE" = "x1" -a "x$2" = "x1"; then
             echo "-<STOP  POST-RUN HOOK>--------------------------------------------------"; 
         fi
         if test $result -ne 0 ; then 
