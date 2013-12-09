@@ -51,11 +51,10 @@ scheduler_get_machinefile () {
             return 13
         fi
     fi
-    cat $MPI_START_MACHINEFILE | sort | uniq -c | tr -s " " |
+    awk '!x[$0]++' $MPI_START_MACHINEFILE | tr -s " " |
          # this is a subshell, variables changes here are not changed outside!
-         while read line; do
-             slots=`echo $line | cut -f1 -d" "`
-             host=`echo $line | cut -f2 -d" "`
+         while read host; do
+             slots=`grep -c "$host" $MPI_START_MACHINEFILE`
              echo $host >> $MPI_START_HOSTFILE
              echo $host $slots >> $MPI_START_HOST_SLOTS_FILE
          done

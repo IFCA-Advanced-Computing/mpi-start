@@ -43,16 +43,14 @@ build_lsb_hosts () {
     for host in $LSB_HOSTS; do
         echo $host >> $MPI_START_MACHINEFILE
     done
-    cat $MPI_START_MACHINEFILE | sort | uniq -c | tr -s " " |
+    awk '!x[$0]++' $MPI_START_MACHINEFILE | tr -s " " |
         # this is a subshell, variables changes here are not changed outside!
-        while read line; do
-            slots=`echo $line | cut -f1 -d" "`
-            host=`echo $line | cut -f2 -d" "`
+        while read host; do
+            slots=`grep -c "$host" $MPI_START_MACHINEFILE`
             echo $host >> $MPI_START_HOSTFILE
             echo $host $slots >> $MPI_START_HOST_SLOTS_FILE
         done
     export MPI_START_NHOSTS=`cat $MPI_START_HOSTFILE | wc -l`
-    export MPI_START_NSLOTS_PER_HOST=`cat $MPI_START_HOST_SLOTS_FILE | cut -f2 -d" " | sort -n | head -1`
     export MPI_START_NSLOTS=`cat $MPI_START_MACHINEFILE | wc -l`
     return 0
 }
@@ -88,7 +86,6 @@ build_lsb_mcpu_hosts () {
     done
     export MPI_START_NHOSTS=$total_hosts
     export MPI_START_NSLOTS=$total_slots
-    export MPI_START_NSLOTS_PER_HOST=`cat $MPI_START_HOST_SLOTS_FILE | cut -f2 -d" " | sort -n | head -1`
     return 0
 }
 
@@ -104,5 +101,8 @@ scheduler_get_machinefile () {
     else
         build_lsb_mcpu_hosts
     fi
+    st=$?
+    export MPI_START_NSLOTS_PER_HOST=`cat $MPI_START_HOST_SLOTS_FILE | cut -f2 -d" " | sort -n | head -1`
+    return $st
 }
 

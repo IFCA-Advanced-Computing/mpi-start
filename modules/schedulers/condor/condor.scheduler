@@ -56,16 +56,13 @@ scheduler_get_machinefile () {
     export MPI_START_HOST_SLOTS_FILE=$MPI_START_TEMP_FILE
     sort -n < $CONDOR_CONTACT_FILE | awk '{print $2}' > $MPI_START_MACHINEFILE
     # assume CONDOR allocation of machines is "sane"
-    cat $MPI_START_MACHINEFILE | sort | uniq -c | tr -s " " |
+    awk '!x[$0]++' $MPI_START_MACHINEFILE | tr -s " " |
          # this is a subshell, variables changes here are not changed outside!
-         while read line; do
-             slots=`echo $line | cut -f1 -d" "`
-             host=`echo $line | cut -f2 -d" "`
+         while read host; do
+             slots=`grep -c "$host" $MPI_START_MACHINEFILE`
              echo $host >> $MPI_START_HOSTFILE
              echo $host $slots >> $MPI_START_HOST_SLOTS_FILE
          done
-         # this only works in bash
-         # < <( cat $MPI_START_MACHINEFILE | sort | uniq -c | tr -s " " )
     export MPI_START_NHOSTS=`cat $MPI_START_HOSTFILE | wc -l`
     export MPI_START_NSLOTS_PER_HOST=`cat $MPI_START_HOST_SLOTS_FILE | cut -f2 -d" " | sort -n | head -1`
     export MPI_START_NSLOTS=`cat $MPI_START_MACHINEFILE | wc -l`
