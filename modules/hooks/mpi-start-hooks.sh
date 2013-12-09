@@ -29,7 +29,7 @@ mpi_start_foreach_host () {
     
     # call callback function
     debug_msg "loop over machine file and call user specific callback"
-    for i in `cat $MPI_START_MACHINEFILE | sort -u`; do
+    for i in `cat $MPI_START_HOSTFILE`; do
         CMD="$1 $i"
         debug_msg " call : $CMD"
         $CMD
