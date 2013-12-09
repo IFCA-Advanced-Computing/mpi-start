@@ -21,10 +21,10 @@ setUp () {
     MYTMPDIR=`$MYMKTEMP -d`
     export SLURM_JOB_NODELIST=$MYTMPDIR/nodes
     cat > $SLURM_JOB_NODELIST << EOF
-host1
-host1
 host2
 host2
+host1
+host1
 host3
 host3
 host3
@@ -77,6 +77,10 @@ test3PerHost() {
 
 testNPAndPnode() {
     count_app_np_pnode "slurm"
+}
+
+testHostOrder() {
+    check_host_order
 }
 
 . $SHUNIT2

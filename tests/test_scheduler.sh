@@ -133,3 +133,27 @@ EOF
     unset I2G_MPI_PER_NODE
     rm -f $I2G_MPI_APPLICATION
 }
+
+check_host_order () {
+    export I2G_MPI_APPLICATION=`$MYMKTEMP`
+    cat > $I2G_MPI_APPLICATION << EOF
+#!/bin/sh
+for h in \`cat \${MPI_START_MACHINEFILE}\`; do
+    echo -n \$h
+done
+echo -n ";" 
+for h in \`cat \${MPI_START_HOSTFILE}\`; do
+    echo -n \$h
+done
+exit 0
+EOF
+    chmod +x $I2G_MPI_APPLICATION
+    output=`$I2G_MPI_START 2> /dev/null`
+    st=$?
+    repeatedhosts=`echo $output | cut -f1 -d";"`
+    hosts=`echo $output | cut -f2 -d";"`
+    assertEquals "host2host2host1host1host3host3host3host3" "$repeatedhosts"
+    assertEquals "host2host1host3" "$hosts"
+    rm -f $I2G_MPI_APPLICATION
+}
+

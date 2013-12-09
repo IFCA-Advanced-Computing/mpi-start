@@ -20,8 +20,8 @@ setUp () {
     export MPI_START_DUMMY_SCHEDULER=0
     export PE_HOSTFILE=`$MYMKTEMP`
     cat > $PE_HOSTFILE << EOF
-host1 2
 host2 2
+host1 2
 host3 4
 EOF
 }
@@ -49,6 +49,10 @@ test3PerHost() {
 
 testNPAndPnode() {
     count_app_np_pnode "sge"
+}
+
+testHostOrder() {
+    check_host_order
 }
 
 . $SHUNIT2

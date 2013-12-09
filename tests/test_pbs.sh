@@ -20,10 +20,10 @@ setUp () {
     export MPI_START_DUMMY_SCHEDULER=0
     export PBS_NODEFILE=`$MYMKTEMP`
     cat > $PBS_NODEFILE << EOF
-host1
-host1
 host2
 host2
+host1
+host1
 host3
 host3
 host3
@@ -54,6 +54,10 @@ test3PerHost() {
 
 testNPAndPnode() {
     count_app_np_pnode "pbs"
+}
+
+testHostOrder() {
+    check_host_order
 }
 
 . $SHUNIT2

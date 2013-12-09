@@ -18,7 +18,7 @@ setUp () {
     unset I2G_MPI_PER_NODE
     export MPI_START_SHARED_FS=1
     export MPI_START_DUMMY_SCHEDULER=0
-    export LSB_HOSTS="host1 host1 host2 host2 host3 host3 host3 host3"
+    export LSB_HOSTS="host2 host2 host1 host1 host3 host3 host3 host3"
 }
 
 tearDown () {
@@ -43,6 +43,10 @@ test3PerHost() {
 
 testNPAndPnode() {
     count_app_np_pnode "lsf"
+}
+
+testHostOrder() {
+    check_host_order
 }
 
 . $SHUNIT2
