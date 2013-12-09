@@ -51,6 +51,9 @@ rm -rf $RPM_BUILD_ROOT
 %doc docs/AUTHORS docs/COPYING docs/LICENSE README ChangeLog
 
 %changelog
+* Mon Dec 09 2013 Enol Fernandez <enolfc _AT_ ifca.unican.es> - 1.5.3-%{release}
+- Fix for issue #12 (mpi-start may change the order of the WN list) 
+
 * Thu Sep 26 2013 Enol Fernandez <enolfc _AT_ ifca.unican.es> - 1.5.2-%{release}
 - Migrated to github.
 - Fix issue #1 (OSC mpiexec with mpich configuration)
